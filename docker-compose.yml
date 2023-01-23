@@ -1,0 +1,55 @@
+version: "3.4"
+
+services:
+
+  lang_app_db:
+    image: mysql
+    container_name: lang_app_db
+    environment:
+      MYSQL_DATABASE: 'lang_app'
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - /var/lib/mysql:/var/lib/mysql
+      - ./docker/mysql/init.sql:/data/application/init.sql
+    ports:
+      - ${DB_HOST_PORT}:3306
+    networks:
+      - lang_app_api
+
+  lang_app_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: nginx
+    container_name: lang_app_api
+    ports:
+      - ${NGINX_HOST_PORT}:80
+    links:
+      - lang_app_php
+    volumes:
+      - ./api:/var/www/lang_app
+    depends_on:
+      - lang_app_php
+    networks:
+      - lang_app_api
+
+  lang_app_php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: lang_app_php
+    container_name: lang_app_php
+    volumes:
+      - ./api:/var/www/lang_app
+    environment:
+      DB_HOST: lang_app_db
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_DATABASE: lang_app
+      DB_PASSWORD: ${DB_ROOT_PASSWORD}
+    networks:
+      - lang_app_api
+
+networks:
+  lang_app_api:
+    driver: bridge
