@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\HobbyController;
+use App\Http\Controllers\Api\ExerciseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,8 +14,10 @@ use App\Http\Controllers\Api\HobbyController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::apiResource('hobby', HobbyController::class);
-Route::post('/hobby/search', [HobbyController::class, 'search']);
-Route::get('/hobby/types', [HobbyController::class, '']);
 Route::post('/register', [AuthController::class, 'register' ]);
 Route::post('/login', [AuthController::class, 'login']);
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::get('/exercises/for-user', [ExerciseController::class, 'getAllExercises']);
+    Route::get('/exercises/{type}', [ExerciseController::class, 'getExercisesByType']);
+    Route::post('/exercise/{type}/{id}', [ExerciseController::class, 'getExerciseByIdAndType']);
+});

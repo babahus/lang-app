@@ -18,18 +18,20 @@ class ExerciseSeeder extends Seeder
     {
         Schema::disableForeignKeyConstraints();
         DB::table('compile_phrases')->truncate();
-        DB::table('exercise_types')->truncate();
+        DB::table('user_exercise_type')->truncate();
         Schema::enableForeignKeyConstraints();
 
        $phrases = [
            ['phrase' => 'Test phrase number 1'],
            ['phrase' => 'Test phrase number 2'],
+           ['phrase' => 'Does Samuel L. Jackson like anime?'],
+           ['phrase' => 'How did you pass the exam?'],
        ];
+
 
        foreach ($phrases as $phrase)
        {
-           $createdPhrase = CompilePhrase::create($phrase);
-           $createdPhrase->exerciseType()->create(['exercise_id' => $createdPhrase->id, 'user_id' => 0]);
+           CompilePhrase::create($phrase);
        }
 
     }

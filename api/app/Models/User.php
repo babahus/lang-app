@@ -38,7 +38,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
  * @mixin \Eloquent
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ExerciseType[] $exercises
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Exercise[] $exercises
  * @property-read int|null $exercises_count
  */
 class User extends Authenticatable
@@ -82,6 +82,17 @@ class User extends Authenticatable
 
     public function exercises(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(ExerciseType::class, 'exercise_types', 'user_id', 'exercise_id')->withTimestamps();
+        return $this->belongsToMany(Exercise::class,'user_exercise_type','user_id', 'exercise_id')->withTimestamps();
     }
+
+    public function dictionary(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Dictionary::class,'user_exercise_type','user_id', 'exercise_id')->withPivotValue('type',[Dictionary::class])->withTimestamps();
+    }
+
+    public function compilePhrase(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(CompilePhrase::class,'user_exercise_type','user_id', 'exercise_id')->withPivotValue('type',[CompilePhrase::class])->withTimestamps();
+    }
+
 }

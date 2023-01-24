@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $phrase
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\ExerciseType|null $exerciseType
  * @method static \Illuminate\Database\Eloquent\Builder|CompilePhrase newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CompilePhrase newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CompilePhrase query()
@@ -21,12 +20,24 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|CompilePhrase wherePhrase($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CompilePhrase whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read \App\Models\Exercise|null $exerciseType
+ * @property int $user_id
+ * @property int $exercise_id
+ * @property string $exercise_type
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\User[] $users
+ * @property-read int|null $users_count
+ * @method static \Illuminate\Database\Eloquent\Builder|CompilePhrase whereExerciseId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CompilePhrase whereExerciseType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CompilePhrase whereUserId($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Exercise[] $exercises
+ * @property-read int|null $exercises_count
  */
 class CompilePhrase extends Model
 {
     use HasFactory;
 
-    public function exerciseType(){
-        return $this->belongsTo(ExerciseType::class, 'exercise_id', 'id');
+    public function exercises()
+    {
+        return $this->belongsToMany(CompilePhrase::class,'user_exercise_type');
     }
 }

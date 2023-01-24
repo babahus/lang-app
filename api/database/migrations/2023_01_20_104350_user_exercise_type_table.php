@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class ExerciseTypesTable extends Migration
+class UserExerciseTypeTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,11 @@ class ExerciseTypesTable extends Migration
      */
     public function up()
     {
-        Schema::create('exercise_types', function (Blueprint $table) {
-            $table->unsignedInteger('exercise_id');
-            $table->unsignedInteger('user_id')->nullable()->default(null);
-            $table->primary(['exercise_id', 'user_id']);
+        Schema::create('user_exercise_type', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('exercise_id');
+            $table->string('type');
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ class ExerciseTypesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('exercise_types');
+        Schema::dropIfExists('user_exercise_type');
     }
 }

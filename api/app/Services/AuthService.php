@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Models\Dictionary;
 use App\Models\User;
 use App\DataTransfers\LoginDTO;
 use App\DataTransfers\RegisterDTO;
@@ -19,7 +20,11 @@ class AuthService implements AuthContract
             'email'    => $registerDTO->email,
             'password' => $encryptPassword
         ]);
+        // when user is created, we attach to him default role (User)
+        // and create empty dictionary for exercises
         $user->roles()->attach(1);
+        $createdDictionary = Dictionary::create(['dictionary' => '[]']);
+        $user->exercises()->attach($createdDictionary->id,['type'=>Dictionary::class]);
         return $user;
     }
 
