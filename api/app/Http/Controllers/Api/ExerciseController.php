@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\ExercisesTypes;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CreateExerciseRequest;
+use App\Http\Requests\DeleteExerciseRequest;
+use App\Http\Requests\UpdateExerciseRequest;
 use App\Http\Resources\CompilePhraseResource;
 use App\Http\Resources\DictionaryResource;
 use App\Http\Resources\ExerciseResource;
@@ -23,20 +26,20 @@ class ExerciseController extends Controller
         $this->exerciseService = $exerciseService;
     }
 
-    public function getAllExercises(): ApiResponse
+    public function index(): ApiResponse
     {
         $userExercises = $this->exerciseService->getAllExercises(auth()->id());
 
         return new ApiResponse(ExerciseResource::collection($userExercises));
     }
 
-    public function getExerciseByIdAndType(string $type, int $id): ApiResponse
+    public function show(string $type, int $id): ApiResponse
     {
         $exercise = $this->exerciseService->getExerciseByIdAndType($type, $id, auth()->id());
         if (!$exercise){
             return new ApiResponse('Can not find Exercises by Id', Response::HTTP_BAD_REQUEST, false);
         }
-        return match (ExercisesTypes::tryFrom($type)){
+        return match (ExercisesTypes::inEnum($type)){
             ExercisesTypes::DICTIONARY     => new ApiResponse(DictionaryResource::make($exercise)),
             ExercisesTypes::COMPILE_PHRASE => new ApiResponse(CompilePhraseResource::make($exercise))
         };
@@ -48,9 +51,36 @@ class ExerciseController extends Controller
         if (!$exercises){
             return new ApiResponse('Can not find Exercises Type', Response::HTTP_BAD_REQUEST, false);
         }
-        return match (ExercisesTypes::tryFrom($type)){
+        return match (ExercisesTypes::inEnum($type)){
             ExercisesTypes::DICTIONARY     => new ApiResponse(DictionaryResource::collection($exercises)),
             ExercisesTypes::COMPILE_PHRASE => new ApiResponse(CompilePhraseResource::collection($exercises))
+        };
+    }
+
+    public function update(UpdateExerciseRequest $request, int $id): ApiResponse
+    {
+        $isUpdated = $this->exerciseService->update($request->getDTO(), $id);
+        if (!$isUpdated){
+            return new ApiResponse('Something went wrong', Response::HTTP_BAD_REQUEST, false);
+        }
+        return new ApiResponse('Exercise is successfully updated');
+    }
+
+    public function destroy(DeleteExerciseRequest $request, int $id): ApiResponse
+    {
+        $isDeleted = $this->exerciseService->delete($request->getDTO(), $id);
+        if (!$isDeleted){
+            return new ApiResponse('Something went wrong', Response::HTTP_BAD_REQUEST, false);
+        }
+        return new ApiResponse('Exercise is successfully deleted');
+    }
+
+    public function store(CreateExerciseRequest $request): ApiResponse
+    {
+        $createdExercise = $this->exerciseService->create($request->getDTO());
+        return match (ExercisesTypes::inEnum($request->getDTO()->type)){
+            ExercisesTypes::DICTIONARY     => new ApiResponse(DictionaryResource::make($createdExercise)),
+            ExercisesTypes::COMPILE_PHRASE => new ApiResponse(CompilePhraseResource::make($createdExercise))
         };
     }
 }

@@ -36,6 +36,10 @@ class CompilePhrase extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+      'phrase'
+    ];
+
     public function exercises()
     {
         return $this->belongsToMany(CompilePhrase::class,'user_exercise_type');
