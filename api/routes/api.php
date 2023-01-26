@@ -17,13 +17,13 @@ use App\Http\Controllers\Api\ExerciseController;
 Route::post('/register', [AuthController::class, 'register' ]);
 Route::post('/login', [AuthController::class, 'login']);
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::apiResource('/exercise', ExerciseController::class)->except(
-        'show'
-    );
+    Route::middleware(['admin'])->group(function () {
+        Route::apiResource('/exercise', ExerciseController::class)->except(
+            'show','index'
+        );
+    });
+    Route::get('/exercise', [ExerciseController::class, 'index']);
+    Route::post('/exercise/attach', [ExerciseController::class, 'attach']);
     Route::get('/exercise/{type}/{id}', [ExerciseController::class, 'show']);
-//    Route::post('/exercise/{type}', [ExerciseController::class, 'store']);
-//    Route::put('/exercise/{type}/{id}', [ExerciseController::class, 'update']);
-//    Route::delete('/exercise/{type}/{id}', [ExerciseController::class, 'delete']);
-//    Route::get('/exercises', [ExerciseController::class, 'getAllExercises']);
-    Route::get('/exercises/{type}', [ExerciseController::class, 'getExercisesByType']);
+    Route::get('/exercise/{type}', [ExerciseController::class, 'getExercisesByType']);
 });

@@ -5,10 +5,12 @@ namespace App\Services;
 use App\Contracts\ExerciseServiceContract;
 use App\DataTransfers\CreateExerciseDTO;
 use App\DataTransfers\DeleteExerciseDTO;
+use App\DataTransfers\MoveUserExerciseDTO;
 use App\DataTransfers\UpdateExerciseDTO;
 use App\Enums\ExercisesTypes;
 use App\Models\CompilePhrase;
 use App\Models\Dictionary;
+use App\Models\Exercise;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -55,8 +57,12 @@ class ExerciseService implements ExerciseServiceContract
 
     public function delete(DeleteExerciseDTO $deleteExerciseDTO, int $id)
     {
+        if (Exercise::whereExerciseId($id)->where('user_id', auth()->id())->get()->isNotEmpty()){
+            \Auth::user()->exercises()->detach($id, ['type' => $deleteExerciseDTO->type]);
+        }
+
         return match (ExercisesTypes::inEnum($deleteExerciseDTO->type)) {
-            ExercisesTypes::DICTIONARY => Dictionary::whereId($id)->delete(),
+            ExercisesTypes::DICTIONARY     => Dictionary::whereId($id)->delete(),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::whereId($id)->delete(),
             default => false
         };
@@ -68,6 +74,30 @@ class ExerciseService implements ExerciseServiceContract
             ExercisesTypes::DICTIONARY => Dictionary::create(['dictionary' => $createExerciseDTO->data]),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::create(['phrase' => $createExerciseDTO->data]),
             default => false
+        };
+    }
+
+    public function attach(MoveUserExerciseDTO $moveUserExerciseDTO, User|\Illuminate\Contracts\Auth\Authenticatable $user): bool
+    {
+        $typeClass = $this->getClassType($moveUserExerciseDTO->type);
+
+        $user->exercises()->attach($moveUserExerciseDTO->id, ['type'=>$typeClass]);
+        return true;
+    }
+
+    public function detach(MoveUserExerciseDTO $moveUserExerciseDTO, User|\Illuminate\Contracts\Auth\Authenticatable $user): bool
+    {
+        $typeClass = $this->getClassType($moveUserExerciseDTO->type);
+
+        $user->exercises()->detach($moveUserExerciseDTO->id, ['type'=>$typeClass]);
+        return true;
+    }
+
+    public function getClassType(string $type): string
+    {
+        return match (ExercisesTypes::inEnum($type)) {
+            ExercisesTypes::DICTIONARY => Dictionary::class,
+            ExercisesTypes::COMPILE_PHRASE => CompilePhrase::class,
         };
     }
 }

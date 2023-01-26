@@ -6,15 +6,12 @@ use App\Enums\ExercisesTypes;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateExerciseRequest;
 use App\Http\Requests\DeleteExerciseRequest;
+use App\Http\Requests\MoveUserExerciseRequest;
 use App\Http\Requests\UpdateExerciseRequest;
 use App\Http\Resources\CompilePhraseResource;
 use App\Http\Resources\DictionaryResource;
 use App\Http\Resources\ExerciseResource;
 use App\Http\Response\ApiResponse;
-use App\Models\CompilePhrase;
-use App\Models\Dictionary;
-use App\Models\Exercise;
-use App\Models\User;
 use App\Services\ExerciseService;
 use Illuminate\Http\Response;
 
@@ -82,5 +79,23 @@ class ExerciseController extends Controller
             ExercisesTypes::DICTIONARY     => new ApiResponse(DictionaryResource::make($createdExercise)),
             ExercisesTypes::COMPILE_PHRASE => new ApiResponse(CompilePhraseResource::make($createdExercise))
         };
+    }
+
+    public function attach(MoveUserExerciseRequest $request): ApiResponse
+    {
+        if ($this->exerciseService->attach($request->getDTO(), auth()->user())){
+            return new ApiResponse('Successful attached exercise to user');
+        }
+
+        return new ApiResponse('Something went wrong', Response::HTTP_BAD_REQUEST, false);
+    }
+
+    public function detach(MoveUserExerciseRequest $request): ApiResponse
+    {
+        if ($this->exerciseService->detach($request->getDTO(), auth()->user())){
+            return new ApiResponse('Successful detached exercise to user');
+        }
+
+        return new ApiResponse('Something went wrong', Response::HTTP_BAD_REQUEST, false);
     }
 }
