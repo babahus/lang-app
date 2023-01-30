@@ -18,7 +18,7 @@ class ApiAdminMiddleware
     public function handle(Request $request, Closure $next)
     {
         $usersRolesIds = Auth::user()->roles()->pluck('id')->toArray();
-        if (!in_array(3,$usersRolesIds) || !in_array(4,$usersRolesIds)) {
+        if (!(in_array(3,$usersRolesIds) || in_array(4,$usersRolesIds))) {
             return response()->json(['error' => 'Not enough rights'], 401);
         }
 

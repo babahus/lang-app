@@ -7,7 +7,7 @@ use App\Services\AuthService;
 use App\Http\Response\ApiResponse;
 use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\UserResource;
+use App\Http\Resources\UserResponseResource;
 use App\Http\Requests\RegisterRequest;
 
 class AuthController extends Controller
@@ -25,13 +25,13 @@ class AuthController extends Controller
             return new ApiResponse('Invalid Credentials', 401, false);
         }
 
-        return new ApiResponse(new UserResource($user));
+        return new ApiResponse(new UserResponseResource($user));
     }
 
     public function register(RegisterRequest $request): ApiResponse
     {
         $user = $this->authService->register($request->getDTO());
 
-        return new ApiResponse(new UserResource($user));
+        return new ApiResponse(new UserResponseResource($user));
     }
 }

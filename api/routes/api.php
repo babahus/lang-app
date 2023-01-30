@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ExerciseController;
+use App\Http\Controllers\Api\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,9 +22,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::apiResource('/exercise', ExerciseController::class)->except(
             'show','index'
         );
+        Route::apiResource('/admin', AdminController::class);
     });
     Route::get('/exercise', [ExerciseController::class, 'index']);
     Route::post('/exercise/attach', [ExerciseController::class, 'attach']);
+    Route::post('/exercise/detach', [ExerciseController::class, 'detach']);
     Route::get('/exercise/{type}/{id}', [ExerciseController::class, 'show']);
     Route::get('/exercise/{type}', [ExerciseController::class, 'getExercisesByType']);
 });
