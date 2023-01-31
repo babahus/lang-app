@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminStoreUserRequest;
 use App\Http\Requests\AdminUpdateUserRequest;
+use App\Http\Resources\RolesResource;
 use App\Http\Resources\UserResource;
 use App\Http\Response\ApiResponse;
 use App\Services\AdminService;
@@ -53,7 +54,7 @@ class AdminController extends Controller
     {
         $selectedUser = $this->adminService->show($id);
         if (!$selectedUser){
-            return new ApiResponse('Invalid id, cannot find user', Response::HTTP_BAD_REQUEST, false);
+            return new ApiResponse('Invalid id', Response::HTTP_BAD_REQUEST, false);
         }
         return new ApiResponse(UserResource::make($selectedUser));
     }
@@ -84,5 +85,16 @@ class AdminController extends Controller
             return new ApiResponse('User not found', Response::HTTP_BAD_REQUEST, false);
         }
         return new ApiResponse('User is successfully deleted');
+    }
+
+    /**
+     * Return roles
+     *
+     * @return ApiResponse
+     */
+    public function getRoles(): ApiResponse
+    {
+        $roles = $this->adminService->getRoles();
+        return new ApiResponse(RolesResource::collection($roles));
     }
 }

@@ -17,11 +17,14 @@ use App\Http\Controllers\Api\AdminController;
 */
 Route::post('/register', [AuthController::class, 'register' ]);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('login/{provider}', [AuthController::class ,'getProviderLink']);
+Route::get('login/{provider}/callback', [AuthController::class ,'handleProviderCallback']);
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::middleware(['admin'])->group(function () {
         Route::apiResource('/exercise', ExerciseController::class)->except(
             'show','index'
         );
+        Route::get('/admin/roles', [AdminController::class, 'getRoles']);
         Route::apiResource('/admin', AdminController::class);
     });
     Route::get('/exercise', [ExerciseController::class, 'index']);
@@ -29,4 +32,5 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/exercise/detach', [ExerciseController::class, 'detach']);
     Route::get('/exercise/{type}/{id}', [ExerciseController::class, 'show']);
     Route::get('/exercise/{type}', [ExerciseController::class, 'getExercisesByType']);
+    Route::get('/logout', [AuthController::class, 'logout']);
 });

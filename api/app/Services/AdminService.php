@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Contracts\AdminServiceContract;
 use App\DataTransfers\AdminStoreUserDTO;
 use App\DataTransfers\AdminUpdateUserDTO;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -37,6 +38,7 @@ class AdminService implements AdminServiceContract
         $user->fill([
             'name' => $adminUpdateUserDTO->name,
             'email' => $adminUpdateUserDTO->email,
+            'email_verified_at' => null
         ]);
         $user->save();
         return $user;
@@ -57,5 +59,10 @@ class AdminService implements AdminServiceContract
     public function findUserById(int $id): \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder|User|null
     {
         return User::whereId($id)->with('roles')->first();
+    }
+
+    public function getRoles(): \Illuminate\Database\Eloquent\Collection|array
+    {
+        return Role::all();
     }
 }

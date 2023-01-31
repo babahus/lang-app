@@ -8,6 +8,8 @@ use App\DataTransfers\RegisterDTO;
 use App\Contracts\AuthContract;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Laravel\Socialite;
 
 class AuthService implements AuthContract
 {
@@ -38,5 +40,24 @@ class AuthService implements AuthContract
         }
 
         return Auth::user();
+    }
+
+    public function findOrCreateUser(User|\Laravel\Socialite\Two\User $user, string $provider): \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder|User
+    {
+        // if the user already exists, return it
+        $authUser = User::where('email', $user->email)->first();
+        if ($authUser) {
+            return $authUser;
+        }
+
+        // otherwise create a new user and return it
+        $hashPassword = Hash::make(Str::random(16));
+        $authUser = User::create([
+            'name' => $user->name,
+            'email' => $user->email,
+            'password' => $hashPassword
+        ]);
+        $authUser->roles()->attach(1);
+        return $authUser;
     }
 }
