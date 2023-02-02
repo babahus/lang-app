@@ -33,6 +33,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $exercise_type
  * @method static \Illuminate\Database\Eloquent\Builder|Exercise whereExerciseType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Exercise whereId($value)
+ * @property string $type
+ * @method static \Illuminate\Database\Eloquent\Builder|Exercise whereType($value)
  */
 class Exercise extends Model
 {

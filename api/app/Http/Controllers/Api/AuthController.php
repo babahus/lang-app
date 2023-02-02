@@ -10,7 +10,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResponseResource;
 use App\Http\Requests\RegisterRequest;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller

@@ -30,7 +30,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/exercise', [ExerciseController::class, 'index']);
     Route::post('/exercise/attach', [ExerciseController::class, 'attach']);
     Route::post('/exercise/detach', [ExerciseController::class, 'detach']);
+    Route::get('/exercise/upload/{id}', [ExerciseController::class, 'uploadAudioAndTranscript']);
     Route::get('/exercise/{type}/{id}', [ExerciseController::class, 'show']);
     Route::get('/exercise/{type}', [ExerciseController::class, 'getExercisesByType']);
     Route::get('/logout', [AuthController::class, 'logout']);
 });
+Route::post('/webhook', [ExerciseController::class, 'webHook']);

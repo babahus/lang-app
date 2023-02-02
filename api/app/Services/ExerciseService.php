@@ -8,18 +8,22 @@ use App\DataTransfers\DeleteExerciseDTO;
 use App\DataTransfers\MoveUserExerciseDTO;
 use App\DataTransfers\UpdateExerciseDTO;
 use App\Enums\ExercisesTypes;
+use App\Models\Audit;
 use App\Models\CompilePhrase;
 use App\Models\Dictionary;
 use App\Models\Exercise;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
+use function PHPUnit\Framework\callback;
 
 class ExerciseService implements ExerciseServiceContract
 {
 
     public function getAllExercises(int $userId): \Illuminate\Database\Eloquent\Collection|array
     {
-        return User::with(['dictionary','compilePhrase'])->where('id', $userId)->get();
+        return User::with(['dictionary', 'compilePhrase', 'audit'])->where('id', $userId)->get();
     }
 
     public function getExercisesByType(string $type, int $userId): \Illuminate\Contracts\Pagination\LengthAwarePaginator|bool
@@ -29,6 +33,7 @@ class ExerciseService implements ExerciseServiceContract
                 ->whereRelation('exercises',['user_id' => $userId])
                 ->paginate(10),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::paginate(10),
+            ExercisesTypes::AUDIT => Audit::paginate(10),
             default => false
         };
     }
@@ -40,6 +45,7 @@ class ExerciseService implements ExerciseServiceContract
                 ->whereRelation('exercises',['user_id' => $userId, 'exercise_id' => $id])
                 ->first(),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::whereId($id)->first(),
+            ExercisesTypes::AUDIT => Audit::whereId($id)->first(),
             default => false
         };
     }
@@ -51,6 +57,8 @@ class ExerciseService implements ExerciseServiceContract
                      ->update(['dictionary' => $updateExerciseDTO->data, 'updated_at' => now()]),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::whereId($id)
                      ->update(['phrase' => $updateExerciseDTO->data, 'updated_at' => now()]),
+            ExercisesTypes::AUDIT => Audit::whereId($id)
+                ->update(['path' => $updateExerciseDTO->data, 'updated_at' => now()]),
             default => false
         };
     }
@@ -68,11 +76,21 @@ class ExerciseService implements ExerciseServiceContract
         };
     }
 
-    public function create(CreateExerciseDTO $createExerciseDTO): \Illuminate\Database\Eloquent\Model|Dictionary|bool|CompilePhrase
+    public function create(CreateExerciseDTO $createExerciseDTO): \Illuminate\Database\Eloquent\Model|Dictionary|bool|CompilePhrase|\Closure
     {
         return match (ExercisesTypes::inEnum($createExerciseDTO->type)) {
             ExercisesTypes::DICTIONARY => Dictionary::create(['dictionary' => $createExerciseDTO->data]),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::create(['phrase' => $createExerciseDTO->data]),
+            ExercisesTypes::AUDIT => call_user_func(function() use ($createExerciseDTO): Audit
+            {
+                $auditObj = Audit::create();
+                Storage::put((
+                    'public/audit/'. $auditObj->id . '/' . $auditObj->id . '.' . $createExerciseDTO->data->getClientOriginalExtension()),
+                    $createExerciseDTO->data->getContent());
+                $auditObj->path = 'audit/'. $auditObj->id . '/' . $auditObj->id . '.' . $createExerciseDTO->data->getClientOriginalExtension();
+                $auditObj->save();
+                return $auditObj;
+            }),
             default => false
         };
     }
@@ -98,6 +116,7 @@ class ExerciseService implements ExerciseServiceContract
         return match (ExercisesTypes::inEnum($type)) {
             ExercisesTypes::DICTIONARY => Dictionary::class,
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::class,
+            ExercisesTypes::AUDIT => Audit::class
         };
     }
 }

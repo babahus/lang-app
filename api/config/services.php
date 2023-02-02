@@ -42,4 +42,11 @@ return [
         'redirect'      => env('FACEBOOK_REDIRECT'),
     ],
 
+    'assemblayai' => [
+        'api_key'        => env('ASSEMBLYAI_API_KEY'),
+        'upload_url'     => env('ASSEMBLYAI_UPLOAD_URL'),
+        'transcript_url' => env('ASSEMBLYAI_TRANSCRIPT_URL'),
+        'webhook_url'    => env('ASSEMBLYAI_WEBHOOK_URL'),
+    ],
+
 ];

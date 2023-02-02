@@ -29,7 +29,12 @@ class CreateExerciseRequest extends BaseRequest
     public function rules()
     {
         return [
-            'data' => 'required',
+            'data' => match (ExercisesTypes::inEnum($this->input('type'))){
+                    ExercisesTypes::COMPILE_PHRASE => ['required', 'string'],
+                    ExercisesTypes::DICTIONARY     => ['required', 'json'],
+                    ExercisesTypes::AUDIT => ['required', 'file', 'mimes:mp3,wav,flac', 'max:12048'],
+                    default => 'nullable'
+            },
             'type' => ['required', 'string', new Enum(ExercisesTypes::class)],
         ];
     }
@@ -37,7 +42,10 @@ class CreateExerciseRequest extends BaseRequest
     public function getDTO(): CreateExerciseDTO
     {
         return new CreateExerciseDTO(
-            $this->input('data'),
+            match (ExercisesTypes::inEnum($this->input('type'))){
+                ExercisesTypes::AUDIT => $this->file('data'),
+                default => $this->input('data'),
+            },
             $this->input('type')
         );
     }

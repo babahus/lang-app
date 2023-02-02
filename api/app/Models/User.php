@@ -40,6 +40,10 @@ use Laravel\Sanctum\HasApiTokens;
  * @mixin \Eloquent
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Exercise[] $exercises
  * @property-read int|null $exercises_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\CompilePhrase[] $compilePhrase
+ * @property-read int|null $compile_phrase_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Dictionary[] $dictionary
+ * @property-read int|null $dictionary_count
  */
 class User extends Authenticatable
 {

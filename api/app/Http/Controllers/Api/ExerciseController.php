@@ -12,15 +12,22 @@ use App\Http\Resources\CompilePhraseResource;
 use App\Http\Resources\DictionaryResource;
 use App\Http\Resources\ExerciseResource;
 use App\Http\Response\ApiResponse;
+use App\Services\AuditApiService;
 use App\Services\ExerciseService;
 use Illuminate\Http\Response;
+use Log;
 
 class ExerciseController extends Controller
 {
     private ExerciseService $exerciseService;
+    private AuditApiService $audit;
 
-    public function __construct(ExerciseService $exerciseService){
+    public function __construct(
+        ExerciseService $exerciseService,
+        AuditApiService $audit
+    ){
         $this->exerciseService = $exerciseService;
+        $this->audit = $audit;
     }
 
     public function index(): ApiResponse
@@ -38,7 +45,8 @@ class ExerciseController extends Controller
         }
         return match (ExercisesTypes::inEnum($type)){
             ExercisesTypes::DICTIONARY     => new ApiResponse(DictionaryResource::make($exercise)),
-            ExercisesTypes::COMPILE_PHRASE => new ApiResponse(CompilePhraseResource::make($exercise))
+            ExercisesTypes::COMPILE_PHRASE => new ApiResponse(CompilePhraseResource::make($exercise)),
+            ExercisesTypes::AUDIT => new ApiResponse($exercise)
         };
     }
 
@@ -77,7 +85,8 @@ class ExerciseController extends Controller
         $createdExercise = $this->exerciseService->create($request->getDTO());
         return match (ExercisesTypes::inEnum($request->getDTO()->type)){
             ExercisesTypes::DICTIONARY     => new ApiResponse(DictionaryResource::make($createdExercise)),
-            ExercisesTypes::COMPILE_PHRASE => new ApiResponse(CompilePhraseResource::make($createdExercise))
+            ExercisesTypes::COMPILE_PHRASE => new ApiResponse(CompilePhraseResource::make($createdExercise)),
+            ExercisesTypes::AUDIT => new ApiResponse($createdExercise),
         };
     }
 
@@ -97,5 +106,25 @@ class ExerciseController extends Controller
         }
 
         return new ApiResponse('Something went wrong', Response::HTTP_BAD_REQUEST, false);
+    }
+
+    /**
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function uploadAudioAndTranscript(int $id)
+    {
+        Log::info('Request send successful');
+        $upload_url = $this->audit->uploadAudio($id);
+        return $this->audit->transcriptAudio($upload_url, $id);
+    }
+
+    public function webHook(\Illuminate\Http\Request $request): bool
+    {
+        Log::info($request->input('transcript_id'));
+        Log::info($request->input('status'));
+        Log::info($request->input('text'));
+        Log::info('Request get successful');
+        $this->audit->getResult($request->only(['transcript_id', 'status', 'text']));
+        return true;
     }
 }

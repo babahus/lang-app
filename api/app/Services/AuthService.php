@@ -9,10 +9,14 @@ use App\Contracts\AuthContract;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Laravel\Socialite;
 
 class AuthService implements AuthContract
 {
+    private DictionaryService $dictionaryService;
+
+    public function __construct(DictionaryService $dictionaryService){
+        $this->dictionaryService = $dictionaryService;
+    }
 
     public function register(RegisterDTO $registerDTO): User
     {
@@ -25,8 +29,8 @@ class AuthService implements AuthContract
         // when user is created, we attach to him default role (User)
         // and create empty dictionary for exercises
         $user->roles()->attach(1);
-        $createdDictionary = Dictionary::create(['dictionary' => '[]']);
-        $user->exercises()->attach($createdDictionary->id,['type'=>Dictionary::class]);
+        $createdDictionary = $this->dictionaryService->createEmptyDictionary();
+        $user->exercises()->attach($createdDictionary->id,['type' => Dictionary::class]);
         return $user;
     }
 
@@ -53,11 +57,13 @@ class AuthService implements AuthContract
         // otherwise create a new user and return it
         $hashPassword = Hash::make(Str::random(16));
         $authUser = User::create([
-            'name' => $user->name,
-            'email' => $user->email,
+            'name'     => $user->name,
+            'email'    => $user->email,
             'password' => $hashPassword
         ]);
         $authUser->roles()->attach(1);
+        $createdDictionary = $this->dictionaryService->createEmptyDictionary();
+        $user->exercises()->attach($createdDictionary->id,['type' => Dictionary::class]);
         return $authUser;
     }
 }
