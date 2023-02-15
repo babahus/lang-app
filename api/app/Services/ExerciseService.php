@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Constants\AuditFilesPath;
 use App\Contracts\ExerciseServiceContract;
 use App\DataTransfers\CreateExerciseDTO;
 use App\DataTransfers\DeleteExerciseDTO;
@@ -13,14 +14,11 @@ use App\Models\CompilePhrase;
 use App\Models\Dictionary;
 use App\Models\Exercise;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
-use function PHPUnit\Framework\callback;
+use Illuminate\Support\Facades\File;
 
 class ExerciseService implements ExerciseServiceContract
 {
-
     public function getAllExercises(int $userId): \Illuminate\Database\Eloquent\Collection|array
     {
         return User::with(['dictionary', 'compilePhrase', 'audit'])->where('id', $userId)->get();
@@ -38,7 +36,7 @@ class ExerciseService implements ExerciseServiceContract
         };
     }
 
-    public function getExerciseByIdAndType(string $type, int $id, int $userId): CompilePhrase|Dictionary|bool
+    public function getExerciseByIdAndType(string $type, int $id, int $userId): CompilePhrase|Audit|Dictionary|bool
     {
         return match (ExercisesTypes::inEnum($type)) {
             ExercisesTypes::DICTIONARY => Dictionary::with('exercises')
@@ -54,11 +52,11 @@ class ExerciseService implements ExerciseServiceContract
     {
         return match (ExercisesTypes::inEnum($updateExerciseDTO->type)) {
             ExercisesTypes::DICTIONARY => Dictionary::whereId($id)
-                     ->update(['dictionary' => $updateExerciseDTO->data, 'updated_at' => now()]),
+                     ->update(['dictionary' => $updateExerciseDTO->data]),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::whereId($id)
-                     ->update(['phrase' => $updateExerciseDTO->data, 'updated_at' => now()]),
+                     ->update(['phrase' => $updateExerciseDTO->data]),
             ExercisesTypes::AUDIT => Audit::whereId($id)
-                ->update(['path' => $updateExerciseDTO->data, 'updated_at' => now()]),
+                ->update(['transcript' => $updateExerciseDTO->data]),
             default => false
         };
     }
@@ -72,11 +70,17 @@ class ExerciseService implements ExerciseServiceContract
         return match (ExercisesTypes::inEnum($deleteExerciseDTO->type)) {
             ExercisesTypes::DICTIONARY     => Dictionary::whereId($id)->delete(),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::whereId($id)->delete(),
+            ExercisesTypes::AUDIT          => call_user_func(function() use ($id): bool {
+                $auditObj = Audit::whereId($id)->first();
+
+                Storage::disk('public')->deleteDirectory(sprintf(AuditFilesPath::DIRECTORY_PATH, $auditObj->id));
+                return $auditObj->delete();
+            }),
             default => false
         };
     }
 
-    public function create(CreateExerciseDTO $createExerciseDTO): \Illuminate\Database\Eloquent\Model|Dictionary|bool|CompilePhrase|\Closure
+    public function create(CreateExerciseDTO $createExerciseDTO): \Illuminate\Database\Eloquent\Model|Audit|Dictionary|bool|CompilePhrase|\Closure
     {
         return match (ExercisesTypes::inEnum($createExerciseDTO->type)) {
             ExercisesTypes::DICTIONARY => Dictionary::create(['dictionary' => $createExerciseDTO->data]),
@@ -84,10 +88,12 @@ class ExerciseService implements ExerciseServiceContract
             ExercisesTypes::AUDIT => call_user_func(function() use ($createExerciseDTO): Audit
             {
                 $auditObj = Audit::create();
-                Storage::put((
-                    'public/audit/'. $auditObj->id . '/' . $auditObj->id . '.' . $createExerciseDTO->data->getClientOriginalExtension()),
-                    $createExerciseDTO->data->getContent());
-                $auditObj->path = 'audit/'. $auditObj->id . '/' . $auditObj->id . '.' . $createExerciseDTO->data->getClientOriginalExtension();
+                $strAuditPath = sprintf(AuditFilesPath::AUDIT_FILE_PATH, $auditObj->id, $auditObj->id, $createExerciseDTO->data->getClientOriginalExtension());
+                Storage::disk('public')->put(
+                    $strAuditPath,
+                    $createExerciseDTO->data->getContent()
+                );
+                $auditObj->path = $strAuditPath;
                 $auditObj->save();
                 return $auditObj;
             }),
