@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * App\Models\Dictionary
  *
  * @property int $id
- * @property int $dictionary
+ * @property string|array $dictionary
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Dictionary newModelQuery()

@@ -27,6 +27,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get('/admin/roles', [AdminController::class, 'getRoles']);
         Route::apiResource('/admin', AdminController::class);
     });
+    Route::post('/exercise/solve', [ExerciseController::class, 'solving']);
     Route::get('/exercise', [ExerciseController::class, 'index']);
     Route::post('/exercise/attach', [ExerciseController::class, 'attach']);
     Route::post('/exercise/detach', [ExerciseController::class, 'detach']);

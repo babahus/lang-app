@@ -14,8 +14,15 @@ class DictionaryResource extends JsonResource
      */
     public function toArray($request)
     {
+        $result = array_reduce(json_decode($this->dictionary, true), function ($carry, $item) {
+            $item = str_replace(['{', '}', "'", " "], '', $item);
+            [$key, $value] = explode(',', $item);
+            [$translate, $word] = explode(':', $value);
+            $carry[trim(explode(':', $key)[1])] = $word;
+            return $carry;
+        }, []);
         return [
-          'dictionary' => $this->dictionary,
+          'dictionary' => $result,
           'updated_at' => $this->updated_at,
         ];
     }

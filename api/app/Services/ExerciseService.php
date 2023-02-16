@@ -7,6 +7,7 @@ use App\Contracts\ExerciseServiceContract;
 use App\DataTransfers\CreateExerciseDTO;
 use App\DataTransfers\DeleteExerciseDTO;
 use App\DataTransfers\MoveUserExerciseDTO;
+use App\DataTransfers\SolvingExerciseDTO;
 use App\DataTransfers\UpdateExerciseDTO;
 use App\Enums\ExercisesTypes;
 use App\Models\Audit;
@@ -14,11 +15,28 @@ use App\Models\CompilePhrase;
 use App\Models\Dictionary;
 use App\Models\Exercise;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\File;
 
 class ExerciseService implements ExerciseServiceContract
 {
+
+    private AuditService $auditService;
+    private CompilePhraseService $compilePhrase;
+    private DictionaryService $dictionaryService;
+
+    public function __construct
+    (
+        AuditService $auditService,
+        CompilePhraseService $compilePhrase,
+        DictionaryService $dictionaryService
+    )
+    {
+        $this->compilePhrase = $compilePhrase;
+        $this->auditService = $auditService;
+        $this->dictionaryService = $dictionaryService;
+    }
+
     public function getAllExercises(int $userId): \Illuminate\Database\Eloquent\Collection|array
     {
         return User::with(['dictionary', 'compilePhrase', 'audit'])->where('id', $userId)->get();
@@ -105,7 +123,7 @@ class ExerciseService implements ExerciseServiceContract
     {
         $typeClass = $this->getClassType($moveUserExerciseDTO->type);
 
-        $user->exercises()->attach($moveUserExerciseDTO->id, ['type'=>$typeClass]);
+        $user->exercises()->attach($moveUserExerciseDTO->id, ['type' => $typeClass]);
         return true;
     }
 
@@ -113,8 +131,26 @@ class ExerciseService implements ExerciseServiceContract
     {
         $typeClass = $this->getClassType($moveUserExerciseDTO->type);
 
-        $user->exercises()->detach($moveUserExerciseDTO->id, ['type'=>$typeClass]);
+        $user->exercises()->detach($moveUserExerciseDTO->id, ['type' => $typeClass]);
         return true;
+    }
+
+    public function solving(SolvingExerciseDTO $solvingExerciseDTO): Dictionary|CompilePhrase|Audit|bool
+    {
+        if (!Exercise::where('user_id', auth()->id())
+            ->where('exercise_id', $solvingExerciseDTO->id)
+            ->where('type', 'LIKE', '%'. ExercisesTypes::inEnum($solvingExerciseDTO->type)->value .'%')
+            ->first()
+        )
+        {
+            return false;
+        }
+        return match (ExercisesTypes::inEnum($solvingExerciseDTO->type)) {
+            ExercisesTypes::DICTIONARY => $this->dictionaryService->fillDictionary($solvingExerciseDTO),
+            ExercisesTypes::COMPILE_PHRASE => $this->compilePhrase->solveCompilePhrase($solvingExerciseDTO),
+            ExercisesTypes::AUDIT => $this->auditService->solveAudit($solvingExerciseDTO),
+            default => false
+        };
     }
 
     public function getClassType(string $type): string

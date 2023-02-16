@@ -33,7 +33,8 @@ class MoveUserExerciseRequest extends BaseRequest
         return [
             'id' => match (ExercisesTypes::inEnum($this->input('type'))){
                         ExercisesTypes::COMPILE_PHRASE => ['required', 'numeric', Rule::exists('compile_phrases', 'id')],
-                        ExercisesTypes::DICTIONARY     => ['required', 'numeric', Rule::exists('contracts_drafts', 'id')],
+                        ExercisesTypes::DICTIONARY => ['required', 'numeric', Rule::exists('dictionaries', 'id')],
+                        ExercisesTypes::AUDIT => ['required', 'numeric', Rule::exists('audits', 'id')],
                         default => 'nullable'
                     },
             'type' => ['required', 'string', new Enum(ExercisesTypes::class)]

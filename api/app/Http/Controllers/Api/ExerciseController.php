@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateExerciseRequest;
 use App\Http\Requests\DeleteExerciseRequest;
 use App\Http\Requests\MoveUserExerciseRequest;
+use App\Http\Requests\SolvingExerciseRequest;
 use App\Http\Requests\UpdateExerciseRequest;
 use App\Http\Resources\AuditResource;
 use App\Http\Resources\CompilePhraseResource;
@@ -106,6 +107,19 @@ class ExerciseController extends Controller
             return new ApiResponse('Successful detached exercise to user');
         }
 
+        return new ApiResponse('Something went wrong', Response::HTTP_BAD_REQUEST, false);
+    }
+
+    public function solving(SolvingExerciseRequest $request): ApiResponse|string
+    {
+        $solved = $this->exerciseService->solving($request->getDTO());
+        if ($solved){
+            return match (ExercisesTypes::inEnum($request->getDTO()->type)){
+                ExercisesTypes::DICTIONARY     => new ApiResponse(DictionaryResource::make($solved)),
+                ExercisesTypes::COMPILE_PHRASE => new ApiResponse(CompilePhraseResource::make($solved)),
+                ExercisesTypes::AUDIT          => new ApiResponse(AuditResource::make($solved)),
+            };
+        }
         return new ApiResponse('Something went wrong', Response::HTTP_BAD_REQUEST, false);
     }
 
