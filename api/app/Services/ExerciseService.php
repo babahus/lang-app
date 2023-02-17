@@ -15,6 +15,7 @@ use App\Models\CompilePhrase;
 use App\Models\Dictionary;
 use App\Models\Exercise;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
@@ -137,12 +138,11 @@ class ExerciseService implements ExerciseServiceContract
 
     public function solving(SolvingExerciseDTO $solvingExerciseDTO): Dictionary|CompilePhrase|Audit|bool
     {
-        if (!Exercise::where('user_id', auth()->id())
+        $exercise = Exercise::where('user_id', auth()->id())
             ->where('exercise_id', $solvingExerciseDTO->id)
             ->where('type', 'LIKE', '%'. ExercisesTypes::inEnum($solvingExerciseDTO->type)->value .'%')
-            ->first()
-        )
-        {
+            ->first();
+        if (!$exercise) {
             return false;
         }
         return match (ExercisesTypes::inEnum($solvingExerciseDTO->type)) {

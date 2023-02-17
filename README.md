@@ -19,6 +19,7 @@
 9. Cache Project Config `docker compose -f docker-compose.yml run --rm lang_app_php php artisan config:cache`
 10. Run Migrations. `docker compose -f docker-compose.yml run --rm lang_app_php php artisan migrate`
 11. Run Seeders. `docker compose -f docker-compose.yml run --rm lang_app_php php artisan db:seed`
+12. Run Scheduled jobs `docker compose -f docker-compose.yml run --rm lang_app_php php artisan schedule:work`
 
 ## Environment Variables
 
