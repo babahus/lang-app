@@ -18,6 +18,7 @@ class ExerciseResource extends JsonResource
         return [
           'dictionary_exercise'    => DictionaryResource::collection($this->dictionary()->get()),
           'compilePhrase_exercise' => CompilePhraseResource::collection($this->compilePhrase()->get()),
+          'audit_exercise'         => AuditResource::collection($this->audit()->get())
         ];
     }
 }

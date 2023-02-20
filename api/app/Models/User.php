@@ -91,12 +91,17 @@ class User extends Authenticatable
 
     public function dictionary(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(Dictionary::class,'user_exercise_type','user_id', 'exercise_id')->withPivotValue('type',[Dictionary::class])->withTimestamps();
+        return $this->belongsToMany(Dictionary::class,'user_exercise_type','user_id', 'exercise_id')->withPivotValue('type', [Dictionary::class])->withTimestamps();
     }
 
     public function compilePhrase(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(CompilePhrase::class,'user_exercise_type','user_id', 'exercise_id')->withPivotValue('type',[CompilePhrase::class])->withTimestamps();
+        return $this->belongsToMany(CompilePhrase::class,'user_exercise_type','user_id', 'exercise_id')->withPivotValue('type', [CompilePhrase::class])->withTimestamps();
+    }
+
+    public function audit(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Audit::class,'user_exercise_type','user_id', 'exercise_id')->withPivotValue('type', [Audit::class])->withTimestamps();
     }
 
 }

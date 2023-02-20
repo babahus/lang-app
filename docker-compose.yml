@@ -30,6 +30,7 @@ services:
       - ./api:/var/www/lang_app
     depends_on:
       - lang_app_php
+      - cron # add the cron container as a dependency
     networks:
       - lang_app_api
 
@@ -47,6 +48,19 @@ services:
       DB_USERNAME: root
       DB_DATABASE: lang_app
       DB_PASSWORD: ${DB_ROOT_PASSWORD}
+    networks:
+      - lang_app_api
+
+  cron:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: cron # specify the cron stage
+    container_name: lang_app_cron
+    volumes:
+      - ./api:/var/www/lang_app
+    depends_on:
+      - lang_app_php
     networks:
       - lang_app_api
 
