@@ -1,2 +1,0 @@
-# m h dom mon dow command
-0 */6 * * * php /var/www/lang_app/api/artisan schedule:run
