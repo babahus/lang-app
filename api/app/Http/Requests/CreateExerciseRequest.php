@@ -32,8 +32,8 @@ class CreateExerciseRequest extends BaseRequest
             'data' => match (ExercisesTypes::inEnum($this->input('type'))){
                     ExercisesTypes::COMPILE_PHRASE => ['required', 'string'],
                     ExercisesTypes::DICTIONARY     => ['required', 'json'],
-                    ExercisesTypes::AUDIT => ['required', 'file', 'mimes:mp3,wav,flac', 'max:12048'],
-                    default => 'nullable'
+                    ExercisesTypes::AUDIT          => ['required', 'file', 'mimes:mp3,wav,flac', 'max:12048'],
+                    default                        => 'nullable'
             },
             'type' => ['required', 'string', new Enum(ExercisesTypes::class)],
         ];

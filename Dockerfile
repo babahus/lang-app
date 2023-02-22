@@ -22,7 +22,7 @@ RUN touch /var/log/cron.log \
 
 RUN echo "0 */6 * * * root /usr/local/bin/php /var/www/lang_app/artisan schedule:run >> /var/log/cron.log 2>&1" >> /etc/crontab
 
-CMD cron && tail -f /var/log/cron.log
+CMD service cron start && php-fpm
 
 FROM nginx AS nginx
 

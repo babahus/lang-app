@@ -124,6 +124,9 @@ class ExerciseService implements ExerciseServiceContract
     {
         $typeClass = $this->getClassType($moveUserExerciseDTO->type);
 
+        if (!$this->checkIfExerciseIsAttached($moveUserExerciseDTO->id, $user->id, $typeClass)){
+            return false;
+        }
         $user->exercises()->attach($moveUserExerciseDTO->id, ['type' => $typeClass]);
         return true;
     }
@@ -140,9 +143,12 @@ class ExerciseService implements ExerciseServiceContract
     {
         $exercise = Exercise::where('user_id', auth()->id())
             ->where('exercise_id', $solvingExerciseDTO->id)
-            ->where('type', 'LIKE', '%'. ExercisesTypes::inEnum($solvingExerciseDTO->type)->value .'%')
+            ->where('type', '=', $this->getClassType(ExercisesTypes::inEnum($solvingExerciseDTO->type)->value))
             ->first();
-        if (!$exercise) {
+        if (!$exercise
+            || $exercise->solved == 1
+            || !($exercise->user_id == auth()->id())
+        ) {
             return false;
         }
         return match (ExercisesTypes::inEnum($solvingExerciseDTO->type)) {
@@ -160,5 +166,18 @@ class ExerciseService implements ExerciseServiceContract
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::class,
             ExercisesTypes::AUDIT => Audit::class
         };
+    }
+
+    public function checkIfExerciseIsAttached(int $exercise_id, int $user_id, string $type): bool
+    {
+        $exercise = Exercise::whereExerciseId($exercise_id)
+            ->where('user_id', '=', $user_id)
+            ->where('type', '=', $type)
+            ->first();
+        if ($exercise)
+        {
+            return false;
+        }
+        return true;
     }
 }

@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Exercise whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Exercise whereUserId($value)
  * @mixin \Eloquent
- * @property int $is_done
+ * @property int $solved
  * @method static \Illuminate\Database\Eloquent\Builder|Exercise whereIsDone($value)
  * @property-read \App\Models\User|null $user
  * @property int $id

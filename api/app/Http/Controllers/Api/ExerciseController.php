@@ -115,9 +115,8 @@ class ExerciseController extends Controller
         $solved = $this->exerciseService->solving($request->getDTO());
         if ($solved){
             return match (ExercisesTypes::inEnum($request->getDTO()->type)){
-                ExercisesTypes::DICTIONARY     => new ApiResponse(DictionaryResource::make($solved)),
-                ExercisesTypes::COMPILE_PHRASE => new ApiResponse(CompilePhraseResource::make($solved)),
-                ExercisesTypes::AUDIT          => new ApiResponse(AuditResource::make($solved)),
+                ExercisesTypes::DICTIONARY                            => new ApiResponse(DictionaryResource::make($solved)),
+                ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::AUDIT => new ApiResponse('Successfully solved exercise'),
             };
         }
         return new ApiResponse('Something went wrong', Response::HTTP_BAD_REQUEST, false);

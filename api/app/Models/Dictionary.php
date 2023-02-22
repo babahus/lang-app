@@ -42,6 +42,6 @@ class Dictionary extends Model
 
     public function exercises()
     {
-        return $this->belongsToMany(Dictionary::class,'user_exercise_type','exercise_id', 'id')->withPivotValue('type', Dictionary::class);
+        return $this->belongsToMany(Dictionary::class,'user_exercise_type','exercise_id', 'exercise_id', 'id')->withPivotValue('type', Dictionary::class);
     }
 }

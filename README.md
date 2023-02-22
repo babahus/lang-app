@@ -5,6 +5,7 @@
 ### Requirements
 - Docker
 - GIT CLI
+- Ngrok
 
 #### Using Docker Commands
 
@@ -19,6 +20,7 @@
 9. Cache Project Config `docker compose -f docker-compose.yml run --rm lang_app_php php artisan config:cache`
 10. Run Migrations. `docker compose -f docker-compose.yml run --rm lang_app_php php artisan migrate`
 11. Run Seeders. `docker compose -f docker-compose.yml run --rm lang_app_php php artisan db:seed`
+12. Run Ngrok `ngrok http 8803` and replace env value ASSEMBLYAI_WEBHOOK_URL to your value
 
 ## Environment Variables
 
