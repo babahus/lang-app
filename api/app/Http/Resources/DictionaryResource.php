@@ -16,9 +16,7 @@ class DictionaryResource extends JsonResource
     {
         $result = array_reduce(json_decode($this->dictionary, true), function ($carry, $item) {
             $item = str_replace(['{', '}', "'", " "], '', $item);
-            [$key, $value] = explode(',', $item);
-            [$translate, $word] = explode(':', $value);
-            $carry[trim(explode(':', $key)[1])] = $word;
+            $carry[$item['word']] = $item['translate'];
             return $carry;
         }, []);
         return [

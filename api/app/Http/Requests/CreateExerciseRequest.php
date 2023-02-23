@@ -35,6 +35,10 @@ class CreateExerciseRequest extends BaseRequest
                     ExercisesTypes::AUDIT          => ['required', 'file', 'mimes:mp3,wav,flac', 'max:12048'],
                     default                        => 'nullable'
             },
+            'transcript' => match (ExercisesTypes::inEnum($this->input('type'))) {
+                ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::DICTIONARY  => ['nullable'],
+                ExercisesTypes::AUDIT => ['required', 'string'],
+            },
             'type' => ['required', 'string', new Enum(ExercisesTypes::class)],
         ];
     }
@@ -46,7 +50,8 @@ class CreateExerciseRequest extends BaseRequest
                 ExercisesTypes::AUDIT => $this->file('data'),
                 default => $this->input('data'),
             },
-            $this->input('type')
+            $this->input('type'),
+            $this->input('transcript') ?? null
         );
     }
 }

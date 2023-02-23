@@ -29,13 +29,25 @@ class DeleteExerciseRequest extends FormRequest
     {
         return [
             'type' => ['required', 'string', new Enum(ExercisesTypes::class)],
+            'data' => match (ExercisesTypes::inEnum($this->input('type'))) {
+                ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::AUDIT => ['nullable'],
+                ExercisesTypes::DICTIONARY => ['required', function ($attribute, $value, $fail) {
+                    // Try to decode the value as JSON
+                    $decodedValue = json_decode($value, true);
+                    // Check if the value was successfully decoded and contains the expected keys
+                    if ($decodedValue === null || !isset($decodedValue['word']) || !isset($decodedValue['translate'])) {
+                        $fail("The $attribute field must be a valid JSON object with 'word' and 'translate' keys.");
+                    }
+                }]
+            },
         ];
     }
 
     public function getDTO(): DeleteExerciseDTO
     {
         return new DeleteExerciseDTO(
-            $this->input('type')
+            $this->input('type'),
+            $this->input('data') ?? null
         );
     }
 }

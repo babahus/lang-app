@@ -15,7 +15,6 @@ use App\Models\CompilePhrase;
 use App\Models\Dictionary;
 use App\Models\Exercise;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
@@ -46,9 +45,7 @@ class ExerciseService implements ExerciseServiceContract
     public function getExercisesByType(string $type, int $userId): \Illuminate\Contracts\Pagination\LengthAwarePaginator|bool
     {
         return match (ExercisesTypes::inEnum($type)) {
-            ExercisesTypes::DICTIONARY => Dictionary::with('exercises')
-                ->whereRelation('exercises',['user_id' => $userId])
-                ->paginate(10),
+            ExercisesTypes::DICTIONARY => Dictionary::paginate(10),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::paginate(10),
             ExercisesTypes::AUDIT => Audit::paginate(10),
             default => false
@@ -59,7 +56,7 @@ class ExerciseService implements ExerciseServiceContract
     {
         return match (ExercisesTypes::inEnum($type)) {
             ExercisesTypes::DICTIONARY => Dictionary::with('exercises')
-                ->whereRelation('exercises',['user_id' => $userId, 'exercise_id' => $id])
+                ->whereRelation('exercises', ['user_id' => $userId, 'exercise_id' => $id])
                 ->first(),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::whereId($id)->first(),
             ExercisesTypes::AUDIT => Audit::whereId($id)->first(),
@@ -70,8 +67,10 @@ class ExerciseService implements ExerciseServiceContract
     public function update(UpdateExerciseDTO $updateExerciseDTO, int $id): bool|int
     {
         return match (ExercisesTypes::inEnum($updateExerciseDTO->type)) {
-            ExercisesTypes::DICTIONARY => Dictionary::whereId($id)
-                     ->update(['dictionary' => $updateExerciseDTO->data]),
+            ExercisesTypes::DICTIONARY => call_user_func(function() use ($id, $updateExerciseDTO): bool {
+                $dictionary = Dictionary::whereId($id)->first();
+                return $this->dictionaryService->updateDictionary($dictionary, $updateExerciseDTO->data);
+            }),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::whereId($id)
                      ->update(['phrase' => $updateExerciseDTO->data]),
             ExercisesTypes::AUDIT => Audit::whereId($id)
@@ -80,23 +79,27 @@ class ExerciseService implements ExerciseServiceContract
         };
     }
 
-    public function delete(DeleteExerciseDTO $deleteExerciseDTO, int $id)
+    public function delete(DeleteExerciseDTO $deleteExerciseDTO, int $id) : bool|null
     {
-        if (Exercise::whereExerciseId($id)->where('user_id', auth()->id())->get()->isNotEmpty()){
+        if (Exercise::whereExerciseId($id)->where('user_id', auth()->id())->get()->isNotEmpty() && $deleteExerciseDTO->type !== "dictionary"){
             \Auth::user()->exercises()->detach($id, ['type' => $deleteExerciseDTO->type]);
         }
+        try {
+            return match (ExercisesTypes::inEnum($deleteExerciseDTO->type)) {
+                ExercisesTypes::DICTIONARY     => $this->dictionaryService->deleteDictionary(Dictionary::whereId($id)->first(), $deleteExerciseDTO->data),
+                ExercisesTypes::COMPILE_PHRASE => CompilePhrase::whereId($id)->delete(),
+                ExercisesTypes::AUDIT          => call_user_func(function() use ($id): bool {
+                    $auditObj = Audit::whereId($id)->first();
 
-        return match (ExercisesTypes::inEnum($deleteExerciseDTO->type)) {
-            ExercisesTypes::DICTIONARY     => Dictionary::whereId($id)->delete(),
-            ExercisesTypes::COMPILE_PHRASE => CompilePhrase::whereId($id)->delete(),
-            ExercisesTypes::AUDIT          => call_user_func(function() use ($id): bool {
-                $auditObj = Audit::whereId($id)->first();
-
-                Storage::disk('public')->deleteDirectory(sprintf(AuditFilesPath::DIRECTORY_PATH, $auditObj->id));
-                return $auditObj->delete();
-            }),
-            default => false
-        };
+                    Storage::disk('public')->deleteDirectory(sprintf(AuditFilesPath::DIRECTORY_PATH, $auditObj->id));
+                    return $auditObj->delete();
+                }),
+                default => false
+            };
+        } catch (\Error $error)
+        {
+            return false;
+        }
     }
 
     public function create(CreateExerciseDTO $createExerciseDTO): \Illuminate\Database\Eloquent\Model|Audit|Dictionary|bool|CompilePhrase|\Closure
@@ -113,6 +116,7 @@ class ExerciseService implements ExerciseServiceContract
                     $createExerciseDTO->data->getContent()
                 );
                 $auditObj->path = $strAuditPath;
+                $auditObj->transcription = $createExerciseDTO->transcript;
                 $auditObj->save();
                 return $auditObj;
             }),
@@ -125,6 +129,9 @@ class ExerciseService implements ExerciseServiceContract
         $typeClass = $this->getClassType($moveUserExerciseDTO->type);
 
         if (!$this->checkIfExerciseIsAttached($moveUserExerciseDTO->id, $user->id, $typeClass)){
+            return false;
+        }
+        if ($typeClass == Dictionary::class && !is_null($this->checkIfDictionaryIsAttached($moveUserExerciseDTO->id))){
             return false;
         }
         $user->exercises()->attach($moveUserExerciseDTO->id, ['type' => $typeClass]);
@@ -145,9 +152,9 @@ class ExerciseService implements ExerciseServiceContract
             ->where('exercise_id', $solvingExerciseDTO->id)
             ->where('type', '=', $this->getClassType(ExercisesTypes::inEnum($solvingExerciseDTO->type)->value))
             ->first();
-        if (!$exercise
+        if ((!$exercise
             || $exercise->solved == 1
-            || !($exercise->user_id == auth()->id())
+            || !($exercise->user_id == auth()->id()))
         ) {
             return false;
         }
@@ -179,5 +186,12 @@ class ExerciseService implements ExerciseServiceContract
             return false;
         }
         return true;
+    }
+
+    public function checkIfDictionaryIsAttached(int $exerciseId): Model|\Illuminate\Database\Eloquent\Builder|null
+    {
+        return Exercise::whereExerciseId($exerciseId)
+            ->whereType($this->getClassType('dictionary'))
+            ->first();
     }
 }

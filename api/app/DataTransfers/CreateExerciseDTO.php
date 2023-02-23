@@ -9,13 +9,16 @@ class CreateExerciseDTO implements DTO
 {
     public readonly string|UploadedFile $data;
     public readonly string $type;
+    public readonly string $transcript;
 
     public function __construct(
         $data,
-        $type
+        $type,
+        $transcript
     )
     {
         $this->data = $data;
         $this->type = $type;
+        $this->transcript = $transcript;
     }
 }
