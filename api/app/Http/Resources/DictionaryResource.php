@@ -20,6 +20,7 @@ class DictionaryResource extends JsonResource
             return $carry;
         }, []);
         return [
+          'id'         => $this->id,
           'dictionary' => $result,
           'updated_at' => $this->updated_at,
         ];
