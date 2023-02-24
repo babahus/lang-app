@@ -2,13 +2,12 @@
 
 namespace App\Services;
 
-use App\Contracts\DictionaryServiceContract;
-use App\DataTransfers\SolvingExerciseDTO;
-use App\Models\Dictionary;
 use Carbon\Carbon;
-use function Symfony\Component\Translation\t;
+use App\Models\Dictionary;
+use App\DataTransfers\SolvingExerciseDTO;
+use App\Contracts\DictionaryServiceContract;
 
-class DictionaryService implements DictionaryServiceContract
+final class DictionaryService implements DictionaryServiceContract
 {
 
     public function createEmptyDictionary(): Dictionary
@@ -24,6 +23,7 @@ class DictionaryService implements DictionaryServiceContract
         $dictionary->exercises()->update(['solved' => true, 'user_exercise_type.updated_at' => Carbon::now()]);
         $dictionary->dictionary = json_encode($json);
         $dictionary->save();
+
         return $dictionary;
     }
 
@@ -34,6 +34,7 @@ class DictionaryService implements DictionaryServiceContract
 
         // Loop through each associative array and update the 'translate' key value
         foreach ($decodedArrJson as &$item) {
+
             if ($item['word'] == $transformedData['word']) {
                 $item['translate'] = $transformedData['translate'];
             }
@@ -42,6 +43,7 @@ class DictionaryService implements DictionaryServiceContract
         $updatedData = json_encode($decodedArrJson, JSON_UNESCAPED_UNICODE);
         // Print the updated JSON string
         $dictionary->dictionary = $updatedData;
+
         return $dictionary->save();
     }
 
@@ -50,10 +52,12 @@ class DictionaryService implements DictionaryServiceContract
         $data = json_decode($data , true);
         $jsonArray = json_decode($dictionary->dictionary, true);
         $index = array_search($data, $jsonArray);
+
         if ($index !== false) {
             unset($jsonArray[$index]);
         }
         $dictionary->dictionary = array_values($jsonArray);
+
         return $dictionary->save();
     }
 }

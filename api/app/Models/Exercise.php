@@ -30,7 +30,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Exercise whereUserId($value)
  * @mixin \Eloquent
  */
-class Exercise extends Model
+final class Exercise extends Model
 {
     use HasFactory;
 

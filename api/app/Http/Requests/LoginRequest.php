@@ -6,7 +6,7 @@ use App\Contracts\DTO;
 use App\DataTransfers\LoginDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends BaseRequest
+final class LoginRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.

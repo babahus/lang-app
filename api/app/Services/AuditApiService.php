@@ -7,7 +7,7 @@ use GuzzleHttp\Client;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
-class AuditApiService
+final class AuditApiService
 {
 
     private Client $client;
@@ -23,7 +23,6 @@ class AuditApiService
             'Authorization' => 'Token ' . config('services.assemblayai.api_key'),
             'Content-Type' => 'application/json',
         ];
-
     }
 
     public function uploadAudio(int $id)
@@ -79,6 +78,7 @@ class AuditApiService
         $auditModel->request_status = $result['status'];
         $auditModel->transcription = $result['text'];
         $auditModel->save();
+
         return true;
     }
 }

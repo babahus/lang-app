@@ -8,7 +8,7 @@ use App\Enums\ExercisesTypes;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
-class SolvingExerciseRequest extends BaseRequest
+final class SolvingExerciseRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.

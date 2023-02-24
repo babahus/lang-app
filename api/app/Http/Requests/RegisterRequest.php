@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use App\DataTransfers\RegisterDTO;
 
-class RegisterRequest extends BaseRequest
+final class RegisterRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.

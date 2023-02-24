@@ -30,7 +30,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Audit whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class Audit extends Model
+final class Audit extends Model
 {
     use HasFactory;
 

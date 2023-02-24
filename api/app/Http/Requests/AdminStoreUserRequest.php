@@ -6,7 +6,7 @@ use App\Contracts\DTO;
 use App\DataTransfers\AdminStoreUserDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
-class AdminStoreUserRequest extends BaseRequest
+final class AdminStoreUserRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.

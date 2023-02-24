@@ -4,7 +4,7 @@ namespace App\Http\Response;
 
 use Illuminate\Http\JsonResponse;
 
-class ApiResponse extends JsonResponse
+final class ApiResponse extends JsonResponse
 {
     public function __construct($data = null, $status = 200, $success = true, $headers = [], $options = 0)
     {

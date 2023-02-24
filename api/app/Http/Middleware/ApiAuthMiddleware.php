@@ -18,8 +18,10 @@ class ApiAuthMiddleware
     public function handle(Request $request, Closure $next)
     {
         if (!$request->bearerToken() || !Auth::guard('api')->check()) {
+
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+
         return $next($request);
     }
 

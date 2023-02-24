@@ -11,7 +11,7 @@ use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
-class MoveUserExerciseRequest extends BaseRequest
+final class MoveUserExerciseRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.

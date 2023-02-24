@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|CompilePhrase whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class CompilePhrase extends Model
+final class CompilePhrase extends Model
 {
     use HasFactory;
 

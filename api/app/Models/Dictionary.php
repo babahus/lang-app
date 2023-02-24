@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Dictionary whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class Dictionary extends Model
+final class Dictionary extends Model
 {
     use HasFactory;
 

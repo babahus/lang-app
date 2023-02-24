@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class DictionaryResource extends JsonResource
+final class DictionaryResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,8 +17,10 @@ class DictionaryResource extends JsonResource
         $result = array_reduce(json_decode($this->dictionary, true), function ($carry, $item) {
             $item = str_replace(['{', '}', "'", " "], '', $item);
             $carry[$item['word']] = $item['translate'];
+
             return $carry;
         }, []);
+
         return [
           'id'         => $this->id,
           'dictionary' => $result,

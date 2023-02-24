@@ -8,7 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
-class UpdateExerciseRequest extends BaseRequest
+final class UpdateExerciseRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
