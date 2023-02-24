@@ -55,9 +55,7 @@ class ExerciseService implements ExerciseServiceContract
     public function getExerciseByIdAndType(string $type, int $id, int $userId): CompilePhrase|Audit|Dictionary|bool
     {
         return match (ExercisesTypes::inEnum($type)) {
-            ExercisesTypes::DICTIONARY => Dictionary::with('exercises')
-                ->whereRelation('exercises', ['user_id' => $userId, 'exercise_id' => $id])
-                ->first(),
+            ExercisesTypes::DICTIONARY => Dictionary::whereId($id)->first(),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::whereId($id)->first(),
             ExercisesTypes::AUDIT => Audit::whereId($id)->first(),
             default => false
@@ -74,7 +72,7 @@ class ExerciseService implements ExerciseServiceContract
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::whereId($id)
                      ->update(['phrase' => $updateExerciseDTO->data]),
             ExercisesTypes::AUDIT => Audit::whereId($id)
-                ->update(['transcript' => $updateExerciseDTO->data]),
+                     ->update(['transcript' => $updateExerciseDTO->data]),
             default => false
         };
     }

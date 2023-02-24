@@ -29,17 +29,17 @@ class CreateExerciseRequest extends BaseRequest
     public function rules()
     {
         return [
-            'data' => match (ExercisesTypes::inEnum($this->input('type'))){
+            'data'       => match (ExercisesTypes::inEnum($this->input('type'))){
                     ExercisesTypes::COMPILE_PHRASE => ['required', 'string'],
-                    ExercisesTypes::DICTIONARY     => ['required', 'json'],
+                    ExercisesTypes::DICTIONARY     => ['required', 'nullable', 'json'],
                     ExercisesTypes::AUDIT          => ['required', 'file', 'mimes:mp3,wav,flac', 'max:12048'],
                     default                        => 'nullable'
             },
             'transcript' => match (ExercisesTypes::inEnum($this->input('type'))) {
                 ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::DICTIONARY  => ['nullable'],
-                ExercisesTypes::AUDIT => ['required', 'string'],
+                ExercisesTypes::AUDIT                                       => ['required', 'string'],
             },
-            'type' => ['required', 'string', new Enum(ExercisesTypes::class)],
+            'type'                                                          => ['required', 'string', new Enum(ExercisesTypes::class)],
         ];
     }
 
@@ -48,7 +48,7 @@ class CreateExerciseRequest extends BaseRequest
         return new CreateExerciseDTO(
             match (ExercisesTypes::inEnum($this->input('type'))){
                 ExercisesTypes::AUDIT => $this->file('data'),
-                default => $this->input('data'),
+                default               => $this->input('data'),
             },
             $this->input('type'),
             $this->input('transcript') ?? null
