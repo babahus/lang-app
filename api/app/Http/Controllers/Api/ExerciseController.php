@@ -23,6 +23,7 @@ use App\Services\{
 };
 use App\Http\Response\ApiResponse;
 use App\Http\Controllers\Controller;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 final class ExerciseController extends Controller
 {
@@ -126,7 +127,7 @@ final class ExerciseController extends Controller
 
         if (!$isDeleted){
 
-            return new ApiResponse('Something went wrong', Response::HTTP_BAD_REQUEST, false);
+            return new ApiResponse('Something went wrong', ResponseAlias::HTTP_BAD_REQUEST, false);
         }
 
         return new ApiResponse('Exercise is successfully deleted');
@@ -158,7 +159,7 @@ final class ExerciseController extends Controller
             return new ApiResponse('Successful attached exercise to user');
         }
 
-        return new ApiResponse('Something went wrong', Response::HTTP_BAD_REQUEST, false);
+        return new ApiResponse('Something went wrong', ResponseAlias::HTTP_BAD_REQUEST, false);
     }
 
     /**
@@ -172,7 +173,7 @@ final class ExerciseController extends Controller
             return new ApiResponse('Successful detached exercise to user');
         }
 
-        return new ApiResponse('Something went wrong', Response::HTTP_BAD_REQUEST, false);
+        return new ApiResponse('Something went wrong', ResponseAlias::HTTP_BAD_REQUEST, false);
     }
 
     /**
@@ -183,7 +184,7 @@ final class ExerciseController extends Controller
     {
         $solved = $this->exerciseService->solving($request->getDTO());
 
-        if ($solved){
+        if (!is_string($solved)){
 
             return match (ExercisesTypes::inEnum($request->getDTO()->type)){
                 ExercisesTypes::DICTIONARY                            => new ApiResponse(DictionaryResource::make($solved)),
@@ -191,7 +192,7 @@ final class ExerciseController extends Controller
             };
         }
 
-        return new ApiResponse('Something went wrong', Response::HTTP_BAD_REQUEST, false);
+        return new ApiResponse($solved, ResponseAlias::HTTP_BAD_REQUEST, false);
     }
 
     /**

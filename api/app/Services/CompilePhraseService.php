@@ -9,7 +9,7 @@ use App\DataTransfers\SolvingExerciseDTO;
 final class CompilePhraseService
 {
 
-    public function solveCompilePhrase(SolvingExerciseDTO $solvingExerciseDTO)
+    public function solveCompilePhrase(SolvingExerciseDTO $solvingExerciseDTO): bool|string
     {
         $compilePhrase = CompilePhrase::whereId($solvingExerciseDTO->id)->first();
 
@@ -20,7 +20,7 @@ final class CompilePhraseService
             return true;
         }
 
-        return false;
+        return 'Incorrect answer, try again';
     }
 
 }

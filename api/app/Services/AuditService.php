@@ -19,7 +19,7 @@ final class AuditService
             return true;
         }
 
-        return false;
+        return 'Invalid Description';
     }
 
 }

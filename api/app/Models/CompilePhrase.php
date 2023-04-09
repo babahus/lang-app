@@ -33,6 +33,6 @@ final class CompilePhrase extends Model
 
     public function exercises()
     {
-        return $this->belongsToMany(CompilePhrase::class,'user_exercise_type', 'exercise_id', 'exercise_id', 'id')->withPivotValue('type', CompilePhrase::class);
+        return $this->belongsToMany(CompilePhrase::class,'user_exercise_type', 'exercise_id', 'exercise_id', 'id')->withPivotValue('type', CompilePhrase::class)->withPivot('solved');
     }
 }

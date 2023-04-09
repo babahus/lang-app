@@ -130,6 +130,9 @@
       <path value="$PROJECT_DIR$/api/vendor/google/gax" />
       <path value="$PROJECT_DIR$/api/vendor/google/grpc-gcp" />
       <path value="$PROJECT_DIR$/api/vendor/google/cloud" />
+      <path value="$PROJECT_DIR$/api/vendor/symfony/yaml" />
+      <path value="$PROJECT_DIR$/api/vendor/barryvdh/laravel-cors" />
+      <path value="$PROJECT_DIR$/api/vendor/fruitcake/php-cors" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.1" />

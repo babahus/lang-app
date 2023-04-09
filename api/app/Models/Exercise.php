@@ -38,7 +38,8 @@ final class Exercise extends Model
 
     protected $fillable = [
       'exercise_id',
-      'user_id'
+      'user_id',
+      'solved',
     ];
 
     public function users()

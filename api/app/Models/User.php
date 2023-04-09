@@ -89,22 +89,22 @@ final class User extends Authenticatable
 
     public function exercises(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(Exercise::class,'user_exercise_type','user_id', 'exercise_id')->withTimestamps();
+        return $this->belongsToMany(Exercise::class,'user_exercise_type','user_id', 'exercise_id')->withPivot('solved', 'created_at', 'updated_at')->withTimestamps();
     }
 
     public function dictionary(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(Dictionary::class,'user_exercise_type','user_id', 'exercise_id')->withPivotValue('type', [Dictionary::class])->withTimestamps();
+        return $this->belongsToMany(Dictionary::class,'user_exercise_type','user_id', 'exercise_id')->withPivotValue('type', [Dictionary::class])->withPivot('solved')->withTimestamps();
     }
 
     public function compilePhrase(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(CompilePhrase::class,'user_exercise_type','user_id', 'exercise_id')->withPivotValue('type', [CompilePhrase::class])->withTimestamps();
+        return $this->belongsToMany(CompilePhrase::class,'user_exercise_type','user_id', 'exercise_id')->withPivotValue('type', [CompilePhrase::class])->withPivot('solved')->withTimestamps();
     }
 
     public function audit(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(Audit::class,'user_exercise_type','user_id', 'exercise_id')->withPivotValue('type', [Audit::class])->withTimestamps();
+        return $this->belongsToMany(Audit::class,'user_exercise_type','user_id', 'exercise_id')->withPivotValue('type', [Audit::class])->withPivot('solved')->withTimestamps();
     }
 
 }

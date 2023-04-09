@@ -181,7 +181,6 @@ final class ExerciseService implements ExerciseServiceContract
         $typeClass = $this->getClassType($moveUserExerciseDTO->type);
 
         if (!$this->checkIfExerciseIsAttached($moveUserExerciseDTO->id, $user->id, $typeClass)){
-
             return false;
         }
         if ($typeClass == Dictionary::class && !is_null($this->checkIfDictionaryIsAttached($moveUserExerciseDTO->id))){
@@ -211,7 +210,7 @@ final class ExerciseService implements ExerciseServiceContract
      * @param SolvingExerciseDTO $solvingExerciseDTO
      * @return Dictionary|CompilePhrase|Audit|bool
      */
-    public function solving(SolvingExerciseDTO $solvingExerciseDTO): Dictionary|CompilePhrase|Audit|bool
+    public function solving(SolvingExerciseDTO $solvingExerciseDTO): Dictionary|CompilePhrase|Audit|bool|string
     {
         $exercise = Exercise::where('user_id', auth()->id())
             ->where('exercise_id', $solvingExerciseDTO->id)
@@ -222,15 +221,14 @@ final class ExerciseService implements ExerciseServiceContract
             || $exercise->solved == 1
             || !($exercise->user_id == auth()->id()))
         ) {
-
-            return false;
+            return 'Something went wrong';
         }
 
         return match (ExercisesTypes::inEnum($solvingExerciseDTO->type)) {
             ExercisesTypes::DICTIONARY => $this->dictionaryService->fillDictionary($solvingExerciseDTO),
             ExercisesTypes::COMPILE_PHRASE => $this->compilePhrase->solveCompilePhrase($solvingExerciseDTO),
             ExercisesTypes::AUDIT => $this->auditService->solveAudit($solvingExerciseDTO),
-            default => false
+            default => 'Something went wrong'
         };
     }
 

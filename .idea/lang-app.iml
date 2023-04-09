@@ -130,6 +130,8 @@
       <excludeFolder url="file://$MODULE_DIR$/api/vendor/google/gax" />
       <excludeFolder url="file://$MODULE_DIR$/api/vendor/google/grpc-gcp" />
       <excludeFolder url="file://$MODULE_DIR$/api/vendor/google/cloud" />
+      <excludeFolder url="file://$MODULE_DIR$/api/vendor/barryvdh/laravel-cors" />
+      <excludeFolder url="file://$MODULE_DIR$/api/vendor/fruitcake/php-cors" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
