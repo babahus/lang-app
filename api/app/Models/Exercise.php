@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Eloquent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,7 +29,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Exercise whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Exercise whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Exercise whereUserId($value)
- * @mixin \Eloquent
+ * @property-read \App\Models\Stage|null $stages
+ * @mixin Eloquent
  */
 final class Exercise extends Model
 {
@@ -46,5 +48,11 @@ final class Exercise extends Model
     {
         return $this->belongsToMany(User::class,'user_exercise_type','exercise_id', 'user_id')->withTimestamps();
     }
+
+    public function stages()
+    {
+        return $this->belongsTo(Stage::class);
+    }
+
 
 }

@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|CompilePhrase whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CompilePhrase wherePhrase($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CompilePhrase whereUpdatedAt($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, CompilePhrase> $exercises
  * @mixin \Eloquent
  */
 final class CompilePhrase extends Model

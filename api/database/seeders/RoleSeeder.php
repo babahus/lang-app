@@ -23,7 +23,7 @@ class RoleSeeder extends Seeder
 
         DB::table('roles')->insert([
             ['name' => 'User'],
-            ['name' => 'Super User'],
+            ['name' => 'Teacher'],
             ['name' => 'Admin'],
             ['name' => 'Root'],
         ]);

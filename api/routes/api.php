@@ -3,7 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ExerciseController;
+use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\StageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +29,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get('/admin/roles', [AdminController::class, 'getRoles']);
         Route::apiResource('/admin', AdminController::class);
     });
+    Route::apiResource('/course', CourseController::class);
+    Route::apiResource('/stage', StageController::class);
+
     Route::post('/exercise/solve', [ExerciseController::class, 'solving']);
     Route::get('/exercise', [ExerciseController::class, 'index']);
     Route::post('/exercise/attach', [ExerciseController::class, 'attach']);

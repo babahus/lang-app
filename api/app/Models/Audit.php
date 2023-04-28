@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Audit whereRequestStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Audit whereTranscription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Audit whereUpdatedAt($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Audit> $exercises
  * @mixin \Eloquent
  */
 final class Audit extends Model
