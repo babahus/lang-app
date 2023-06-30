@@ -25,8 +25,7 @@ use App\Http\Response\ApiResponse;
 use App\Http\Controllers\Controller;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
-final class ExerciseController extends Controller
-{
+final class ExerciseController extends Controller {
     /**
      * @var ExerciseService
      */
@@ -51,8 +50,7 @@ final class ExerciseController extends Controller
     /**
      * @return ApiResponse
      */
-    public function index(): ApiResponse
-    {
+    public function index(): ApiResponse {
         $userExercises = $this->exerciseService->getAllExercises(auth()->id());
 
         return new ApiResponse(ExerciseResource::collection($userExercises));
@@ -63,8 +61,7 @@ final class ExerciseController extends Controller
      * @param int $id
      * @return ApiResponse
      */
-    public function show(string $type, int $id): ApiResponse
-    {
+    public function show(string $type, int $id): ApiResponse {
         $exercise = $this->exerciseService->getExerciseByIdAndType($type, $id, auth()->id());
 
         if (!$exercise){
@@ -83,8 +80,7 @@ final class ExerciseController extends Controller
      * @param string $type
      * @return ApiResponse
      */
-    public function getExercisesByType(string $type): ApiResponse
-    {
+    public function getExercisesByType(string $type): ApiResponse {
         $exercises = $this->exerciseService->getExercisesByType($type, auth()->id());
 
         if (!$exercises){
@@ -104,8 +100,7 @@ final class ExerciseController extends Controller
      * @param int $id
      * @return ApiResponse
      */
-    public function update(UpdateExerciseRequest $request, int $id): ApiResponse
-    {
+    public function update(UpdateExerciseRequest $request, int $id): ApiResponse {
         $isUpdated = $this->exerciseService->update($request->getDTO(), $id);
 
         if (!$isUpdated){
@@ -121,8 +116,7 @@ final class ExerciseController extends Controller
      * @param int $id
      * @return ApiResponse
      */
-    public function destroy(DeleteExerciseRequest $request, int $id): ApiResponse
-    {
+    public function destroy(DeleteExerciseRequest $request, int $id): ApiResponse {
         $isDeleted = $this->exerciseService->delete($request->getDTO(), $id);
 
         if (!$isDeleted){
@@ -137,8 +131,7 @@ final class ExerciseController extends Controller
      * @param CreateExerciseRequest $request
      * @return ApiResponse
      */
-    public function store(CreateExerciseRequest $request): ApiResponse
-    {
+    public function store(CreateExerciseRequest $request): ApiResponse {
         $createdExercise = $this->exerciseService->create($request->getDTO());
 
         return match (ExercisesTypes::inEnum($request->getDTO()->type)){
@@ -152,8 +145,7 @@ final class ExerciseController extends Controller
      * @param MoveUserExerciseRequest $request
      * @return ApiResponse
      */
-    public function attach(MoveUserExerciseRequest $request): ApiResponse
-    {
+    public function attach(MoveUserExerciseRequest $request): ApiResponse {
         if ($this->exerciseService->attach($request->getDTO(), auth()->user())){
 
             return new ApiResponse('Successful attached exercise to user');
@@ -166,8 +158,7 @@ final class ExerciseController extends Controller
      * @param MoveUserExerciseRequest $request
      * @return ApiResponse
      */
-    public function detach(MoveUserExerciseRequest $request): ApiResponse
-    {
+    public function detach(MoveUserExerciseRequest $request): ApiResponse {
         if ($this->exerciseService->detach($request->getDTO(), auth()->user())){
 
             return new ApiResponse('Successful detached exercise to user');
@@ -180,8 +171,7 @@ final class ExerciseController extends Controller
      * @param SolvingExerciseRequest $request
      * @return ApiResponse|string
      */
-    public function solving(SolvingExerciseRequest $request): ApiResponse|string
-    {
+    public function solving(SolvingExerciseRequest $request): ApiResponse|string {
         $solved = $this->exerciseService->solving($request->getDTO());
 
         if (!is_string($solved)){
@@ -198,8 +188,7 @@ final class ExerciseController extends Controller
     /**
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function uploadAudioAndTranscript(int $id)
-    {
+    public function uploadAudioAndTranscript(int $id) {
         $upload_url = $this->auditService->uploadAudio($id);
 
         return $this->auditService->transcriptAudio($upload_url, $id);
@@ -209,8 +198,7 @@ final class ExerciseController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return bool
      */
-    public function webHook(\Illuminate\Http\Request $request): bool
-    {
+    public function webHook(\Illuminate\Http\Request $request): bool {
         $this->auditService->getResult($request->only(['transcript_id', 'status', 'text']));
 
         return true;

@@ -13,12 +13,10 @@ use App\Services\CourseService;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
-class CourseController extends Controller
-{
+class CourseController extends Controller {
     private CourseService $courseService;
 
-    public function __construct(CourseService $courseService)
-    {
+    public function __construct(CourseService $courseService) {
         $this->courseService = $courseService;
     }
 
@@ -28,8 +26,7 @@ class CourseController extends Controller
      * @param int|null $count
      * @return ApiResponse
      */
-    public function index(?int $count): ApiResponse
-    {
+    public function index(?int $count): ApiResponse {
         $courses = Course::paginate($count);
 
         return new ApiResponse(CourseResource::collection($courses));
@@ -41,8 +38,7 @@ class CourseController extends Controller
      * @param CourseCreateRequest $request
      * @return ApiResponse
      */
-    public function store(CourseCreateRequest $request): ApiResponse
-    {
+    public function store(CourseCreateRequest $request): ApiResponse {
         $createdCourse = $this->courseService->create($request->getDTO());
 
         return new ApiResponse(CourseResource::make($createdCourse));
@@ -54,8 +50,7 @@ class CourseController extends Controller
      * @param  int  $id
      * @return ApiResponse
      */
-    public function show(int $id): ApiResponse
-    {
+    public function show(int $id): ApiResponse {
         $course = $this->courseService->show($id);
 
         return new ApiResponse(CourseResource::make($course));
@@ -68,8 +63,7 @@ class CourseController extends Controller
      * @param  int  $id
      * @return ApiResponse
      */
-    public function update(CourseUpdateRequest $request, int $id): ApiResponse
-    {
+    public function update(CourseUpdateRequest $request, int $id): ApiResponse {
         $updatedCourse = $this->courseService->update($request->getDTO(), $id);
 
         if (!$updatedCourse)
@@ -86,8 +80,7 @@ class CourseController extends Controller
      * @param  int  $id
      * @return ApiResponse
      */
-    public function destroy(CourseDeleteRequest $request, int $id): ApiResponse
-    {
+    public function destroy(CourseDeleteRequest $request, int $id): ApiResponse {
        $this->courseService->delete($id);
 
        return new ApiResponse('Successfully delete course', ResponseAlias::HTTP_OK);

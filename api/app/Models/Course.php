@@ -13,8 +13,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Course query()
  * @mixin \Eloquent
  */
-class Course extends Model
-{
+class Course extends Model {
+
     use HasFactory;
 
     protected $fillable = [
@@ -23,8 +23,9 @@ class Course extends Model
 
     protected $table = 'accounts_courses';
 
-    public function stages()
-    {
+    public function stages() {
+        
         $this->hasMany(Stage::class);
     }
 }
+

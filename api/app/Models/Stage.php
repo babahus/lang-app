@@ -16,17 +16,18 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Stage query()
  * @mixin \Eloquent
  */
-class Stage extends Model
-{
+class Stage extends Model {
+
     use HasFactory;
 
-    public function course()
-    {
+    public function course() {
+
         return $this->belongsTo(Course::class);
     }
 
-    public function exercises()
-    {
+    public function exercises() {
+        
         return $this->hasMany(Exercise::class);
     }
 }
+

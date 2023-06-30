@@ -32,27 +32,26 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\Stage|null $stages
  * @mixin Eloquent
  */
-final class Exercise extends Model
-{
+final class Exercise extends Model {
+
     use HasFactory;
 
     protected $table = 'user_exercise_type';
 
     protected $fillable = [
-      'exercise_id',
-      'user_id',
-      'solved',
+        'user_id',
+        'exercise_id',
+        'type',
+        'timestamps',
     ];
 
-    public function users()
-    {
-        return $this->belongsToMany(User::class,'user_exercise_type','exercise_id', 'user_id')->withTimestamps();
+    public function users() {
+
+        return $this->belongsToMany(User::class, 'user_exercise_type', 'exercise_id', 'user_id')->withTimestamps();
     }
 
-    public function stages()
-    {
+    public function stages() {
+
         return $this->belongsTo(Stage::class);
     }
-
-
 }

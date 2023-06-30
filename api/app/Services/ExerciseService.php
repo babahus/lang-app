@@ -22,8 +22,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use App\Contracts\ExerciseServiceContract;
 
-final class ExerciseService implements ExerciseServiceContract
-{
+final class ExerciseService implements ExerciseServiceContract {
     /**
      * @var AuditService
      */
@@ -42,13 +41,11 @@ final class ExerciseService implements ExerciseServiceContract
      * @param CompilePhraseService $compilePhrase
      * @param DictionaryService $dictionaryService
      */
-    public function __construct
-    (
+    public function __construct (
         AuditService $auditService,
         CompilePhraseService $compilePhrase,
         DictionaryService $dictionaryService
-    )
-    {
+    ) {
         $this->compilePhrase = $compilePhrase;
         $this->auditService = $auditService;
         $this->dictionaryService = $dictionaryService;
@@ -58,8 +55,7 @@ final class ExerciseService implements ExerciseServiceContract
      * @param int $userId
      * @return \Illuminate\Database\Eloquent\Collection|array
      */
-    public function getAllExercises(int $userId): \Illuminate\Database\Eloquent\Collection|array
-    {
+    public function getAllExercises(int $userId): \Illuminate\Database\Eloquent\Collection|array {
         return User::with(['dictionary', 'compilePhrase', 'audit'])->where('id', $userId)->get();
     }
 
@@ -68,8 +64,7 @@ final class ExerciseService implements ExerciseServiceContract
      * @param int $userId
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|bool
      */
-    public function getExercisesByType(string $type, int $userId): \Illuminate\Contracts\Pagination\LengthAwarePaginator|bool
-    {
+    public function getExercisesByType(string $type, int $userId): \Illuminate\Contracts\Pagination\LengthAwarePaginator|bool {
         return match (ExercisesTypes::inEnum($type)) {
             ExercisesTypes::DICTIONARY => Dictionary::paginate(10),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::paginate(10),
@@ -84,8 +79,7 @@ final class ExerciseService implements ExerciseServiceContract
      * @param int $userId
      * @return CompilePhrase|Audit|Dictionary|bool
      */
-    public function getExerciseByIdAndType(string $type, int $id, int $userId): CompilePhrase|Audit|Dictionary|bool
-    {
+    public function getExerciseByIdAndType(string $type, int $id, int $userId): CompilePhrase|Audit|Dictionary|bool {
         return match (ExercisesTypes::inEnum($type)) {
             ExercisesTypes::DICTIONARY => Dictionary::whereId($id)->first(),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::whereId($id)->first(),
@@ -99,8 +93,7 @@ final class ExerciseService implements ExerciseServiceContract
      * @param int $id
      * @return bool|int
      */
-    public function update(UpdateExerciseDTO $updateExerciseDTO, int $id): bool|int
-    {
+    public function update(UpdateExerciseDTO $updateExerciseDTO, int $id): bool|int {
         return match (ExercisesTypes::inEnum($updateExerciseDTO->type)) {
             ExercisesTypes::DICTIONARY => call_user_func(function() use ($id, $updateExerciseDTO): bool {
                 $dictionary = Dictionary::whereId($id)->first();
@@ -119,8 +112,7 @@ final class ExerciseService implements ExerciseServiceContract
      * @param int $id
      * @return bool|null
      */
-    public function delete(DeleteExerciseDTO $deleteExerciseDTO, int $id) : bool|null
-    {
+    public function delete(DeleteExerciseDTO $deleteExerciseDTO, int $id) : bool|null {
         if (Exercise::whereExerciseId($id)->where('user_id', auth()->id())->get()->isNotEmpty() && $deleteExerciseDTO->type !== "dictionary"){
             \Auth::user()->exercises()->detach($id, ['type' => $deleteExerciseDTO->type]);
         }
@@ -148,8 +140,7 @@ final class ExerciseService implements ExerciseServiceContract
      * @param CreateExerciseDTO $createExerciseDTO
      * @return Model|Audit|Dictionary|bool|CompilePhrase|\Closure
      */
-    public function create(CreateExerciseDTO $createExerciseDTO): \Illuminate\Database\Eloquent\Model|Audit|Dictionary|bool|CompilePhrase|\Closure
-    {
+    public function create(CreateExerciseDTO $createExerciseDTO): \Illuminate\Database\Eloquent\Model|Audit|Dictionary|bool|CompilePhrase|\Closure {
         return match (ExercisesTypes::inEnum($createExerciseDTO->type)) {
             ExercisesTypes::DICTIONARY => Dictionary::create(['dictionary' => $createExerciseDTO->data]),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::create(['phrase' => $createExerciseDTO->data]),
@@ -176,8 +167,7 @@ final class ExerciseService implements ExerciseServiceContract
      * @param User|\Illuminate\Contracts\Auth\Authenticatable $user
      * @return bool
      */
-    public function attach(MoveUserExerciseDTO $moveUserExerciseDTO, User|\Illuminate\Contracts\Auth\Authenticatable $user): bool
-    {
+    public function attach(MoveUserExerciseDTO $moveUserExerciseDTO, User|\Illuminate\Contracts\Auth\Authenticatable $user): bool {
         $typeClass = $this->getClassType($moveUserExerciseDTO->type);
 
         if (!$this->checkIfExerciseIsAttached($moveUserExerciseDTO->id, $user->id, $typeClass)){
@@ -197,8 +187,7 @@ final class ExerciseService implements ExerciseServiceContract
      * @param User|\Illuminate\Contracts\Auth\Authenticatable $user
      * @return bool
      */
-    public function detach(MoveUserExerciseDTO $moveUserExerciseDTO, User|\Illuminate\Contracts\Auth\Authenticatable $user): bool
-    {
+    public function detach(MoveUserExerciseDTO $moveUserExerciseDTO, User|\Illuminate\Contracts\Auth\Authenticatable $user): bool {
         $typeClass = $this->getClassType($moveUserExerciseDTO->type);
 
         $user->exercises()->detach($moveUserExerciseDTO->id, ['type' => $typeClass]);
@@ -210,8 +199,7 @@ final class ExerciseService implements ExerciseServiceContract
      * @param SolvingExerciseDTO $solvingExerciseDTO
      * @return Dictionary|CompilePhrase|Audit|bool
      */
-    public function solving(SolvingExerciseDTO $solvingExerciseDTO): Dictionary|CompilePhrase|Audit|bool|string
-    {
+    public function solving(SolvingExerciseDTO $solvingExerciseDTO): Dictionary|CompilePhrase|Audit|bool|string {
         $exercise = Exercise::where('user_id', auth()->id())
             ->where('exercise_id', $solvingExerciseDTO->id)
             ->where('type', '=', $this->getClassType(ExercisesTypes::inEnum($solvingExerciseDTO->type)->value))
@@ -236,8 +224,7 @@ final class ExerciseService implements ExerciseServiceContract
      * @param string $type
      * @return string
      */
-    public function getClassType(string $type): string
-    {
+    public function getClassType(string $type): string {
         return match (ExercisesTypes::inEnum($type)) {
             ExercisesTypes::DICTIONARY => Dictionary::class,
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::class,
@@ -251,8 +238,7 @@ final class ExerciseService implements ExerciseServiceContract
      * @param string $type
      * @return bool
      */
-    public function checkIfExerciseIsAttached(int $exercise_id, int $user_id, string $type): bool
-    {
+    public function checkIfExerciseIsAttached(int $exercise_id, int $user_id, string $type): bool {
         $exercise = Exercise::whereExerciseId($exercise_id)
             ->where('user_id', '=', $user_id)
             ->where('type', '=', $type)
@@ -271,8 +257,7 @@ final class ExerciseService implements ExerciseServiceContract
      * @param int $exerciseId
      * @return Model|\Illuminate\Database\Eloquent\Builder|null
      */
-    public function checkIfDictionaryIsAttached(int $exerciseId): Model|\Illuminate\Database\Eloquent\Builder|null
-    {
+    public function checkIfDictionaryIsAttached(int $exerciseId): Model|\Illuminate\Database\Eloquent\Builder|null {
         return Exercise::whereExerciseId($exerciseId)
             ->whereType($this->getClassType('dictionary'))
             ->first();
