@@ -29,7 +29,7 @@ class CourseCreateRequest extends BaseRequest
         return [
             'title'       => 'required|string|max:225',
             'description' => 'required|string|max:255',
-            'price'       => 'sometimes|numeric|max:100000'
+            'price'       => 'nullable|numeric|max:100000'
         ];
     }
 
@@ -38,7 +38,7 @@ class CourseCreateRequest extends BaseRequest
         return new CreateCourseDTO(
             $this->input('title'),
             $this->input('description'),
-            $this->input('price')
+            $this->input('price') ?? 0
         );
     }
 }
