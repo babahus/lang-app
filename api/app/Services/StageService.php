@@ -11,10 +11,12 @@ class StageService {
     }
 
     public function createStage(array $data) {
+
         return Stage::create($data);
     }
 
     public function getStageById($id) {
+        
         return Stage::find($id);
     }
 

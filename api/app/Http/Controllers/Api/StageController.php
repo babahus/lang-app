@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\StageCreateRequest;
-use App\Http\Requests\StageUpdateRequest;
+use App\Http\Requests\Stages\StageCreateRequest;
+use App\Http\Requests\Stages\StageUpdateRequest;
 use App\Http\Resources\StageResource;
 use App\Services\StageService;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Response\ApiResponse;
 
@@ -22,7 +21,7 @@ class StageController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function index() {
+    public function index(): ApiResponse {
         $stages = $this->stageService->getAllStages();
 
         return new ApiResponse(StageResource::collection($stages));
@@ -34,8 +33,8 @@ class StageController extends Controller {
      * @param  \App\Http\Requests\StageCreateRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StageCreateRequest $request) {
-        $stage = $this->stageService->createStage($request->validated());
+    public function store(StageCreateRequest $request): ApiResponse {
+        $stage = $this->stageService->createStage($request->getDTO());
 
         return new ApiResponse(StageResource::make($stage));
     }
@@ -46,7 +45,7 @@ class StageController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id) {
+    public function show(int $id): ApiResponse {
         $stage = $this->stageService->getStageById($id);
 
         if (!$stage) {
@@ -63,8 +62,8 @@ class StageController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(StageUpdateRequest $request, $id) {
-        $stage = $this->stageService->updateStage($id, $request->validated());
+    public function update(StageUpdateRequest $request, int $id): ApiResponse {
+        $stage = $this->stageService->updateStage($id, $request->getDTO());
 
         if (!$stage) {
             return new ApiResponse('Stage not found', Response::HTTP_NOT_FOUND, false);
@@ -79,7 +78,7 @@ class StageController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id) {
+    public function destroy(int $id): ApiResponse {
         $success = $this->stageService->deleteStage($id);
 
         if (!$success) {
