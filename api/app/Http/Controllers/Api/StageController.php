@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Stages\StageCreateRequest;
 use App\Http\Requests\Stages\StageUpdateRequest;
 use App\Http\Resources\StageResource;
@@ -19,7 +20,7 @@ class StageController extends Controller {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Response\ApiResponse
      */
     public function index(): ApiResponse {
         $stages = $this->stageService->getAllStages();
@@ -30,8 +31,8 @@ class StageController extends Controller {
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StageCreateRequest  $request
-     * @return \Illuminate\Http\Response
+     * @param  \App\Http\Requests\Stages\StageCreateRequest  $request
+     * @return \App\Http\Response\ApiResponse
      */
     public function store(StageCreateRequest $request): ApiResponse {
         $stage = $this->stageService->createStage($request->getDTO());
@@ -43,7 +44,7 @@ class StageController extends Controller {
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Response\ApiResponse
      */
     public function show(int $id): ApiResponse {
         $stage = $this->stageService->getStageById($id);
@@ -58,9 +59,9 @@ class StageController extends Controller {
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\StageUpdateRequest  $request
+     * @param  \App\Http\Requests\Stages\StageUpdateRequest  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Response\ApiResponse
      */
     public function update(StageUpdateRequest $request, int $id): ApiResponse {
         $stage = $this->stageService->updateStage($id, $request->getDTO());
@@ -76,7 +77,7 @@ class StageController extends Controller {
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Response\ApiResponse
      */
     public function destroy(int $id): ApiResponse {
         $success = $this->stageService->deleteStage($id);
