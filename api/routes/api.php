@@ -5,7 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ExerciseController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\AdminController;
-use App\Http\Controllers\StageController;
+use App\Http\Controllers\Api\StageController;
 
 /*
 |--------------------------------------------------------------------------
