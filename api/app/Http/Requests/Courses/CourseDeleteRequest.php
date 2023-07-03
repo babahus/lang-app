@@ -15,6 +15,7 @@ class CourseDeleteRequest extends FormRequest
     public function authorize()
     {
         $course = Course::findOrFail($this->route('course'));
+
         return $course->account_id === auth()->id();
     }
 

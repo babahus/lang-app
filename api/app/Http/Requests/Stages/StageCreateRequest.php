@@ -28,7 +28,7 @@ class StageCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'course_id'   => 'required|exists:courses,id',
+            'course_id'   => 'required|exists:accounts_courses,id',
             'description' => 'required|string|max:255',
             'title'       => 'required|string|max:255',
         ];

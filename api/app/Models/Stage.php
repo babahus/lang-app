@@ -20,13 +20,21 @@ class Stage extends Model {
 
     use HasFactory;
 
-    public function course() {
+    protected $table = 'accounts_courses_stages';
 
+    protected $fillable = [
+        'course_id',
+        'title',
+        'description'
+    ];
+
+    public function course()
+    {
         return $this->belongsTo(Course::class);
     }
 
-    public function exercises() {
-        
+    public function exercises()
+    {
         return $this->hasMany(Exercise::class);
     }
 }
