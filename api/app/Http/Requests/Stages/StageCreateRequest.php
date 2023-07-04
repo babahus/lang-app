@@ -4,9 +4,12 @@ namespace App\Http\Requests\Stages;
 
 use App\Models\Course;
 use App\Models\Stage;
+use App\Http\Requests\BaseRequest;
+use App\Contracts\DTO;
+use App\DataTransfers\Stage\CreateStageDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StageCreateRequest extends FormRequest
+class StageCreateRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -32,5 +35,14 @@ class StageCreateRequest extends FormRequest
             'description' => 'required|string|max:255',
             'title'       => 'required|string|max:255',
         ];
+    }
+
+    public function getDTO(): CreateStageDTO
+    {
+        return new CreateStageDTO(
+            $this->input('course_id'),
+            $this->input('description'),
+            $this->input('title')
+        );
     }
 }
