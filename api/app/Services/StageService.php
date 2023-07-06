@@ -25,7 +25,9 @@ class StageService {
         return Stage::find($id);
     }
 
-    public function updateStage($id, array $data) {
+    public function updateStage($id, CreateStageDTO $dto) {
+        $data = get_object_vars($dto); 
+        
         $stage = Stage::find($id);
 
         if (!$stage) {

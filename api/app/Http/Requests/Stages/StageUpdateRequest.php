@@ -5,7 +5,7 @@ namespace App\Http\Requests\Stages;
 use App\Models\Stage;
 use App\Http\Requests\BaseRequest;
 use App\Contracts\DTO;
-use App\DataTransfers\Stage\CreateStageDTO;
+use App\DataTransfers\Stages\CreateStageDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StageUpdateRequest extends BaseRequest
@@ -18,7 +18,8 @@ class StageUpdateRequest extends BaseRequest
     public function authorize()
     {
         $stage = Stage::findOrFail($this->route('stage'));
-        return $stage->course()->account_id === auth()->id();
+        
+        return $stage->course->account_id === auth()->id();
     }
 
     /**
@@ -38,9 +39,9 @@ class StageUpdateRequest extends BaseRequest
     public function getDTO(): CreateStageDTO
     {
         return new CreateStageDTO(
-            $this->input('course_id'),
+            $this->input('title'),
             $this->input('description'),
-            $this->input('title')
+            $this->input('course_id')
         );
     }
 }

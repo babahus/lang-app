@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * App\Models\Stage
  *
  * @property-read \App\Models\Course|null $course
+ * @property-read \App\Models\Account|null $account
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Exercise> $exercises
  * @property-read int|null $exercises_count
  * @method static \Illuminate\Database\Eloquent\Builder|Stage newModelQuery()
@@ -16,8 +17,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Stage query()
  * @mixin \Eloquent
  */
-class Stage extends Model {
-
+class Stage extends Model
+{
     use HasFactory;
 
     protected $table = 'accounts_courses_stages';
@@ -33,9 +34,13 @@ class Stage extends Model {
         return $this->belongsTo(Course::class);
     }
 
+    public function account()
+    {
+        return $this->belongsTo(Account::class, 'account_id');
+    }
+
     public function exercises()
     {
         return $this->hasMany(Exercise::class);
     }
 }
-
