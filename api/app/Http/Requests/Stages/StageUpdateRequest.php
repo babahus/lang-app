@@ -15,12 +15,14 @@ class StageUpdateRequest extends BaseRequest
      *
      * @return bool
      */
+
     public function authorize()
     {
         $stage = Stage::findOrFail($this->route('stage'));
         
         return $stage->course->account_id === auth()->id();
     }
+
 
     /**
      * Get the validation rules that apply to the request.
