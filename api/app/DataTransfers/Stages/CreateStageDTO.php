@@ -8,12 +8,12 @@ class CreateStageDTO implements DTO
 {
     public readonly string $title;
     public readonly string $description;
-    public readonly ?int $course_id;
+    public readonly ?string $course_id;
 
     public function __construct(
-        $title,
-        $description,
-        $course_id,
+        string $title,
+        string $description,
+        ?string $course_id
     )
     {
         $this->title = $title;

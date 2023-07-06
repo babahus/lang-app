@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Stage;
+use App\DataTransfers\Stages\CreateStageDTO;
 
 class StageService {
     
@@ -10,13 +11,17 @@ class StageService {
         return Stage::all();
     }
 
-    public function createStage(array $data) {
-
+    public function createStage(CreateStageDTO $dto) {
+        $data = [
+            'title' => $dto->title,
+            'description' => $dto->description,
+            'course_id' => $dto->course_id,
+        ];
+        
         return Stage::create($data);
     }
 
     public function getStageById($id) {
-        
         return Stage::find($id);
     }
 
