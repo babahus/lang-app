@@ -91,10 +91,6 @@ class StageController extends Controller
     {
         $response = $this->stageService->deleteStageById($id);
 
-        if (!$response['success']) {
-            return new ApiResponse($response['message'], Response::HTTP_NOT_FOUND, false);
-        }
-
-        return new ApiResponse($response['message'], Response::HTTP_OK);
+        return new ApiResponse('Stage deleted', Response::HTTP_OK);
     }
 }

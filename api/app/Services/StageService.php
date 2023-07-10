@@ -26,7 +26,7 @@ class StageService {
     }
 
     public function updateStage($id, CreateStageDTO $dto) {
-        $data = $dto->toArray(); 
+        $data = get_object_vars($dto); 
         
         $stage = Stage::find($id);
 
@@ -43,7 +43,7 @@ class StageService {
         $stage = Stage::find($id);
 
         if (!$stage) {
-            return false;
+            return null;
         }
 
         return $stage->delete();
