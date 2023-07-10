@@ -14,6 +14,12 @@ class StageResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'id'              => $this->id,
+            'title'           => $this->title,
+            'description'     => $this->description,
+            'stage_exercises' => $this->stage_exercises,
+        ];
     }
 }
+
