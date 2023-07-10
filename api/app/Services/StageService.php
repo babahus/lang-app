@@ -7,8 +7,18 @@ use App\DataTransfers\Stages\CreateStageDTO;
 
 class StageService {
     
-    public function getAllStages() {
-        return Stage::all();
+    public function getAllStages()
+    {
+        $currentUser = auth()->user();
+
+        if (!$currentUser) {
+            
+            return null;
+        }
+
+        return Stage::whereHas('course', function ($query) use ($currentUser) {
+            $query->where('account_id', $currentUser->id);
+        })->get();
     }
 
     public function createStage(CreateStageDTO $dto) {
@@ -21,8 +31,20 @@ class StageService {
         return Stage::create($data);
     }
 
-    public function getStageById($id) {
-        return Stage::find($id);
+    public function getStageById($id)
+    {
+        $currentUser = auth()->user();
+
+        if (!$currentUser) {
+            
+            return null;
+        }
+        
+        return Stage::where('id', $id)
+            ->whereHas('course', function ($query) use ($currentUser) {
+                $query->where('account_id', $currentUser->id);
+            })
+            ->get();
     }
 
     public function updateStage($id, CreateStageDTO $dto) {
