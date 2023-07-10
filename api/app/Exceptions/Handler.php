@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use App\Http\Response\ApiResponse;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
@@ -36,9 +37,29 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
+        $this->renderable(function (AccessDeniedHttpException $e, $request) {
+            return $this->handleAccessDeniedException($e, $request);
+        });
+
         $this->renderable(function (NotFoundHttpException $e, $request) {
             return $this->handleNotFoundException($e, $request);
         });
+    }
+
+    /**
+     * Handle the "Access Denied" exception.
+     *
+     * @param  \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException  $e
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function handleAccessDeniedException(AccessDeniedHttpException $e, $request)
+    {
+        if ($request->expectsJson()) {
+            return ApiResponse::error('This action is unauthorized.', 403);
+        }
+
+        return parent::render($request, $e);
     }
 
     /**
