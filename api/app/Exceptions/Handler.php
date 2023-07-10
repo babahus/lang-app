@@ -2,9 +2,9 @@
 
 namespace App\Exceptions;
 
+use App\Http\Response\ApiResponse;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
-use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
@@ -51,7 +51,7 @@ class Handler extends ExceptionHandler
     protected function handleNotFoundException(NotFoundHttpException $e, $request)
     {
         if ($request->expectsJson()) {
-            return new JsonResponse(['message' => 'The resource was not found'], 404);
+            return ApiResponse::error('The resource was not found', 404);
         }
 
         return parent::render($request, $e);
