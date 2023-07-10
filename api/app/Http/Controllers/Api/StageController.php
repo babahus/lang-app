@@ -10,10 +10,12 @@ use App\Services\StageService;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Response\ApiResponse;
 
-class StageController extends Controller {
+class StageController extends Controller
+{
     private StageService $stageService;
 
-    public function __construct(StageService $stageService) {
+    public function __construct(StageService $stageService)
+    {
         $this->stageService = $stageService;
     }
 
@@ -22,7 +24,8 @@ class StageController extends Controller {
      *
      * @return \App\Http\Response\ApiResponse
      */
-    public function index(): ApiResponse {
+    public function index(): ApiResponse
+    {
         $stages = $this->stageService->getAllStages();
 
         return new ApiResponse(StageResource::collection($stages));
@@ -34,9 +37,10 @@ class StageController extends Controller {
      * @param  \App\Http\Requests\Stages\StageCreateRequest  $request
      * @return \App\Http\Response\ApiResponse
      */
-    public function store(StageCreateRequest $request): ApiResponse {
+    public function store(StageCreateRequest $request): ApiResponse
+    {
         $stage = $this->stageService->createStage($request->getDTO());
-  
+
         return new ApiResponse(StageResource::make($stage));
     }
 
@@ -46,7 +50,8 @@ class StageController extends Controller {
      * @param  int  $id
      * @return \App\Http\Response\ApiResponse
      */
-    public function show(int $id): ApiResponse {
+    public function show(int $id): ApiResponse
+    {
         $stage = $this->stageService->getStageById($id);
 
         if (!$stage) {
@@ -63,7 +68,8 @@ class StageController extends Controller {
      * @param  int  $id
      * @return \App\Http\Response\ApiResponse
      */
-    public function update(StageUpdateRequest $request, int $id): ApiResponse {
+    public function update(StageUpdateRequest $request, int $id): ApiResponse
+    {
         $stage = $this->stageService->updateStage($id, $request->getDTO());
 
         if (!$stage) {
@@ -79,13 +85,14 @@ class StageController extends Controller {
      * @param  int  $id
      * @return \App\Http\Response\ApiResponse
      */
-    public function destroy(int $id): ApiResponse {
-        $success = $this->stageService->deleteStage($id);
+    public function destroy(int $id): ApiResponse
+    {
+        $response = $this->stageService->deleteStageById($id);
 
-        if (!$success) {
-            return new ApiResponse('Stage not found', Response::HTTP_NOT_FOUND, false);
+        if (!$response['success']) {
+            return new ApiResponse($response['message'], Response::HTTP_NOT_FOUND, false);
         }
 
-        return new ApiResponse('Stage deleted successfully', Response::HTTP_OK);
+        return new ApiResponse($response['message'], Response::HTTP_OK);
     }
 }
