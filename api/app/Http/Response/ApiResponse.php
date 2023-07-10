@@ -16,8 +16,9 @@ final class ApiResponse extends JsonResponse
         parent::__construct($payload, $status, $headers, $options);
     }
 
-    public static function error($message, $status = 400): ApiResponse
+    public static function error($message, $status = 400, $success = false): ApiResponse
     {
-        return new self(['message' => $message], $status);
+        return new self(['message' => $message], $status, $success);
     }
 }
+
