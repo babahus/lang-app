@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Stages\StageCreateRequest;
 use App\Http\Requests\Stages\StageUpdateRequest;
+use App\Http\Requests\Stages\StageDeleteRequest;
 use App\Http\Resources\StageResource;
 use App\Services\StageService;
 use Symfony\Component\HttpFoundation\Response;
@@ -83,9 +84,10 @@ class StageController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
+     * @param  \App\Http\Requests\Stages\StageDeleteRequest  $request
      * @return \App\Http\Response\ApiResponse
      */
-    public function destroy(int $id): ApiResponse
+    public function destroy(StageDeleteRequest $request, int $id): ApiResponse
     {
         $response = $this->stageService->deleteStageById($id);
 

@@ -16,7 +16,7 @@ class StageDeleteRequest extends FormRequest
     {
         $stage = Stage::findOrFail($this->route('stage'));
         
-        return $stage->course()->account_id === auth()->id();
+        return $stage->course->account_id === auth()->id();
     }
 
     /**
