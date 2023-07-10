@@ -26,7 +26,7 @@ class CourseController extends Controller {
      * @param int|null $count
      * @return ApiResponse
      */
-    public function index(?int $count): ApiResponse {
+    public function index(?int $count = 10): ApiResponse {
         $courses = Course::paginate($count);
 
         return new ApiResponse(CourseResource::collection($courses));
@@ -78,6 +78,7 @@ class CourseController extends Controller {
      * Remove the specified resource from storage.
      *
      * @param  int  $id
+     * @param  CourseDeleteRequest  $request
      * @return ApiResponse
      */
     public function destroy(CourseDeleteRequest $request, int $id): ApiResponse {
