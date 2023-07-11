@@ -42,7 +42,7 @@ class StageController extends Controller
     {
         $stage = $this->stageService->createStage($request->getDTO());
 
-        return new ApiResponse(StageResource::make($stage));
+        return new ApiResponse(StageResource::collection($stage));
     }
 
     /**
@@ -53,7 +53,7 @@ class StageController extends Controller
      */
     public function show(int $id): ApiResponse
     {
-        $stage = $this->stageService->getStageById($id);
+        $stage = $this->stageService->getStageById($id)->find($id);
 
         if (!$stage) {
             return new ApiResponse('Stage not found', Response::HTTP_NOT_FOUND, false);

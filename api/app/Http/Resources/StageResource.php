@@ -18,8 +18,7 @@ class StageResource extends JsonResource
             'id'              => $this->id,
             'title'           => $this->title,
             'description'     => $this->description,
-            'stage_exercises' => $this->stage_exercises,
+            'stage_exercises' => null, // todo : when stages will be done, need to add relation
         ];
     }
 }
-
