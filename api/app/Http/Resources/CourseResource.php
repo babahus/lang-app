@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Models\Stage;
 
 class CourseResource extends JsonResource
 {
@@ -19,7 +20,7 @@ class CourseResource extends JsonResource
             'title'         => $this->title,
             'description'   => $this->description,
             'price'         => $this->price,
-            'course_stages' => null, // todo : when stages will be done, need to add relation
+            'course_stages' => StageResource::collection($this->stages),
         ];
     }
 }

@@ -23,9 +23,9 @@ class Course extends Model {
 
     protected $table = 'accounts_courses';
 
-    public function stages() {
-        
-        $this->hasMany(Stage::class);
+    public function stages()
+    {
+        return $this->hasMany(Stage::class);
     }
 }
 
