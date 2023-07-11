@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Contracts\CourseContract;
 use App\DataTransfers\Courses\CreateCourseDTO;
 use App\Models\Course;
+use App\Exceptions\Handler;
 
 class CourseService implements CourseContract {
 
@@ -18,7 +19,8 @@ class CourseService implements CourseContract {
     }
 
     public function show(int $id): Course {
-        return Course::find($id);
+
+        return Course::findOrFail($id);
     }
 
     public function update(CreateCourseDTO $createCourseDTO, int $id): ?Course {

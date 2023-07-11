@@ -52,7 +52,7 @@ class CourseController extends Controller {
      */
     public function show(int $id): ApiResponse {
         $course = $this->courseService->show($id);
-
+        
         return new ApiResponse(CourseResource::make($course));
     }
 
