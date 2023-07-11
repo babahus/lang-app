@@ -30,7 +30,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::apiResource('/admin', AdminController::class);
     });
     Route::apiResource('/course', CourseController::class);
-    Route::apiResource('/stage', StageController::class);
+    Route::apiResource('/stage', StageController::class)->except('index');
     Route::get('/stages/{course_id}', [StageController::class, 'index']);
 
     Route::post('/exercise/solve', [ExerciseController::class, 'solving']);

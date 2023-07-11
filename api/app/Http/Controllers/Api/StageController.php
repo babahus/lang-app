@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Stages\StageCreateRequest;
 use App\Http\Requests\Stages\StageUpdateRequest;
 use App\Http\Requests\Stages\StageDeleteRequest;
+use App\Http\Requests\Stages\CourseIdRequest;
 use App\Http\Resources\StageResource;
 use App\Services\StageService;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,11 +24,13 @@ class StageController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  \App\Http\Requests\Stages\CourseIdRequest  $request
+     * @param  int  $id
      * @return \App\Http\Response\ApiResponse
      */
-    public function index(): ApiResponse
+    public function index(CourseIdRequest $request, int $id): ApiResponse
     {
-        $stages = $this->stageService->getAllStages();
+        $stages = $this->stageService->getAllStages($id);
 
         return new ApiResponse(StageResource::collection($stages));
     }
