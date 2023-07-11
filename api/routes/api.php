@@ -31,6 +31,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
     Route::apiResource('/course', CourseController::class);
     Route::apiResource('/stage', StageController::class);
+    Route::get('/stages/{course_id}', [StageController::class, 'index']);
 
     Route::post('/exercise/solve', [ExerciseController::class, 'solving']);
     Route::get('/exercise', [ExerciseController::class, 'index']);
