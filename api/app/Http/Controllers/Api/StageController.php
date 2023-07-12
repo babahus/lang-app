@@ -44,8 +44,8 @@ class StageController extends Controller
     public function store(StageCreateRequest $request): ApiResponse
     {
         $stage = $this->stageService->createStage($request->getDTO());
-
-        return new ApiResponse(StageResource::collection($stage));
+        
+        return new ApiResponse(StageResource::make($stage));
     }
 
     /**
