@@ -4,8 +4,39 @@ namespace App\Services;
 
 use App\Models\Stage;
 use App\DataTransfers\Stages\CreateStageDTO;
+use App\Contracts\StageContract;
 
-class StageService {
+class StageService implements StageContract
+{
+    public function create()
+    {
+    
+    }
+
+    public function show()
+    {
+        
+    }
+
+    public function update()
+    {
+        
+    }
+
+    public function delete()
+    {
+        
+    }
+
+    public function attachToCourse()
+    {
+        
+    }
+
+    public function detachFromCourse()
+    {
+        
+    }
     
     public function getAllStages($courseId)
     {
