@@ -56,14 +56,21 @@ class StageController extends Controller
      */
     public function show(int $id): ApiResponse
     {
-        $stage = $this->stageService->getStageById($id)->find($id);
+        $stage = $this->stageService->getStageById($id);
 
         if (!$stage) {
             return new ApiResponse('Stage not found', Response::HTTP_NOT_FOUND, false);
         }
 
-        return new ApiResponse(StageResource::make($stage));
+        $foundStage = $stage->find($id);
+
+        if (!$foundStage) {
+            return new ApiResponse('Stage not found', Response::HTTP_NOT_FOUND, false);
+        }
+
+        return new ApiResponse(StageResource::make($foundStage));
     }
+
 
     /**
      * Update the specified resource in storage.
