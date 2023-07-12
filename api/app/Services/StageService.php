@@ -8,37 +8,8 @@ use App\Contracts\StageContract;
 
 class StageService implements StageContract
 {
-    public function create()
-    {
     
-    }
-
-    public function show()
-    {
-        
-    }
-
-    public function update()
-    {
-        
-    }
-
-    public function delete()
-    {
-        
-    }
-
-    public function attachToCourse()
-    {
-        
-    }
-
-    public function detachFromCourse()
-    {
-        
-    }
-    
-    public function getAllStages($courseId)
+    public function getAllStages(int $courseId)
     {
         $currentUser = auth()->user();
 
@@ -53,7 +24,8 @@ class StageService implements StageContract
     }
 
 
-    public function createStage(CreateStageDTO $dto) {
+    public function createStage(CreateStageDTO $dto): Stage 
+    {
         $data = [
             'title' => $dto->title,
             'description' => $dto->description,
@@ -63,23 +35,24 @@ class StageService implements StageContract
         return Stage::create($data);
     }
 
-    public function getStageById($id)
+    public function getStageById(int $id): ?Stage
     {
         $currentUser = auth()->user();
 
         if (!$currentUser) {
-            
             return null;
         }
-        
+
         return Stage::where('id', $id)
             ->whereHas('course', function ($query) use ($currentUser) {
                 $query->where('account_id', $currentUser->id);
             })
-            ->get();
+            ->first();
     }
 
-    public function updateStage($id, CreateStageDTO $dto) {
+
+    public function updateStage(int $id, CreateStageDTO $dto): ?Stage 
+    {
         $data = get_object_vars($dto); 
         
         $stage = Stage::find($id);
@@ -93,7 +66,7 @@ class StageService implements StageContract
         return $stage;
     }
 
-    public function deleteStageById($id) {
+    public function deleteStageById(int $id): bool {
         $stage = Stage::find($id);
 
         if (!$stage) {

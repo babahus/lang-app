@@ -9,7 +9,7 @@ use App\Exceptions\Handler;
 
 class CourseService implements CourseContract {
 
-    public function create(CreateCourseDTO $createCourseDTO) : Course {
+    public function create(CreateCourseDTO $createCourseDTO): Course {
         return Course::create([
            'title'       => $createCourseDTO->title,
            'description' => $createCourseDTO->description,
@@ -33,7 +33,7 @@ class CourseService implements CourseContract {
         return $this->show($id);
     }
 
-    public function delete(int $id) : bool {
+    public function delete(int $id): bool {
         $course = $this->show($id);
 
         return $course->delete();
