@@ -6,7 +6,6 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-
 /**
  * App\Models\Exercise
  *
@@ -32,11 +31,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\Stage|null $stages
  * @mixin Eloquent
  */
-final class Exercise extends Model {
-
+final class Exercise extends Model
+{
     use HasFactory;
 
-    protected $table = 'user_exercise_type';
+    protected $table = 'accounts_exercises';
 
     protected $fillable = [
         'user_id',
@@ -45,13 +44,13 @@ final class Exercise extends Model {
         'timestamps',
     ];
 
-    public function users() {
-
+    public function users()
+    {
         return $this->belongsToMany(User::class, 'user_exercise_type', 'exercise_id', 'user_id')->withTimestamps();
     }
 
-    public function stages() {
-
-        return $this->belongsTo(Stage::class);
+    public function stages()
+    {
+        return $this->belongsTo(Stage::class, 'stage_id');
     }
 }

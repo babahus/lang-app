@@ -113,9 +113,9 @@ final class ExerciseService implements ExerciseServiceContract {
      * @return bool|null
      */
     public function delete(DeleteExerciseDTO $deleteExerciseDTO, int $id) : bool|null {
-        if (Exercise::whereExerciseId($id)->where('user_id', auth()->id())->get()->isNotEmpty() && $deleteExerciseDTO->type !== "dictionary"){
-            \Auth::user()->exercises()->detach($id, ['type' => $deleteExerciseDTO->type]);
-        }
+        // if (Exercise::whereExerciseId($id)->where('user_id', auth()->id())->get()->isNotEmpty() && $deleteExerciseDTO->type !== "dictionary"){
+        //     \Auth::user()->exercises()->detach($id, ['type' => $deleteExerciseDTO->type]);
+        // }
 
         try {
             return match (ExercisesTypes::inEnum($deleteExerciseDTO->type)) {
