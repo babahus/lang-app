@@ -38,10 +38,10 @@ final class Exercise extends Model
     protected $table = 'accounts_exercises';
 
     protected $fillable = [
-        'user_id',
-        'exercise_id',
-        'type',
-        'timestamps',
+        'account_id',
+        'course_id',
+        'stage_id',
+        'exercise_type',
     ];
 
     public function users()

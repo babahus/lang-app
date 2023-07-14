@@ -10,6 +10,8 @@ use App\Http\Requests\{
     MoveUserExerciseRequest,
     SolvingExerciseRequest,
     UpdateExerciseRequest,
+    AttachExerciseToStageCoursesRequest,
+    DetachExerciseToStageCoursesRequest,
 };
 use App\Http\Resources\{
     AuditResource,
@@ -145,10 +147,12 @@ final class ExerciseController extends Controller {
      * @param MoveUserExerciseRequest $request
      * @return ApiResponse
      */
-    public function attach(MoveUserExerciseRequest $request): ApiResponse {
-        if ($this->exerciseService->attach($request->getDTO(), auth()->user())){
+    public function attachExerciseToStageCourses(AttachExerciseToStageCoursesRequest $request): ApiResponse {
+        $stageId = $request->input('stage_id');
+        $courseId = $request->input('course_id');
 
-            return new ApiResponse('Successful attached exercise to user');
+        if ($this->exerciseService->attachExerciseToStageCourse($request->getDTO(), $stageId, $courseId)) {
+            return new ApiResponse('Successful attached exercise to stage and course');
         }
 
         return new ApiResponse('Something went wrong', ResponseAlias::HTTP_BAD_REQUEST, false);
@@ -158,10 +162,12 @@ final class ExerciseController extends Controller {
      * @param MoveUserExerciseRequest $request
      * @return ApiResponse
      */
-    public function detach(MoveUserExerciseRequest $request): ApiResponse {
-        if ($this->exerciseService->detach($request->getDTO(), auth()->user())){
+    public function detachExerciseToStageCourses(DetachExerciseToStageCoursesRequest $request): ApiResponse {
+        $stageId = $request->input('stage_id');
+        $courseId = $request->input('course_id');
 
-            return new ApiResponse('Successful detached exercise to user');
+        if ($this->exerciseService->detachExerciseToStageCourse($request->getDTO(), $stageId, $courseId)) {
+            return new ApiResponse('Successful detached exercise from stage and course');
         }
 
         return new ApiResponse('Something went wrong', ResponseAlias::HTTP_BAD_REQUEST, false);

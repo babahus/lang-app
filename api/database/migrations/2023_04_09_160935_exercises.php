@@ -23,6 +23,7 @@ class Exercises extends Migration
         });
     }
 
+
     /**
      * Reverse the migrations.
      *

@@ -35,8 +35,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::post('/exercise/solve', [ExerciseController::class, 'solving']);
     Route::get('/exercise', [ExerciseController::class, 'index']);
-    Route::post('/exercise/attach', [ExerciseController::class, 'attach']);
-    Route::post('/exercise/detach', [ExerciseController::class, 'detach']);
+    Route::post('/exercise/attach', [ExerciseController::class, 'attachExerciseToStageCourses']);
+    Route::post('/exercise/detach', [ExerciseController::class, 'detachExerciseToStageCourses']);
     Route::get('/exercise/upload/{id}', [ExerciseController::class, 'uploadAudioAndTranscript']);
     Route::get('/exercise/{type}/{id}', [ExerciseController::class, 'show']);
     Route::get('/exercise/{type}', [ExerciseController::class, 'getExercisesByType']);

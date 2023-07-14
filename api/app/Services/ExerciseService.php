@@ -9,6 +9,8 @@ use App\Models\{
     Exercise,
     Dictionary,
     CompilePhrase,
+    Stage,
+    Course,
 };
 use App\DataTransfers\{
     CreateExerciseDTO,
@@ -113,9 +115,9 @@ final class ExerciseService implements ExerciseServiceContract {
      * @return bool|null
      */
     public function delete(DeleteExerciseDTO $deleteExerciseDTO, int $id) : bool|null {
-        // if (Exercise::whereExerciseId($id)->where('user_id', auth()->id())->get()->isNotEmpty() && $deleteExerciseDTO->type !== "dictionary"){
-        //     \Auth::user()->exercises()->detach($id, ['type' => $deleteExerciseDTO->type]);
-        // }
+        if (Exercise::whereExerciseId($id)->where('account_id', auth()->id())->get()->isNotEmpty() && $deleteExerciseDTO->type !== "dictionary"){
+            \Auth::user()->exercises()->detach($id, ['exercise_type' => $deleteExerciseDTO->type]);
+        }
 
         try {
             return match (ExercisesTypes::inEnum($deleteExerciseDTO->type)) {
@@ -177,10 +179,11 @@ final class ExerciseService implements ExerciseServiceContract {
 
             return false;
         }
-        $user->exercises()->attach($moveUserExerciseDTO->id, ['type' => $typeClass]);
+        $user->exercises()->attach($moveUserExerciseDTO->id, ['exercise_type' => $typeClass]);
 
         return true;
     }
+
 
     /**
      * @param MoveUserExerciseDTO $moveUserExerciseDTO
@@ -190,7 +193,7 @@ final class ExerciseService implements ExerciseServiceContract {
     public function detach(MoveUserExerciseDTO $moveUserExerciseDTO, User|\Illuminate\Contracts\Auth\Authenticatable $user): bool {
         $typeClass = $this->getClassType($moveUserExerciseDTO->type);
 
-        $user->exercises()->detach($moveUserExerciseDTO->id, ['type' => $typeClass]);
+        $user->exercises()->detach($moveUserExerciseDTO->id, ['exercise_type' => $typeClass]);
 
         return true;
     }
@@ -200,14 +203,14 @@ final class ExerciseService implements ExerciseServiceContract {
      * @return Dictionary|CompilePhrase|Audit|bool
      */
     public function solving(SolvingExerciseDTO $solvingExerciseDTO): Dictionary|CompilePhrase|Audit|bool|string {
-        $exercise = Exercise::where('user_id', auth()->id())
+        $exercise = Exercise::where('account_id', auth()->id())
             ->where('exercise_id', $solvingExerciseDTO->id)
-            ->where('type', '=', $this->getClassType(ExercisesTypes::inEnum($solvingExerciseDTO->type)->value))
+            ->where('exercise_type', '=', $this->getClassType(ExercisesTypes::inEnum($solvingExerciseDTO->type)->value))
             ->first();
 
         if ((!$exercise
             || $exercise->solved == 1
-            || !($exercise->user_id == auth()->id()))
+            || !($exercise->account_id == auth()->id()))
         ) {
             return 'Something went wrong';
         }
@@ -225,6 +228,7 @@ final class ExerciseService implements ExerciseServiceContract {
      * @return string
      */
     public function getClassType(string $type): string {
+
         return match (ExercisesTypes::inEnum($type)) {
             ExercisesTypes::DICTIONARY => Dictionary::class,
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::class,
@@ -240,8 +244,8 @@ final class ExerciseService implements ExerciseServiceContract {
      */
     public function checkIfExerciseIsAttached(int $exercise_id, int $user_id, string $type): bool {
         $exercise = Exercise::whereExerciseId($exercise_id)
-            ->where('user_id', '=', $user_id)
-            ->where('type', '=', $type)
+            ->where('account_id', '=', $user_id)
+            ->where('exercise_type', '=', $type)
             ->first();
 
         if ($exercise)
@@ -258,8 +262,56 @@ final class ExerciseService implements ExerciseServiceContract {
      * @return Model|\Illuminate\Database\Eloquent\Builder|null
      */
     public function checkIfDictionaryIsAttached(int $exerciseId): Model|\Illuminate\Database\Eloquent\Builder|null {
+        
         return Exercise::whereExerciseId($exerciseId)
             ->whereType($this->getClassType('dictionary'))
             ->first();
+    }
+
+    /**
+     * @param MoveUserExerciseDTO $moveUserExerciseDTO
+     * @param int $stageId
+     * @param int $courseId
+     * @return bool
+     */
+    public function attachExerciseToStageCourse(MoveUserExerciseDTO $moveUserExerciseDTO, int $stageId, int $courseId): bool {
+        $typeClass = $this->getClassType($moveUserExerciseDTO->type);
+
+        if (!$this->checkIfExerciseIsAttached($moveUserExerciseDTO->id, auth()->user()->id, $typeClass)) {
+            
+            return false;
+        }
+            
+        $exerciseNew = new Exercise();
+        $exerciseNew->account_id = auth()->user()->id;
+        $exerciseNew->exercise_type = $typeClass;
+        $exerciseNew->stage_id = $stageId;
+        $exerciseNew->course_id = $courseId;
+        $exerciseNew->exercise_id = $moveUserExerciseDTO->id;
+        $exerciseNew->save();
+
+        return true;
+    }
+
+    /**
+     * @param MoveUserExerciseDTO $moveUserExerciseDTO
+     * @param int $stageId
+     * @param int $courseId
+     * @return bool
+     */
+    public function detachExerciseToStageCourse(MoveUserExerciseDTO $moveUserExerciseDTO, int $stageId, int $courseId): bool {
+        $typeClass = $this->getClassType($moveUserExerciseDTO->type);
+
+        if ($this->checkIfExerciseIsAttached($moveUserExerciseDTO->id, auth()->user()->id, $typeClass)) {
+
+            return false;
+        } 
+
+        $exercise = Exercise::whereExerciseId($moveUserExerciseDTO->id)
+            ->where('account_id', auth()->user()->id)
+            ->where('exercise_type', $typeClass)
+            ->delete();
+          
+        return true;
     }
 }
