@@ -10,8 +10,6 @@ use App\Http\Requests\{
     MoveUserExerciseRequest,
     SolvingExerciseRequest,
     UpdateExerciseRequest,
-    AttachExerciseToStageCoursesRequest,
-    DetachExerciseToStageCoursesRequest,
 };
 use App\Http\Resources\{
     AuditResource,
@@ -147,7 +145,7 @@ final class ExerciseController extends Controller {
      * @param MoveUserExerciseRequest $request
      * @return ApiResponse
      */
-    public function attachExerciseToStageCourses(AttachExerciseToStageCoursesRequest $request): ApiResponse {
+    public function attachExerciseToStageCourses(MoveUserExerciseRequest $request): ApiResponse {
         $stageId = $request->input('stage_id');
         $courseId = $request->input('course_id');
 
@@ -162,7 +160,7 @@ final class ExerciseController extends Controller {
      * @param MoveUserExerciseRequest $request
      * @return ApiResponse
      */
-    public function detachExerciseToStageCourses(DetachExerciseToStageCoursesRequest $request): ApiResponse {
+    public function detachExerciseToStageCourses(MoveUserExerciseRequest $request): ApiResponse {
         $stageId = $request->input('stage_id');
         $courseId = $request->input('course_id');
 

@@ -31,13 +31,15 @@ final class MoveUserExerciseRequest extends BaseRequest
     public function rules()
     {
         return [
-            'id' => match (ExercisesTypes::inEnum($this->input('type'))){
-                        ExercisesTypes::COMPILE_PHRASE => ['required', 'numeric', Rule::exists('compile_phrases', 'id')],
-                        ExercisesTypes::DICTIONARY => ['required', 'numeric', Rule::exists('dictionaries', 'id')],
-                        ExercisesTypes::AUDIT => ['required', 'numeric', Rule::exists('audits', 'id')],
-                        default => 'nullable'
-                    },
-            'type' => ['required', 'string', new Enum(ExercisesTypes::class)]
+            'stage_id' => ['required', 'numeric', Rule::exists('accounts_courses_stages', 'id')],
+            'course_id' => ['required', 'numeric', Rule::exists('accounts_courses', 'id')],
+            'id' => match (ExercisesTypes::inEnum($this->input('exercise_type'))){
+                ExercisesTypes::COMPILE_PHRASE => ['required', 'numeric', Rule::exists('compile_phrases', 'id')],
+                ExercisesTypes::DICTIONARY => ['required', 'numeric', Rule::exists('dictionaries', 'id')],
+                ExercisesTypes::AUDIT => ['required', 'numeric', Rule::exists('audits', 'id')],
+                default => 'nullable'
+            },
+            'exercise_type' => ['required', 'string', new Enum(ExercisesTypes::class)]
         ];
     }
 
@@ -45,7 +47,7 @@ final class MoveUserExerciseRequest extends BaseRequest
     {
         return new MoveUserExerciseDTO(
             $this->input('id'),
-            $this->input('type')
+            $this->input('exercise_type')
         );
     }
 }
