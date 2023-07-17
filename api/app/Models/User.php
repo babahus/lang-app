@@ -96,7 +96,7 @@ final class User extends Authenticatable
 
     public function exercises(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(Exercise::class,'user_exercise_type','user_id', 'exercise_id')->withPivot('solved', 'created_at', 'updated_at')->withTimestamps();
+        return $this->belongsToMany(Exercise::class,'accounts_exercises', 'exercise_id', 'account_id')->withPivot('solved', 'created_at', 'updated_at')->withTimestamps();
     }
 
     public function dictionary(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
