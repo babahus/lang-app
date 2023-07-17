@@ -82,12 +82,14 @@ final class ExerciseService implements ExerciseServiceContract {
      * @return CompilePhrase|Audit|Dictionary|bool
      */
     public function getExerciseByIdAndType(string $type, int $id, int $userId): CompilePhrase|Audit|Dictionary|bool {
-        return match (ExercisesTypes::inEnum($type)) {
+        $exercise = match (ExercisesTypes::inEnum($type)) {
             ExercisesTypes::DICTIONARY => Dictionary::whereId($id)->first(),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::whereId($id)->first(),
             ExercisesTypes::AUDIT => Audit::whereId($id)->first(),
             default => false
         };
+
+        return $exercise ?: false;
     }
 
     /**
@@ -99,7 +101,12 @@ final class ExerciseService implements ExerciseServiceContract {
         return match (ExercisesTypes::inEnum($updateExerciseDTO->type)) {
             ExercisesTypes::DICTIONARY => call_user_func(function() use ($id, $updateExerciseDTO): bool {
                 $dictionary = Dictionary::whereId($id)->first();
-                return $this->dictionaryService->updateDictionary($dictionary, $updateExerciseDTO->data);
+
+                if ($dictionary !== null) {
+                    return $this->dictionaryService->updateDictionary($dictionary, $updateExerciseDTO->data);
+                } else {
+                    return false;
+                }
             }),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::whereId($id)
                      ->update(['phrase' => $updateExerciseDTO->data]),

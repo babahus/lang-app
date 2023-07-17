@@ -50,7 +50,6 @@ class StageService implements StageContract
             ->first();
     }
 
-
     public function updateStage(int $id, CreateStageDTO $dto): ?Stage 
     {
         $data = get_object_vars($dto); 
