@@ -27,5 +27,9 @@ class Course extends Model {
     {
         return $this->hasMany(Stage::class);
     }
-}
 
+    public function students()
+    {
+        return $this->hasMany(CourseStudent::class, 'course_id');
+    }
+}

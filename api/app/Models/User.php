@@ -114,4 +114,8 @@ final class User extends Authenticatable
         return $this->belongsToMany(Audit::class,'user_exercise_type','user_id', 'exercise_id')->withPivotValue('type', [Audit::class])->withPivot('solved')->withTimestamps();
     }
 
+    public function enrolledCourses()
+    {
+        return $this->hasMany(CourseStudent::class, 'student_id');
+    }
 }
