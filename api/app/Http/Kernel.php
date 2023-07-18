@@ -47,7 +47,6 @@ class Kernel extends HttpKernel
             \Fruitcake\Cors\HandleCors::class,
         ],
     ];
-
     /**
      * The application's route middleware.
      *

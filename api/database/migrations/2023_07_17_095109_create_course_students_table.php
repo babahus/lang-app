@@ -20,10 +20,9 @@ class CreateCourseStudentsTable extends Migration
             $table->timestamp('added_at')->nullable(false);
             $table->timestamp('purchased_at')->nullable();
             $table->timestamps();
-            $table->foreign('student_id')->references('id')->on('users');
-            $table->foreign('course_id')->references('id')->on('accounts_courses');
         });
     }
+
 
     /**
      * Reverse the migrations.

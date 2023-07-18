@@ -46,7 +46,7 @@ final class AuthService implements AuthContract
         // and create empty dictionary for exercises
         $user->roles()->attach(1);
         $createdDictionary = $this->dictionaryService->createEmptyDictionary();
-        $user->exercises()->attach($createdDictionary->id,['type' => Dictionary::class]);
+        $user->exercises()->attach($createdDictionary->id,['exercise_type' => Dictionary::class]);
 
         return $user;
     }
