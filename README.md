@@ -15,12 +15,14 @@
 4. Run `docker compose -f docker-compose.yml pull`
 5. Run `docker compose -f docker-compose.yml build --pull`
 6. Run `docker compose -f docker-compose.yml up -d`
-7. Install Composer Deps. Run `docker compose -f docker-compose.yml run --rm lang_app_php composer install`
-8. Set APP_KEY. Run `docker compose -f docker-compose.yml run --rm lang_app_php php artisan key:generate`
-9. Cache Project Config `docker compose -f docker-compose.yml run --rm lang_app_php php artisan config:cache`
-10. Run Migrations. `docker compose -f docker-compose.yml run --rm lang_app_php php artisan migrate`
-11. Run Seeders. `docker compose -f docker-compose.yml run --rm lang_app_php php artisan db:seed`
-12. (Optional) Run Ngrok `ngrok http 8803` and replace env value ASSEMBLYAI_WEBHOOK_URL to your value
+7. If you get error `file_get_contents no such file or directory` run `docker compose -f docker-compose.yml run --rm lang_app_php cp .env.example .env`
+8. Install Composer Deps. Run `docker compose -f docker-compose.yml run --rm lang_app_php composer install`
+9. Run `docker compose -f docker-compose.yml run --rm lang_app_php chown -R www-data:www-data /var/www/lang_app/storage/logs/laravel.log`
+10. Set APP_KEY. Run `docker compose -f docker-compose.yml run --rm lang_app_php php artisan key:generate`
+11. Cache Project Config `docker compose -f docker-compose.yml run --rm lang_app_php php artisan config:cache`
+12. Run Migrations. `docker compose -f docker-compose.yml run --rm lang_app_php php artisan migrate`
+13. Run Seeders. `docker compose -f docker-compose.yml run --rm lang_app_php php artisan db:seed`
+14. (Optional) Run Ngrok `ngrok http 8803` and replace env value ASSEMBLYAI_WEBHOOK_URL to your value
 
 ## Environment Variables
 
