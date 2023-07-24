@@ -33,6 +33,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::apiResource('/stage', StageController::class)->except('index');
     Route::get('/stages/{course_id}', [StageController::class, 'index']);
 
+    Route::post('/course/attach/{studentId}/{courseId}', [CourseController::class, 'attach']);
+    Route::post('/course/detach/{studentId}/{courseId}', [CourseController::class, 'detach']);
+
     Route::post('/exercise/solve', [ExerciseController::class, 'solving']);
     Route::get('/exercise', [ExerciseController::class, 'index']);
     Route::post('/exercise/attach', [ExerciseController::class, 'attachExerciseToStageCourses']);

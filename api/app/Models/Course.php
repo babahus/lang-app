@@ -30,6 +30,8 @@ class Course extends Model {
 
     public function students()
     {
-        return $this->hasMany(CourseStudent::class, 'course_id');
+        return $this->belongsToMany(User::class, 'account_courses_students', 'course_id', 'student_id')
+            ->withPivot('added_at', 'purchased_at')
+            ->withTimestamps();
     }
 }

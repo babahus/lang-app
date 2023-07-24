@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Courses\CourseCreateRequest;
 use App\Http\Requests\Courses\CourseDeleteRequest;
 use App\Http\Requests\Courses\CourseUpdateRequest;
+use App\Http\Requests\Courses\CourseAttachRequest;
+use App\Http\Requests\Courses\CourseDetachRequest;
 use App\Http\Resources\CourseResource;
 use App\Http\Response\ApiResponse;
 use App\Models\Course;
@@ -52,7 +54,7 @@ class CourseController extends Controller {
      */
     public function show(int $id): ApiResponse {
         $course = $this->courseService->show($id);
-        
+
         return new ApiResponse(CourseResource::make($course));
     }
 
@@ -85,5 +87,26 @@ class CourseController extends Controller {
        $this->courseService->delete($id);
 
        return new ApiResponse('Successfully delete course', ResponseAlias::HTTP_OK);
+    }
+    public function attach(CourseAttachRequest $request, int $studentId, int $courseId): ApiResponse
+    {
+        $attached = $this->courseService->attach($studentId, $courseId);
+
+        if (!$attached) {
+            return new ApiResponse('Invalid Provider', Response::HTTP_BAD_REQUEST, false);
+        }
+
+        return new ApiResponse('Course attached successfully', Response::HTTP_OK);
+    }
+
+    public function detach(CourseDetachRequest $request, int $studentId, int $courseId): ApiResponse
+    {
+        $detached = $this->courseService->detach($studentId, $courseId);
+
+        if (!$detached) {
+            return new ApiResponse('Invalid Provider', Response::HTTP_BAD_REQUEST, false);
+        }
+
+        return new ApiResponse('Course detached successfully', Response::HTTP_OK);
     }
 }
