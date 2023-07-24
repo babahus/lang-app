@@ -7,6 +7,7 @@ use App\DataTransfers\Courses\CreateCourseDTO;
 use App\Models\Course;
 use App\Models\User;
 use App\Exceptions\Handler;
+use Illuminate\Support\Facades\Gate;
 
 class CourseService implements CourseContract {
 
@@ -43,9 +44,12 @@ class CourseService implements CourseContract {
     public function attach(int $studentId, int $courseId): bool
     {
         $course = Course::findOrFail($courseId);
-        $student = User::find($studentId);
 
-        $isCourseCreator = ($course->account_id === auth()->id());
+        if (Gate::denies('canManageEnrollment', [$course, $studentId])) {
+            return false;
+        }
+
+        $student = User::find($studentId);
 
         if ($course->students->contains($student)) {
             return false;
@@ -53,7 +57,7 @@ class CourseService implements CourseContract {
 
         $isCoursePurchased = $this->purchased($courseId);
 
-        if ($isCourseCreator || $course->price === 0 || ($isCoursePurchased && !$course->students->contains($student))) {
+        if ($course->price === 0 || ($isCoursePurchased && !$course->students->contains($student))) {
             $this->addStudentToCourse($student, $course);
             return true;
         }
@@ -72,7 +76,7 @@ class CourseService implements CourseContract {
     {
         $course = Course::findOrFail($courseId);
 
-        if ($course->account_id !== auth()->id()) {
+        if (Gate::denies('canManageEnrollment', [$course, $studentId])) {
             return false;
         }
 
