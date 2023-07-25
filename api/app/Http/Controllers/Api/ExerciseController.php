@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DataTransfers\MoveUserExerciseDTO;
 use Illuminate\Http\Response;
 use App\Enums\ExercisesTypes;
 use App\Http\Requests\{
@@ -146,10 +147,10 @@ final class ExerciseController extends Controller {
      * @return ApiResponse
      */
     public function attachExerciseToStageCourses(MoveUserExerciseRequest $request): ApiResponse {
-        $stageId = $request->input('stage_id');
-        $courseId = $request->input('course_id');
-
-        if ($this->exerciseService->attachExerciseToStageCourse($request->getDTO(), $stageId, $courseId)) {
+        $dto = $request->getDTO();
+        $stageId = $dto->stage_id;
+        $courseId = $dto->course_id;
+        if ($this->exerciseService->attachExerciseToStageCourse($dto, $stageId, $courseId)) {
             return new ApiResponse('Successful attached exercise to stage and course');
         }
 
@@ -161,10 +162,12 @@ final class ExerciseController extends Controller {
      * @return ApiResponse
      */
     public function detachExerciseToStageCourses(MoveUserExerciseRequest $request): ApiResponse {
-        $stageId = $request->input('stage_id');
-        $courseId = $request->input('course_id');
 
-        if ($this->exerciseService->detachExerciseToStageCourse($request->getDTO(), $stageId, $courseId)) {
+        $dto = $request->getDTO();
+        $stageId = $dto->stage_id;
+        $courseId = $dto->course_id;
+
+        if ($this->exerciseService->detachExerciseToStageCourse($dto, $stageId, $courseId)) {
             return new ApiResponse('Successful detached exercise from stage and course');
         }
 

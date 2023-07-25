@@ -8,7 +8,7 @@ use App\Contracts\StageContract;
 
 class StageService implements StageContract
 {
-    
+
     public function getAllStages(int $courseId)
     {
         $currentUser = auth()->user();
@@ -24,14 +24,14 @@ class StageService implements StageContract
     }
 
 
-    public function createStage(CreateStageDTO $dto): Stage 
+    public function createStage(CreateStageDTO $dto): Stage
     {
         $data = [
             'title' => $dto->title,
             'description' => $dto->description,
             'course_id' => $dto->course_id,
         ];
-        
+
         return Stage::create($data);
     }
 
@@ -50,10 +50,10 @@ class StageService implements StageContract
             ->first();
     }
 
-    public function updateStage(int $id, CreateStageDTO $dto): ?Stage 
+    public function updateStage(int $id, CreateStageDTO $dto): ?Stage
     {
-        $data = get_object_vars($dto); 
-        
+        $data = get_object_vars($dto);
+
         $stage = Stage::find($id);
 
         if (!$stage) {

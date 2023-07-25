@@ -250,6 +250,7 @@ final class ExerciseService implements ExerciseServiceContract {
      * @return bool
      */
     public function checkIfExerciseIsAttached(int $exercise_id, int $user_id, string $type, $stageId, $courseId): bool {
+
         $exercise = Exercise::whereExerciseId($exercise_id)
             ->where('account_id', '=', $user_id)
             ->where('exercise_type', '=', $type)
@@ -271,7 +272,7 @@ final class ExerciseService implements ExerciseServiceContract {
      * @return Model|\Illuminate\Database\Eloquent\Builder|null
      */
     public function checkIfDictionaryIsAttached(int $exerciseId): Model|\Illuminate\Database\Eloquent\Builder|null {
-        
+
         return Exercise::whereExerciseId($exerciseId)
             ->whereType($this->getClassType('dictionary'))
             ->first();
@@ -312,7 +313,7 @@ final class ExerciseService implements ExerciseServiceContract {
 
         if ($this->checkIfExerciseIsAttached($moveUserExerciseDTO->id, auth()->user()->id, $typeClass, $stageId, $courseId)) {
             return false;
-        } 
+        }
 
         Exercise::whereExerciseId($moveUserExerciseDTO->id)
             ->where('account_id', auth()->user()->id)

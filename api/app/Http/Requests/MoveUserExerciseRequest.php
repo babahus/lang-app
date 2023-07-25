@@ -47,7 +47,9 @@ final class MoveUserExerciseRequest extends BaseRequest
     {
         return new MoveUserExerciseDTO(
             $this->input('id'),
-            $this->input('exercise_type')
+            $this->input('exercise_type'),
+            $this->input('stage_id'),
+            $this->input('course_id')
         );
     }
 }

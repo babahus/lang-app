@@ -41,12 +41,14 @@ final class Exercise extends Model
         'account_id',
         'course_id',
         'stage_id',
+        'exercise_id',
         'exercise_type',
     ];
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'accounts_exercises', 'exercise_id', 'account_id')->withTimestamps();
+        return $this->belongsToMany(User::class, 'accounts_exercises', 'exercise_id', 'account_id')
+            ->withTimestamps();
     }
 
     public function stages()
