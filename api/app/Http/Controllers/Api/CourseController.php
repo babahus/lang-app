@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Courses\CourseActionRequest;
 use App\Http\Requests\Courses\CourseCreateRequest;
 use App\Http\Requests\Courses\CourseDeleteRequest;
 use App\Http\Requests\Courses\CourseUpdateRequest;
-use App\Http\Requests\Courses\CourseAttachRequest;
-use App\Http\Requests\Courses\CourseDetachRequest;
 use App\Http\Resources\CourseResource;
 use App\Http\Response\ApiResponse;
 use App\Models\Course;
@@ -88,9 +87,13 @@ class CourseController extends Controller {
 
        return new ApiResponse('Successfully delete course', ResponseAlias::HTTP_OK);
     }
-    public function attach(CourseAttachRequest $request, int $studentId, int $courseId): ApiResponse
+
+    public function attach(CourseActionRequest $request, int $studentId, int $courseId): ApiResponse
     {
-        $attached = $this->courseService->attach($studentId, $courseId);
+        $dto = $request->validatedDTO();
+
+        $purchased = $this->purchased($dto->courseId);
+        $attached = $this->courseService->attach($dto->studentId, $dto->courseId);
 
         if (!$attached) {
             return new ApiResponse('Invalid Provider', Response::HTTP_BAD_REQUEST, false);
@@ -99,14 +102,27 @@ class CourseController extends Controller {
         return new ApiResponse('Course attached successfully', Response::HTTP_OK);
     }
 
-    public function detach(CourseDetachRequest $request, int $studentId, int $courseId): ApiResponse
+    public function detach(CourseActionRequest $request, int $studentId, int $courseId): ApiResponse
     {
-        $detached = $this->courseService->detach($studentId, $courseId);
+        $dto = $request->validatedDTO();
+
+        $detached = $this->courseService->detach($dto->studentId, $dto->courseId);
 
         if (!$detached) {
             return new ApiResponse('Invalid Provider', Response::HTTP_BAD_REQUEST, false);
         }
 
         return new ApiResponse('Course detached successfully', Response::HTTP_OK);
+    }
+
+    public function purchased( int $courseId): ApiResponse
+    {
+        $purchased = $this->courseService->purchased($courseId);
+
+        if (!$purchased) {
+            return new ApiResponse('Course not purchased or invalid', Response::HTTP_BAD_REQUEST, false);
+        }
+
+        return new ApiResponse('Course purchased successfully', Response::HTTP_OK);
     }
 }

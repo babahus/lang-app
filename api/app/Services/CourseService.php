@@ -55,9 +55,7 @@ class CourseService implements CourseContract {
             return false;
         }
 
-        $isCoursePurchased = $this->purchased($courseId);
-
-        if ($course->price === 0 || ($isCoursePurchased && !$course->students->contains($student))) {
+        if ($course->price === 0 || !$course->students->contains($student)) {
             $this->addStudentToCourse($student, $course);
             return true;
         }
