@@ -55,4 +55,19 @@ final class Exercise extends Model
     {
         return $this->belongsTo(Stage::class, 'stage_id');
     }
+
+    public function dictionary()
+    {
+        return $this->belongsTo(Dictionary::class, 'exercise_id');
+    }
+
+    public function compilePhrase()
+    {
+        return $this->belongsTo(CompilePhrase::class, 'exercise_id');
+    }
+
+    public function audit()
+    {
+        return $this->belongsTo(Audit::class, 'exercise_id');
+    }
 }

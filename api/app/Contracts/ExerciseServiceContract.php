@@ -19,6 +19,6 @@ interface ExerciseServiceContract
     public function delete(DeleteExerciseDTO $deleteExerciseDTO, int $id);
     public function create(CreateExerciseDTO $createExerciseDTO);
     public function solving(SolvingExerciseDTO $solvingExerciseDTO);
-    public function attachExerciseToStageCourse(MoveUserExerciseDTO $moveUserExerciseDTO, int $stageId, int $courseId);
-    public function detachExerciseToStageCourse(MoveUserExerciseDTO $moveUserExerciseDTO, int $stageId, int $courseId);
+    public function attachExerciseToStageCourse(MoveUserExerciseDTO $moveUserExerciseDTO);
+    public function detachExerciseToStageCourse(MoveUserExerciseDTO $moveUserExerciseDTO);
 }

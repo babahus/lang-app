@@ -3,9 +3,11 @@
 namespace App\Http\Requests\Courses;
 
 use App\DataTransfers\Courses\CourseActionDTO;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseRequest;
+use App\Models\Course;
+use Illuminate\Support\Facades\Gate;
 
-class CourseActionRequest extends FormRequest
+final class CourseActionRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +16,10 @@ class CourseActionRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        $course = Course::findOrFail($this->input('courseId'));
+        $studentId = $this->input('studentId');
+
+        return Gate::allows('canManageEnrollment', [$course, $studentId]);
     }
 
     /**
@@ -30,11 +35,11 @@ class CourseActionRequest extends FormRequest
         ];
     }
 
-    public function validatedDTO(): CourseActionDTO
+    public function getDTO(): CourseActionDTO
     {
         return new CourseActionDTO(
-            $this->validated()['studentId'],
-            $this->validated()['courseId'],
+            $this->input()['studentId'],
+            $this->input()['courseId'],
         );
     }
 }

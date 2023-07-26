@@ -12,6 +12,7 @@ use App\Http\Response\ApiResponse;
 use App\Models\Course;
 use App\Services\CourseService;
 use Illuminate\Http\Response;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class CourseController extends Controller {
@@ -88,12 +89,14 @@ class CourseController extends Controller {
        return new ApiResponse('Successfully delete course', ResponseAlias::HTTP_OK);
     }
 
-    public function attach(CourseActionRequest $request, int $studentId, int $courseId): ApiResponse
+    /**
+     * @param CourseActionRequest $request
+     * @return ApiResponse
+     */
+    public function attach(CourseActionRequest $request): ApiResponse
     {
-        $dto = $request->validatedDTO();
-
-        $purchased = $this->purchased($dto->courseId);
-        $attached = $this->courseService->attach($dto->studentId, $dto->courseId);
+        $purchased = $this->purchased($request->getDTO()->courseId);
+        $attached = $this->courseService->attach($request->getDTO());
 
         if (!$attached) {
             return new ApiResponse('Invalid Provider', Response::HTTP_BAD_REQUEST, false);
@@ -102,11 +105,13 @@ class CourseController extends Controller {
         return new ApiResponse('Course attached successfully', Response::HTTP_OK);
     }
 
-    public function detach(CourseActionRequest $request, int $studentId, int $courseId): ApiResponse
+    /**
+     * @param CourseActionRequest $request
+     * @return ApiResponse
+     */
+    public function detach(CourseActionRequest $request): ApiResponse
     {
-        $dto = $request->validatedDTO();
-
-        $detached = $this->courseService->detach($dto->studentId, $dto->courseId);
+        $detached = $this->courseService->detach($request->getDTO());
 
         if (!$detached) {
             return new ApiResponse('Invalid Provider', Response::HTTP_BAD_REQUEST, false);

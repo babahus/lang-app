@@ -10,7 +10,7 @@ class CoursePolicy
 {
     use HandlesAuthorization;
 
-    public function canManageEnrollment(User $user, Course $course, int $studentId)
+    public function canManageEnrollment(User $user, Course $course, int $studentId): bool
     {
         return $user->id === $studentId || $user->id === $course->account_id;
     }

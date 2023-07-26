@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\CourseContract;
+use App\DataTransfers\Courses\CourseActionDTO;
 use App\DataTransfers\Courses\CreateCourseDTO;
 use App\Models\Course;
 use App\Models\User;
@@ -41,15 +42,15 @@ class CourseService implements CourseContract {
         return $course->delete();
     }
 
-    public function attach(int $studentId, int $courseId): bool
+    /**
+     * @param CourseActionDTO $courseActionDTO
+     * @return bool
+     */
+    public function attach(CourseActionDTO $courseActionDTO): bool
     {
-        $course = Course::findOrFail($courseId);
+        $course = Course::findOrFail($courseActionDTO->courseId);
 
-        if (Gate::denies('canManageEnrollment', [$course, $studentId])) {
-            return false;
-        }
-
-        $student = User::find($studentId);
+        $student = User::find($courseActionDTO->studentId);
 
         if ($course->students->contains($student)) {
             return false;
@@ -70,15 +71,15 @@ class CourseService implements CourseContract {
         return true;
     }
 
-    public function detach(int $studentId, int $courseId): bool
+    /**
+     * @param CourseActionDTO $courseActionDTO
+     * @return bool
+     */
+    public function detach(CourseActionDTO $courseActionDTO): bool
     {
-        $course = Course::findOrFail($courseId);
+        $course = Course::findOrFail($courseActionDTO->courseId);
 
-        if (Gate::denies('canManageEnrollment', [$course, $studentId])) {
-            return false;
-        }
-
-        $course->students()->detach($studentId);
+        $course->students()->detach($courseActionDTO->studentId);
 
         return true;
     }
