@@ -178,7 +178,7 @@ final class ExerciseService implements ExerciseServiceContract {
      */
     public function attach(MoveUserExerciseDTO $moveUserExerciseDTO, User|\Illuminate\Contracts\Auth\Authenticatable $user): bool {
         $typeClass = $this->getClassType($moveUserExerciseDTO->type);
-        dd($moveUserExerciseDTO);
+        
         if (!$this->checkIfExerciseIsAttached($moveUserExerciseDTO->id, $user->id, $typeClass)){
             return false;
         }

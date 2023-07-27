@@ -160,11 +160,7 @@ final class ExerciseController extends Controller {
      */
     public function detachExerciseToStageCourses(MoveUserExerciseRequest $request): ApiResponse {
 
-        $dto = $request->getDTO();
-        $stageId = $dto->stage_id;
-        $courseId = $dto->course_id;
-
-        if ($this->exerciseService->detachExerciseToStageCourse($dto, $stageId, $courseId)) {
+        if ($this->exerciseService->detachExerciseToStageCourse($request->getDTO())) {
             return new ApiResponse('Successful detached exercise from stage and course');
         }
 

@@ -57,14 +57,14 @@ class CourseService implements CourseContract {
         }
 
         if ($course->price === 0 || !$course->students->contains($student)) {
-            $this->addStudentToCourse($student, $course);
-            return true;
+
+            return $this->addStudentToCourse($student, $course);
         }
 
         return false;
     }
 
-    public function addStudentToCourse(User $student, Course $course)
+    public function addStudentToCourse(User $student, Course $course): bool
     {
         $course->students()->attach($student->id, ['added_at' => now()]);
 
