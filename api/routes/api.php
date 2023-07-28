@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ExerciseController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\StageController;
+use App\Http\Controllers\ExerciseGeneratorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,3 +47,5 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/logout', [AuthController::class, 'logout']);
 });
 Route::post('/webhook', [ExerciseController::class, 'webHook']);
+
+Route::post('/openai/test', [ExerciseGeneratorController::class, 'test']);
