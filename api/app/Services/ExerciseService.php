@@ -152,7 +152,7 @@ final class ExerciseService implements ExerciseServiceContract {
     public function create(CreateExerciseDTO $createExerciseDTO): \Illuminate\Database\Eloquent\Model|Audit|Dictionary|bool|CompilePhrase|\Closure {
         return match (ExercisesTypes::inEnum($createExerciseDTO->type)) {
             ExercisesTypes::DICTIONARY => Dictionary::create(['dictionary' => $createExerciseDTO->data]),
-            ExercisesTypes::COMPILE_PHRASE => CompilePhrase::create(['phrase' => $createExerciseDTO->data]),
+            ExercisesTypes::COMPILE_PHRASE => CompilePhrase::createIfNotExist($createExerciseDTO->data),
             ExercisesTypes::AUDIT => call_user_func(function() use ($createExerciseDTO): Audit
             {
                 $auditObj = Audit::create();

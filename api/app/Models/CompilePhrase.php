@@ -21,7 +21,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|CompilePhrase whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CompilePhrase wherePhrase($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CompilePhrase whereUpdatedAt($value)
- * @property-read \Illuminate\Database\Eloquent\Collection<int, CompilePhrase> $exercises
  * @mixin \Eloquent
  */
 final class CompilePhrase extends Model
@@ -35,5 +34,16 @@ final class CompilePhrase extends Model
     public function exercises()
     {
         return $this->belongsToMany(CompilePhrase::class,'user_exercise_type', 'exercise_id', 'exercise_id', 'id')->withPivotValue('type', CompilePhrase::class)->withPivot('solved');
+    }
+
+    public static function createIfNotExist(string $phrase): CompilePhrase
+    {
+        $exercise = self::where('phrase', $phrase)->first();
+
+        if (!$exercise) {
+            $exercise = self::create(['phrase' => $phrase]);
+        }
+
+        return $exercise;
     }
 }

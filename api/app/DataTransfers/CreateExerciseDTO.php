@@ -7,12 +7,12 @@ use Illuminate\Http\UploadedFile;
 
 class CreateExerciseDTO implements DTO
 {
-    public readonly string|UploadedFile $data;
-    public readonly string $type;
-    public ?string $transcript; 
+    public string|UploadedFile|null $data;
+    public string $type;
+    public ?string $transcript;
 
     public function __construct(
-        $data,
+        ?string $data,
         $type,
         ?string $transcript = null
     )
