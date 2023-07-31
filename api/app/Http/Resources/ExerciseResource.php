@@ -2,6 +2,9 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\ExercisesResourcesTypes;
+use App\Enums\ExercisesTypes;
+use App\Http\Response\ApiResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 final class ExerciseResource extends JsonResource
@@ -16,17 +19,14 @@ final class ExerciseResource extends JsonResource
     {
         $response = [
             'id' => $this->id,
-            'type' => $this->exercise_type,
-            'data' => null,
+            'type' => strtolower(ExercisesResourcesTypes::from($this->exercise_type)->name),
+            'data' => match ($this->exercise_type) {
+                ExercisesResourcesTypes::DICTIONARY->value => new DictionaryResource($this->dictionary),
+                ExercisesResourcesTypes::COMPILE_PHRASE->value => new CompilePhraseResource($this->compilePhrase),
+                ExercisesResourcesTypes::AUDIT->value => new AuditResource($this->audit),
+                default => null,
+            },
         ];
-
-        if ($this->exercise_type === 'App\Models\Dictionary') {
-            $response['data'] = new DictionaryResource($this->dictionary);
-        } elseif ($this->exercise_type === 'App\Models\CompilePhrase') {
-            $response['data'] = new CompilePhraseResource($this->compilePhrase);
-        } elseif ($this->exercise_type === 'App\Models\Audit') {
-            $response['data'] = new AuditResource($this->audit);
-        }
 
         return $response;
     }

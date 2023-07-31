@@ -176,20 +176,20 @@ final class ExerciseService implements ExerciseServiceContract {
      * @param User|\Illuminate\Contracts\Auth\Authenticatable $user
      * @return bool
      */
-    public function attach(MoveUserExerciseDTO $moveUserExerciseDTO, User|\Illuminate\Contracts\Auth\Authenticatable $user): bool {
-        $typeClass = $this->getClassType($moveUserExerciseDTO->type);
-
-        if (!$this->checkIfExerciseIsAttached($moveUserExerciseDTO->id, $user->id, $typeClass)){
-            return false;
-        }
-        if ($typeClass == Dictionary::class && !is_null($this->checkIfDictionaryIsAttached($moveUserExerciseDTO->id))){
-
-            return false;
-        }
-        $user->exercises()->attach($moveUserExerciseDTO->id, ['exercise_type' => $typeClass]);
-
-        return true;
-    }
+//    public function attach(MoveUserExerciseDTO $moveUserExerciseDTO, User|\Illuminate\Contracts\Auth\Authenticatable $user): bool {
+//        $typeClass = $this->getClassType($moveUserExerciseDTO->type);
+//
+//        if (!$this->checkIfExerciseIsAttached($moveUserExerciseDTO->id, $user->id, $typeClass)){
+//            return false;
+//        }
+//        if ($typeClass == Dictionary::class && !is_null($this->checkIfDictionaryIsAttached($moveUserExerciseDTO->id))){
+//
+//            return false;
+//        }
+//        $user->exercises()->attach($moveUserExerciseDTO->id, ['exercise_type' => $typeClass]);
+//
+//        return true;
+//    }
 
     /**
      * @param MoveUserExerciseDTO $moveUserExerciseDTO
@@ -246,9 +246,11 @@ final class ExerciseService implements ExerciseServiceContract {
      * @param int $exercise_id
      * @param int $user_id
      * @param string $type
+     * @param int $stageId
+     * @param int $courseId
      * @return bool
      */
-    public function checkIfExerciseIsAttached(int $exercise_id, int $user_id, string $type, $stageId, $courseId): bool {
+    public function checkIfExerciseIsAttached(int $exercise_id, int $user_id, string $type, int $stageId, int $courseId): bool {
 
         $exercise = Exercise::whereExerciseId($exercise_id)
             ->where('account_id', '=', $user_id)

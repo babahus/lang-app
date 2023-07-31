@@ -147,6 +147,7 @@ final class ExerciseController extends Controller {
      * @return ApiResponse
      */
     public function attachExerciseToStageCourses(MoveUserExerciseRequest $request): ApiResponse {
+
         if ($this->exerciseService->attachExerciseToStageCourse($request->getDTO())) {
             return new ApiResponse('Successful attached exercise to stage and course');
         }
