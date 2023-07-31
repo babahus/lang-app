@@ -8,14 +8,14 @@ class MoveUserExerciseDTO implements DTO
 {
     public readonly int $id;
     public readonly string $type;
-    public readonly int $stage_id;
-    public readonly int $course_id;
+    public readonly ?int $stage_id;
+    public readonly ?int $course_id;
 
     public function __construct(
         int $id,
         string $type,
-        int $stage_id,
-        int $course_id
+        ?int $stage_id,
+        ?int $course_id
     )
     {
         $this->id = $id;

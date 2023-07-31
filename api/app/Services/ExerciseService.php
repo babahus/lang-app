@@ -250,21 +250,21 @@ final class ExerciseService implements ExerciseServiceContract {
      * @param int $courseId
      * @return bool
      */
-    public function checkIfExerciseIsAttached(int $exercise_id, int $user_id, string $type, int $stageId, int $courseId): bool {
+    public function checkIfExerciseIsAttached(int $exercise_id, int $user_id, string $type, ?int $stageId, ?int $courseId): bool
+    {
+        $query = Exercise::where('exercise_id', $exercise_id)
+            ->where('account_id', $user_id)
+            ->where('exercise_type', $type);
 
-        $exercise = Exercise::whereExerciseId($exercise_id)
-            ->where('account_id', '=', $user_id)
-            ->where('exercise_type', '=', $type)
-            ->where('stage_id', $stageId)
-            ->where('course_id', $courseId)
-            ->first();
-
-        if ($exercise)
-        {
-            return false;
+        if ($stageId !== null && $courseId !== null) {
+            $query->where('stage_id', $stageId);
+            $query->where('course_id', $courseId);
+        } else {
+            $query->whereNull('stage_id');
+            $query->whereNull('course_id');
         }
 
-        return true;
+        return $query->exists();
     }
 
     /**
@@ -287,7 +287,13 @@ final class ExerciseService implements ExerciseServiceContract {
     public function attachExerciseToStageCourse(MoveUserExerciseDTO $moveUserExerciseDTO): bool {
         $typeClass = $this->getClassType($moveUserExerciseDTO->type);
 
-        if (!$this->checkIfExerciseIsAttached($moveUserExerciseDTO->id, auth()->user()->id, $typeClass, $moveUserExerciseDTO->stage_id, $moveUserExerciseDTO->course_id)) {
+        if ($this->checkIfExerciseIsAttached(
+            $moveUserExerciseDTO->id,
+            auth()->user()->id,
+            $typeClass,
+            $moveUserExerciseDTO->stage_id,
+            $moveUserExerciseDTO->course_id
+        )) {
             return false;
         }
 
@@ -311,7 +317,13 @@ final class ExerciseService implements ExerciseServiceContract {
     public function detachExerciseToStageCourse(MoveUserExerciseDTO $moveUserExerciseDTO): bool {
         $typeClass = $this->getClassType($moveUserExerciseDTO->type);
 
-        if ($this->checkIfExerciseIsAttached($moveUserExerciseDTO->id, auth()->user()->id, $typeClass, $moveUserExerciseDTO->stage_id, $moveUserExerciseDTO->course_id)) {
+        if (!$this->checkIfExerciseIsAttached(
+            $moveUserExerciseDTO->id,
+            auth()->user()->id,
+            $typeClass,
+            $moveUserExerciseDTO->stage_id,
+            $moveUserExerciseDTO->course_id
+        )) {
             return false;
         }
 
