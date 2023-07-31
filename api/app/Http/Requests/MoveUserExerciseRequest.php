@@ -6,8 +6,11 @@ use App\Contracts\DTO;
 use App\DataTransfers\MoveUserExerciseDTO;
 use App\Enums\ExercisesTypes;
 use App\Http\Response\ApiResponse;
+use App\Models\Course;
+use App\Models\Exercise;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
@@ -20,7 +23,7 @@ final class MoveUserExerciseRequest extends BaseRequest
      */
     public function authorize()
     {
-        return true;
+        return Gate::allows('attach-detach-exercise', [$this->getDTO()]);
     }
 
     /**
@@ -31,8 +34,8 @@ final class MoveUserExerciseRequest extends BaseRequest
     public function rules()
     {
         return [
-            'stage_id' => ['required', 'numeric', Rule::exists('accounts_courses_stages', 'id')],
-            'course_id' => ['required', 'numeric', Rule::exists('accounts_courses', 'id')],
+            'stage_id' => ['nullable', 'numeric', Rule::exists('accounts_courses_stages', 'id')],
+            'course_id' => ['nullable', 'numeric', Rule::exists('accounts_courses', 'id')],
             'id' => match (ExercisesTypes::inEnum($this->input('exercise_type'))){
                 ExercisesTypes::COMPILE_PHRASE => ['required', 'numeric', Rule::exists('compile_phrases', 'id')],
                 ExercisesTypes::DICTIONARY => ['required', 'numeric', Rule::exists('dictionaries', 'id')],
