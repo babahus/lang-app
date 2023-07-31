@@ -8,6 +8,7 @@ use App\Enums\ExercisesTypes;
 use App\Http\Response\ApiResponse;
 use App\Models\Course;
 use App\Models\Exercise;
+use App\Rules\StageBelongsToCourse;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
@@ -34,7 +35,7 @@ final class MoveUserExerciseRequest extends BaseRequest
     public function rules()
     {
         return [
-            'stage_id' => ['nullable', 'numeric', Rule::exists('accounts_courses_stages', 'id')],
+            'stage_id' => ['nullable', 'numeric', new StageBelongsToCourse($this->input('course_id'))],
             'course_id' => ['nullable', 'numeric', Rule::exists('accounts_courses', 'id')],
             'id' => match (ExercisesTypes::inEnum($this->input('exercise_type'))){
                 ExercisesTypes::COMPILE_PHRASE => ['required', 'numeric', Rule::exists('compile_phrases', 'id')],
