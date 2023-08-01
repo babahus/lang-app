@@ -29,6 +29,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         );
         Route::get('/admin/roles', [AdminController::class, 'getRoles']);
         Route::apiResource('/admin', AdminController::class);
+        Route::post('/exercise/generate', [ExerciseGeneratorController::class, 'generate']);
     });
     Route::apiResource('/course', CourseController::class);
     Route::apiResource('/stage', StageController::class)->except('index');
@@ -47,5 +48,3 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/logout', [AuthController::class, 'logout']);
 });
 Route::post('/webhook', [ExerciseController::class, 'webHook']);
-
-Route::post('/openai/test', [ExerciseGeneratorController::class, 'test']);

@@ -26,7 +26,7 @@ class ExerciseGeneratorController extends Controller
         $this->exerciseService = $exerciseService;
     }
 
-    public function test(GenerateExerciseFromAiRequest $request)
+    public function generate(GenerateExerciseFromAiRequest $request)
     {
         $dto = $request->getDTO();
 
@@ -42,10 +42,8 @@ class ExerciseGeneratorController extends Controller
                     $this->exerciseService->create($dto);
                 }
             }
-            //return $this->openAiService->generateText($exercisePrompt);
         }
 
         return new ApiResponse('Successful generated exercises');
-        //return $this->openAiService->generateText();
     }
 }
