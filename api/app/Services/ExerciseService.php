@@ -3,15 +3,7 @@
 namespace App\Services;
 
 use App\Enums\ExercisesTypes;
-use App\Models\{
-    User,
-    Audit,
-    Exercise,
-    Dictionary,
-    CompilePhrase,
-    Stage,
-    Course,
-};
+use App\Models\{PairExercise, User, Audit, Exercise, Dictionary, CompilePhrase, Stage, Course};
 use App\DataTransfers\{
     CreateExerciseDTO,
     DeleteExerciseDTO,
@@ -37,20 +29,28 @@ final class ExerciseService implements ExerciseServiceContract {
      * @var DictionaryService
      */
     private DictionaryService $dictionaryService;
+    /**
+     * @var PairExerciseService
+     */
+    private PairExerciseService $pairExerciseService;
 
     /**
      * @param AuditService $auditService
      * @param CompilePhraseService $compilePhrase
      * @param DictionaryService $dictionaryService
+     * @param PairExerciseService $pairExerciseService
      */
     public function __construct (
         AuditService $auditService,
         CompilePhraseService $compilePhrase,
-        DictionaryService $dictionaryService
+        DictionaryService $dictionaryService,
+        PairExerciseService $pairExerciseService
+
     ) {
         $this->compilePhrase = $compilePhrase;
         $this->auditService = $auditService;
         $this->dictionaryService = $dictionaryService;
+        $this->pairExerciseService = $pairExerciseService;
     }
 
     /**
@@ -58,7 +58,7 @@ final class ExerciseService implements ExerciseServiceContract {
      * @return \Illuminate\Database\Eloquent\Collection|array
      */
     public function getAllExercises(int $userId): \Illuminate\Database\Eloquent\Collection|array {
-        return User::with(['dictionary', 'compilePhrase', 'audit'])->where('id', $userId)->get();
+        return User::with(['dictionary', 'compilePhrase', 'audit', 'pairExercise'])->where('id', $userId)->get();
     }
 
     /**
@@ -71,6 +71,7 @@ final class ExerciseService implements ExerciseServiceContract {
             ExercisesTypes::DICTIONARY => Dictionary::paginate(10),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::paginate(10),
             ExercisesTypes::AUDIT => Audit::paginate(10),
+            ExercisesTypes::PAIR_EXERCISE => PairExercise::paginate(10),
             default => false
         };
     }
@@ -79,13 +80,14 @@ final class ExerciseService implements ExerciseServiceContract {
      * @param string $type
      * @param int $id
      * @param int $userId
-     * @return CompilePhrase|Audit|Dictionary|bool
+     * @return CompilePhrase|Audit|Dictionary|PairExercise|bool
      */
-    public function getExerciseByIdAndType(string $type, int $id, int $userId): CompilePhrase|Audit|Dictionary|bool {
+    public function getExerciseByIdAndType(string $type, int $id, int $userId): CompilePhrase|Audit|Dictionary|PairExercise|bool {
         $exercise = match (ExercisesTypes::inEnum($type)) {
             ExercisesTypes::DICTIONARY => Dictionary::whereId($id)->first(),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::whereId($id)->first(),
             ExercisesTypes::AUDIT => Audit::whereId($id)->first(),
+            ExercisesTypes::PAIR_EXERCISE => PairExercise::whereId($id)->first(),
             default => false
         };
 
@@ -112,6 +114,7 @@ final class ExerciseService implements ExerciseServiceContract {
                      ->update(['phrase' => $updateExerciseDTO->data]),
             ExercisesTypes::AUDIT => Audit::whereId($id)
                      ->update(['transcript' => $updateExerciseDTO->data]),
+            ExercisesTypes::PAIR_EXERCISE => $this->pairExerciseService->updatePairExercise($id, json_decode($updateExerciseDTO->data, true)),
             default => false
         };
     }
@@ -136,6 +139,7 @@ final class ExerciseService implements ExerciseServiceContract {
 
                     return $auditObj->delete();
                 }),
+                ExercisesTypes::PAIR_EXERCISE  => $this->pairExerciseService->deletePairExercise(PairExercise::whereId($id)->first()),
                 default => false
             };
         } catch (\Error $error)
@@ -147,12 +151,13 @@ final class ExerciseService implements ExerciseServiceContract {
 
     /**
      * @param CreateExerciseDTO $createExerciseDTO
-     * @return Model|Audit|Dictionary|bool|CompilePhrase|\Closure
+     * @return Model|Audit|Dictionary|PairExercise|bool|CompilePhrase|\Closure
      */
-    public function create(CreateExerciseDTO $createExerciseDTO): \Illuminate\Database\Eloquent\Model|Audit|Dictionary|bool|CompilePhrase|\Closure {
+    public function create(CreateExerciseDTO $createExerciseDTO): \Illuminate\Database\Eloquent\Model|Audit|Dictionary|PairExercise|bool|CompilePhrase|\Closure {
         return match (ExercisesTypes::inEnum($createExerciseDTO->type)) {
             ExercisesTypes::DICTIONARY => Dictionary::create(['dictionary' => $createExerciseDTO->data]),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::create(['phrase' => $createExerciseDTO->data]),
+            ExercisesTypes::PAIR_EXERCISE => PairExercise::create(['correct_pair_json' => $createExerciseDTO->data]),
             ExercisesTypes::AUDIT => call_user_func(function() use ($createExerciseDTO): Audit
             {
                 $auditObj = Audit::create();
@@ -206,9 +211,9 @@ final class ExerciseService implements ExerciseServiceContract {
 
     /**
      * @param SolvingExerciseDTO $solvingExerciseDTO
-     * @return Dictionary|CompilePhrase|Audit|bool
+     * @return Dictionary|CompilePhrase|Audit|PairExercise|bool
      */
-    public function solving(SolvingExerciseDTO $solvingExerciseDTO): Dictionary|CompilePhrase|Audit|bool|string {
+    public function solving(SolvingExerciseDTO $solvingExerciseDTO): Dictionary|CompilePhrase|Audit|PairExercise|bool|string {
         $exercise = Exercise::where('account_id', auth()->id())
             ->where('exercise_id', $solvingExerciseDTO->id)
             ->where('exercise_type', '=', $this->getClassType(ExercisesTypes::inEnum($solvingExerciseDTO->type)->value))
@@ -225,6 +230,7 @@ final class ExerciseService implements ExerciseServiceContract {
             ExercisesTypes::DICTIONARY => $this->dictionaryService->fillDictionary($solvingExerciseDTO),
             ExercisesTypes::COMPILE_PHRASE => $this->compilePhrase->solveCompilePhrase($solvingExerciseDTO),
             ExercisesTypes::AUDIT => $this->auditService->solveAudit($solvingExerciseDTO),
+//            ExercisesTypes::PAIR_EXERCISE => $this->pairExerciseService
             default => 'Something went wrong'
         };
     }
@@ -238,7 +244,8 @@ final class ExerciseService implements ExerciseServiceContract {
         return match (ExercisesTypes::inEnum($type)) {
             ExercisesTypes::DICTIONARY => Dictionary::class,
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::class,
-            ExercisesTypes::AUDIT => Audit::class
+            ExercisesTypes::AUDIT => Audit::class,
+            ExercisesTypes::PAIR_EXERCISE => PairExercise::class
         };
     }
 

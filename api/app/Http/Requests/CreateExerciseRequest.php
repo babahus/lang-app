@@ -31,12 +31,12 @@ final class CreateExerciseRequest extends BaseRequest
         return [
             'data'       => match (ExercisesTypes::inEnum($this->input('type'))){
                     ExercisesTypes::COMPILE_PHRASE => ['required', 'string'],
-                    ExercisesTypes::DICTIONARY     => ['required', 'nullable', 'json'],
+                    ExercisesTypes::DICTIONARY, ExercisesTypes::PAIR_EXERCISE => ['required', 'nullable', 'json'],
                     ExercisesTypes::AUDIT          => ['required', 'file', 'mimes:mp3,wav,flac', 'max:12048'],
                     default                        => 'nullable'
             },
             'transcript' => match (ExercisesTypes::inEnum($this->input('type'))) {
-                ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::DICTIONARY  => ['nullable'],
+                ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::DICTIONARY, ExercisesTypes::PAIR_EXERCISE  => ['nullable'],
                 ExercisesTypes::AUDIT                                       => ['required', 'string'],
             },
             'type'                                                          => ['required', 'string', new Enum(ExercisesTypes::class)],

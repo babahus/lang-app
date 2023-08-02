@@ -71,4 +71,9 @@ final class Exercise extends Model
     {
         return $this->belongsTo(Audit::class, 'exercise_id');
     }
+
+    public function pairExercise()
+    {
+        return $this->belongsTo(PairExercise::class, 'exercise_id');
+    }
 }
