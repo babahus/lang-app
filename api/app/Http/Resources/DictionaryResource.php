@@ -14,12 +14,15 @@ final class DictionaryResource extends JsonResource
      */
     public function toArray($request)
     {
-        $result = array_reduce(json_decode($this->dictionary, true), function ($carry, $item) {
-            $item = str_replace(['{', '}', "'", " "], '', $item);
-            $carry[$item['word']] = $item['translate'];
+        $arrValue = array_reduce(json_decode($this->dictionary, true), function ($carry, $item) {
+            $carry[$item['word']] = $item['translation'];
 
             return $carry;
         }, []);
+
+        $result =  array_map(function ($word, $translation) {
+            return ['word' => $word, 'translation' => $translation];
+        }, array_keys($arrValue), $arrValue);
 
         return [
           'id'         => $this->id,

@@ -29,17 +29,28 @@ final class DictionaryService implements DictionaryServiceContract
 
     public function updateDictionary(Dictionary $dictionary, array|string $data): bool
     {
-        $transformedData = json_decode(str_replace("'", '"', $data), true);
+        $transformedData = json_decode($data, true);
+
         $decodedArrJson = json_decode($dictionary->dictionary, true);
-        // Loop through each associative array and update the 'translate' key value
-        foreach ($decodedArrJson as &$item) {
-            if ($item['word'] == $transformedData['word']) {
-                $item['translate'] = $transformedData['translate'];
+
+        foreach ($transformedData as $newWord) {
+            $wordFound = false;
+
+            foreach ($decodedArrJson as &$item) {
+                if ($item['word'] === $newWord['word']) {
+                    $item['translation'] = $newWord['translation'];
+                    $wordFound = true;
+                    break;
+                }
+            }
+
+            if (!$wordFound) {
+                $decodedArrJson[] = $newWord;
             }
         }
-        // Encode the updated array back into a JSON string
-        $updatedData = json_encode($transformedData, JSON_UNESCAPED_UNICODE);
-        // Print the updated JSON string
+
+        $updatedData = json_encode($decodedArrJson, JSON_UNESCAPED_UNICODE);
+
         $dictionary->setAttribute('dictionary', $updatedData);
 
         return $dictionary->save();
@@ -47,14 +58,23 @@ final class DictionaryService implements DictionaryServiceContract
 
     public function deleteDictionary(Dictionary $dictionary, array|string $data): bool
     {
-        $data = json_decode($data , true);
-        $jsonArray = json_decode($dictionary->dictionary, true);
-        $index = array_search($data, $jsonArray);
+        $data = json_decode($data, true);
 
-        if ($index !== false) {
-            unset($jsonArray[$index]);
+        $jsonArray = json_decode($dictionary->dictionary, true);
+
+        foreach ($data as $wordToDelete) {
+            foreach ($jsonArray as $index => $item) {
+                if ($item['word'] === $wordToDelete) {
+                    unset($jsonArray[$index]);
+                }
+            }
         }
-        $dictionary->dictionary = array_values($jsonArray);
+
+        $jsonArray = array_values($jsonArray);
+
+        $updatedData = json_encode($jsonArray, JSON_UNESCAPED_UNICODE);
+
+        $dictionary->setAttribute('dictionary', $updatedData);
 
         return $dictionary->save();
     }

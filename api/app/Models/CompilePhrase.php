@@ -28,6 +28,8 @@ final class CompilePhrase extends Model
 {
     use HasFactory;
 
+    protected $table = 'compile_phrases';
+
     protected $fillable = [
       'phrase'
     ];

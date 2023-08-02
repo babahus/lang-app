@@ -58,7 +58,11 @@ final class ExerciseService implements ExerciseServiceContract {
      * @return \Illuminate\Database\Eloquent\Collection|array
      */
     public function getAllExercises(int $userId): \Illuminate\Database\Eloquent\Collection|array {
-        return User::with(['dictionary', 'compilePhrase', 'audit', 'pairExercise'])->where('id', $userId)->get();
+        return Exercise::where('account_id', $userId)
+            ->whereNull('course_id')
+            ->whereNull('stage_id')
+            ->with(['dictionary', 'compilePhrase', 'audit', 'pairExercise'])
+            ->get();
     }
 
     /**
