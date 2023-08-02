@@ -31,18 +31,16 @@ final class DictionaryService implements DictionaryServiceContract
     {
         $transformedData = json_decode(str_replace("'", '"', $data), true);
         $decodedArrJson = json_decode($dictionary->dictionary, true);
-
         // Loop through each associative array and update the 'translate' key value
         foreach ($decodedArrJson as &$item) {
-
             if ($item['word'] == $transformedData['word']) {
                 $item['translate'] = $transformedData['translate'];
             }
         }
         // Encode the updated array back into a JSON string
-        $updatedData = json_encode($decodedArrJson, JSON_UNESCAPED_UNICODE);
+        $updatedData = json_encode($transformedData, JSON_UNESCAPED_UNICODE);
         // Print the updated JSON string
-        $dictionary->dictionary = $updatedData;
+        $dictionary->setAttribute('dictionary', $updatedData);
 
         return $dictionary->save();
     }

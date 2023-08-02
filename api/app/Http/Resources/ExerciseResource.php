@@ -24,6 +24,7 @@ final class ExerciseResource extends JsonResource
                 ExercisesResourcesTypes::DICTIONARY->value => new DictionaryResource($this->dictionary),
                 ExercisesResourcesTypes::COMPILE_PHRASE->value => new CompilePhraseResource($this->compilePhrase),
                 ExercisesResourcesTypes::AUDIT->value => new AuditResource($this->audit),
+                ExercisesResourcesTypes::PAIR_EXERCISE->value => new PairExerciseResource($this->pairExercise),
                 default => null,
             },
         ];
