@@ -6,15 +6,9 @@ use App\Models\PairExercise;
 
 final class PairExerciseService
 {
-
-    public function createEmptyPairExercise(): PairExercise
-    {
-        return PairExercise::create(['correct_pair_json' => '[]']);
-    }
-
     public function updatePairExercise(int $id, array $data): bool
     {
-        $pairExercise = PairExercise::find($id);
+        $pairExercise = PairExercise::findOrFail($id);
 
         if ($pairExercise === null) {
             return false;
@@ -27,7 +21,7 @@ final class PairExerciseService
 
     public function deletePairExercise(PairExercise $pairExercise ): bool
     {
-        $pairExercise = PairExercise::find($pairExercise->id);
+        $pairExercise = PairExercise::findOrFail($pairExercise->id);
 
         if ($pairExercise === null) {
             return false;
