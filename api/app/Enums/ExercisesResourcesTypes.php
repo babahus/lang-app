@@ -8,5 +8,6 @@ enum ExercisesResourcesTypes : string
     case  DICTIONARY = 'App\Models\Dictionary';
     case  AUDIT = 'App\Models\Audit';
     case  PAIR_EXERCISE = 'App\Models\PairExercise';
+    case  PICTURE_EXERCISE = 'App\Models\PictureExercise';
 
 }

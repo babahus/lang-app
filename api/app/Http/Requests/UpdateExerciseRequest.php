@@ -30,10 +30,37 @@ final class UpdateExerciseRequest extends BaseRequest
         return [
             'data' => match (ExercisesTypes::inEnum($this->input('type'))) {
                 ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::AUDIT => ['required'],
+                ExercisesTypes::PICTURE_EXERCISE =>  ['required', function ($attribute, $arrOptions, $fail) {
+                    $decodedOptions = json_decode($arrOptions, true);
+                    if (!is_array($decodedOptions) || count($decodedOptions) < 2) {
+                        $fail("The $attribute field must be a valid JSON array with at least two elements.");
+                    } else {
+                        $hasCorrectAnswer = false;
+
+                        foreach ($decodedOptions as $option) {
+                            if (!is_array($option) || !isset($option['text']) || !isset($option['is_correct'])) {
+                                $fail("Each element in the $attribute array must have 'text' and 'is_correct' keys.");
+                            }
+
+                            if ($option['is_correct'] === 'true') {
+                                if ($hasCorrectAnswer) {
+                                    $fail("Only one element in the $attribute array can have 'is_correct' set to true.");
+                                }
+                                $hasCorrectAnswer = true;
+                            } elseif ($option['is_correct'] !== 'false') {
+                                $fail("The 'is_correct' value in each element of the $attribute array should be either 'true' or 'false'.");
+                            }
+                        }
+
+                        if (!$hasCorrectAnswer) {
+                            $fail("At least one element in the $attribute array must have 'is_correct' set to true.");
+                        }
+                    }
+                }],
                 ExercisesTypes::DICTIONARY, ExercisesTypes::PAIR_EXERCISE => ['required', function ($attribute, $value, $fail) {
                     $decodedValue = json_decode($value, true);
 
-                    if ($decodedValue === null || !is_array($decodedValue)) {
+                    if (!is_array($decodedValue)) {
                         $fail("The $attribute field must be a valid JSON array.");
                     } else {
                         foreach ($decodedValue as $item) {

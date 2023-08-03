@@ -8,20 +8,21 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @method static whereId(int $id)
  */
-class PairExercise extends Model
+class PictureExercise extends Model
 {
     use HasFactory;
 
-    protected $table = 'pair_exercises';
+    protected $table = 'picture_exercises';
 
     protected $fillable = [
-        'correct_pair_json',
+        'image_path',
+        'option_json'
     ];
 
     public function exercises()
     {
-        return $this->belongsToMany(PairExercise::class,'user_exercise_type','exercise_id', 'exercise_id', 'id')
-            ->withPivotValue('type', PairExercise::class)
+        return $this->belongsToMany(PictureExercise::class,'user_exercise_type','exercise_id', 'exercise_id', 'id')
+            ->withPivotValue('type', PictureExercise::class)
             ->withPivot('solved');
     }
 }
