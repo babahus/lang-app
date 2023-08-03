@@ -35,6 +35,8 @@ final class Audit extends Model
 {
     use HasFactory;
 
+    protected $table = 'audits';
+
     public function exercises()
     {
         return $this->belongsToMany(Audit::class,'user_exercise_type','exercise_id', 'exercise_id', 'id')->withPivotValue('type', Dictionary::class)->withPivot('solved');

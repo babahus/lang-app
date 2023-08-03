@@ -28,6 +28,8 @@ final class Dictionary extends Model
 {
     use HasFactory;
 
+    protected $table = 'dictionaries';
+
     protected $fillable = [
         'dictionary'
     ];

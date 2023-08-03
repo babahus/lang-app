@@ -10,10 +10,6 @@ final class PairExerciseService
     {
         $pairExercise = PairExercise::findOrFail($id);
 
-        if ($pairExercise === null) {
-            return false;
-        }
-
         $pairExercise->correct_pair_json = json_encode($data, JSON_UNESCAPED_UNICODE);
 
         return $pairExercise->save();
@@ -22,10 +18,6 @@ final class PairExerciseService
     public function deletePairExercise(PairExercise $pairExercise ): bool
     {
         $pairExercise = PairExercise::findOrFail($pairExercise->id);
-
-        if ($pairExercise === null) {
-            return false;
-        }
 
         return $pairExercise->delete();
     }
