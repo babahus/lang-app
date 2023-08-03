@@ -15,7 +15,7 @@ final class PairExerciseService
         return $pairExercise->save();
     }
 
-    public function deletePairExercise(PairExercise $pairExercise ): bool
+    public function deletePairExercise(PairExercise $pairExercise): bool
     {
         $pairExercise = PairExercise::findOrFail($pairExercise->id);
 

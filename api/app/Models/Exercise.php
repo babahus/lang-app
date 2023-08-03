@@ -46,34 +46,39 @@ final class Exercise extends Model
         'exercise_type',
     ];
 
-    public function users()
+    public function users(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(User::class, 'accounts_exercises', 'exercise_id', 'account_id')
             ->withTimestamps();
     }
 
-    public function stages()
+    public function stages(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Stage::class, 'stage_id');
     }
 
-    public function dictionary()
+    public function dictionary(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Dictionary::class, 'exercise_id');
     }
 
-    public function compilePhrase()
+    public function compilePhrase(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(CompilePhrase::class, 'exercise_id');
     }
 
-    public function audit()
+    public function audit(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Audit::class, 'exercise_id');
     }
 
-    public function pairExercise()
+    public function pairExercise(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(PairExercise::class, 'exercise_id');
+    }
+
+    public function pictureExercise(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(PictureExercise::class, 'exercise_id');
     }
 }

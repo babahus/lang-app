@@ -30,31 +30,15 @@ final class DeleteExerciseRequest extends FormRequest
         return [
             'type' => ['required', 'string', new Enum(ExercisesTypes::class)],
             'data' => match (ExercisesTypes::inEnum($this->input('type'))) {
-                ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::AUDIT => ['nullable'],
+                ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::AUDIT,
+                ExercisesTypes::PICTURE_EXERCISE, ExercisesTypes::PAIR_EXERCISE => ['nullable'],
                 ExercisesTypes::DICTIONARY => ['required', function ($attribute, $value, $fail) {
                     // Try to decode the value as JSON
                     $decodedValue = json_decode($value, true);
-                    // Check if the value was successfully decoded and contains the expected keys
-                    if ($decodedValue === null || !isset($decodedValue['word']) || !isset($decodedValue['translate'])) {
-                        $fail("The $attribute field must be a valid JSON object with 'word' and 'translate' keys.");
-                    }
-                }],
-                ExercisesTypes::PAIR_EXERCISE => ['required', function ($attribute, $value, $fail) {
-                    $decodedValue = json_decode($value, true);
 
-                    if ($decodedValue === null || !is_array($decodedValue)) {
-                        $fail("The $attribute field must be a valid JSON array.");
-                    } else {
-                        foreach ($decodedValue as $item) {
-                            if (!is_array($item) || !isset($item['word']) || !isset($item['translation'])) {
-                                $fail("The $attribute field must be a valid JSON array containing objects with 'word' and 'translation' keys.");
-                                break;
-                            }
-                            if (empty($item['word']) || empty($item['translation'])) {
-                                $fail("The 'word' and 'translation' values in $attribute must not be empty.");
-                                break;
-                            }
-                        }
+                    // Check if the value was successfully decoded and contains the expected keys
+                    if ($decodedValue === null || !isset($decodedValue['word']) || !isset($decodedValue['translation'])) {
+                        $fail("The $attribute field must be a valid JSON object with 'word' and 'translate' keys.");
                     }
                 }],
             },
