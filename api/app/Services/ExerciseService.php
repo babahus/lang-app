@@ -4,7 +4,16 @@ namespace App\Services;
 
 use App\Constants\PictureExerciseFilesPath;
 use App\Enums\ExercisesTypes;
-use App\Models\{PairExercise, PictureExercise, User, Audit, Exercise, Dictionary, CompilePhrase, Stage, Course};
+use App\Models\{PairExercise,
+    PictureExercise,
+    Sentence,
+    User,
+    Audit,
+    Exercise,
+    Dictionary,
+    CompilePhrase,
+    Stage,
+    Course};
 use App\DataTransfers\{
     CreateExerciseDTO,
     DeleteExerciseDTO,
@@ -38,6 +47,10 @@ final class ExerciseService implements ExerciseServiceContract {
      * @var PictureExerciseService
      */
     private PictureExerciseService $pictureService;
+    /**
+     * @var SentenceService
+     */
+    private SentenceService $sentenceService;
 
     /**
      * @param AuditService $auditService
@@ -45,19 +58,22 @@ final class ExerciseService implements ExerciseServiceContract {
      * @param DictionaryService $dictionaryService
      * @param PairExerciseService $pairExerciseService
      * @param PictureExerciseService $pictureService
+     * @param SentenceService $sentenceService
      */
     public function __construct (
         AuditService $auditService,
         CompilePhraseService $compilePhrase,
         DictionaryService $dictionaryService,
         PairExerciseService $pairExerciseService,
-        PictureExerciseService $pictureService
+        PictureExerciseService $pictureService,
+        SentenceService $sentenceService
     ) {
         $this->compilePhrase = $compilePhrase;
         $this->auditService = $auditService;
         $this->dictionaryService = $dictionaryService;
         $this->pairExerciseService = $pairExerciseService;
         $this->pictureService = $pictureService;
+        $this->sentenceService = $sentenceService;
     }
 
     /**
@@ -84,6 +100,7 @@ final class ExerciseService implements ExerciseServiceContract {
             ExercisesTypes::AUDIT            => Audit::paginate(10),
             ExercisesTypes::PAIR_EXERCISE    => PairExercise::paginate(10),
             ExercisesTypes::PICTURE_EXERCISE => PictureExercise::paginate(10),
+            ExercisesTypes::SENTENCE         => Sentence::paginate(10),
             default => false
         };
     }
@@ -92,15 +109,16 @@ final class ExerciseService implements ExerciseServiceContract {
      * @param string $type
      * @param int $id
      * @param int $userId
-     * @return CompilePhrase|Audit|Dictionary|PairExercise|PictureExercise|bool
+     * @return CompilePhrase|Audit|Dictionary|PairExercise|PictureExercise|Sentence|bool
      */
-    public function getExerciseByIdAndType(string $type, int $id, int $userId): CompilePhrase|Audit|Dictionary|PairExercise|PictureExercise|bool {
+    public function getExerciseByIdAndType(string $type, int $id, int $userId): CompilePhrase|Audit|Dictionary|PairExercise|PictureExercise|Sentence|bool {
         $exercise = match (ExercisesTypes::inEnum($type)) {
             ExercisesTypes::DICTIONARY       => Dictionary::whereId($id)->first(),
             ExercisesTypes::COMPILE_PHRASE   => CompilePhrase::whereId($id)->first(),
             ExercisesTypes::AUDIT            => Audit::whereId($id)->first(),
             ExercisesTypes::PAIR_EXERCISE    => PairExercise::whereId($id)->first(),
             ExercisesTypes::PICTURE_EXERCISE => PictureExercise::whereId($id)->first(),
+            ExercisesTypes::SENTENCE         => Sentence::whereId($id)->first(),
             default => false
         };
 
@@ -129,6 +147,7 @@ final class ExerciseService implements ExerciseServiceContract {
                      ->update(['transcript'  => $updateExerciseDTO->data]),
             ExercisesTypes::PAIR_EXERCISE    => $this->pairExerciseService->updatePairExercise($id, json_decode($updateExerciseDTO->data, true)),
             ExercisesTypes::PICTURE_EXERCISE => $this->pictureService->updatePictureExercise($id, json_decode($updateExerciseDTO->data, true)),
+            ExercisesTypes::SENTENCE         => $this->sentenceService->updateSentence($id, $updateExerciseDTO->data),
             default => false
         };
     }
@@ -159,6 +178,7 @@ final class ExerciseService implements ExerciseServiceContract {
 
                     return $pictureObj->delete();
                 }),
+                ExercisesTypes::SENTENCE         => $this->sentenceService->deleteSentence(Sentence::whereId($id)->first()),
                 default => false
             };
         } catch (\Error $error)
@@ -170,9 +190,9 @@ final class ExerciseService implements ExerciseServiceContract {
 
     /**
      * @param CreateExerciseDTO $createExerciseDTO
-     * @return Model|Audit|Dictionary|PairExercise|bool|CompilePhrase|\Closure
+     * @return Model|Audit|Dictionary|PairExercise|bool|CompilePhrase|Sentence|\Closure
      */
-    public function create(CreateExerciseDTO $createExerciseDTO): \Illuminate\Database\Eloquent\Model|Audit|Dictionary|PairExercise|PictureExercise|bool|CompilePhrase|\Closure {
+    public function create(CreateExerciseDTO $createExerciseDTO): \Illuminate\Database\Eloquent\Model|Audit|Dictionary|PairExercise|PictureExercise|Sentence|bool|CompilePhrase|\Closure {
         return match (ExercisesTypes::inEnum($createExerciseDTO->type)) {
             ExercisesTypes::DICTIONARY => Dictionary::create(['dictionary' => $createExerciseDTO->data]),
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::create(['phrase' => $createExerciseDTO->data]),
@@ -206,6 +226,10 @@ final class ExerciseService implements ExerciseServiceContract {
 
                 return $pictureObj;
             }),
+            ExercisesTypes::SENTENCE => Sentence::create([
+                'sentence_with_gaps' => $createExerciseDTO->data,
+                'correct_answers_json' => $createExerciseDTO->correct_answers_json,
+            ]),
             default => false
         };
     }
@@ -244,9 +268,9 @@ final class ExerciseService implements ExerciseServiceContract {
 
     /**
      * @param SolvingExerciseDTO $solvingExerciseDTO
-     * @return Dictionary|CompilePhrase|Audit|PairExercise|PictureExercise|bool
+     * @return Dictionary|CompilePhrase|Audit|PairExercise|PictureExercise|Sentence|bool
      */
-    public function solving(SolvingExerciseDTO $solvingExerciseDTO): Dictionary|CompilePhrase|Audit|PairExercise|PictureExercise|bool|string {
+    public function solving(SolvingExerciseDTO $solvingExerciseDTO): Dictionary|CompilePhrase|Audit|PairExercise|PictureExercise|Sentence|bool|string {
         $exercise = Exercise::where('account_id', auth()->id())
             ->where('exercise_id', $solvingExerciseDTO->id)
             ->where('exercise_type', '=', $this->getClassType(ExercisesTypes::inEnum($solvingExerciseDTO->type)->value))
@@ -265,6 +289,7 @@ final class ExerciseService implements ExerciseServiceContract {
             ExercisesTypes::AUDIT => $this->auditService->solveAudit($solvingExerciseDTO),
 //            ExercisesTypes::PAIR_EXERCISE => $this->pairExerciseService
 //            ExercisesTypes::PICTURE_EXERCISE => $this->pictureService
+//            ExercisesTypes::SENTENCE => $this->sentenceService
             default => 'Something went wrong'
         };
     }
@@ -280,7 +305,8 @@ final class ExerciseService implements ExerciseServiceContract {
             ExercisesTypes::COMPILE_PHRASE => CompilePhrase::class,
             ExercisesTypes::AUDIT   => Audit::class,
             ExercisesTypes::PAIR_EXERCISE => PairExercise::class,
-            ExercisesTypes::PICTURE_EXERCISE => PictureExercise::class
+            ExercisesTypes::PICTURE_EXERCISE => PictureExercise::class,
+            ExercisesTypes::SENTENCE => Sentence::class
         };
     }
 

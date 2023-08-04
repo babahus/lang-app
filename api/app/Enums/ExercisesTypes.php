@@ -9,6 +9,7 @@ enum ExercisesTypes : string
     case AUDIT = 'audit';
     case  PAIR_EXERCISE = 'pair_exercise';
     case  PICTURE_EXERCISE = 'picture_exercise';
+    case SENTENCE = 'sentence';
 
     public static function inEnum(string $type): ExercisesTypes|bool
     {
@@ -18,6 +19,7 @@ enum ExercisesTypes : string
             'audit'            => self::AUDIT,
             'pair_exercise'    => self::PAIR_EXERCISE,
             'picture_exercise' => self::PICTURE_EXERCISE,
+            'sentence'         => self::SENTENCE,
             default => false,
         };
     }

@@ -81,4 +81,9 @@ final class Exercise extends Model
     {
         return $this->belongsTo(PictureExercise::class, 'exercise_id');
     }
+
+    public function sentence(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Sentence::class, 'exercise_id');
+    }
 }
