@@ -8,7 +8,6 @@ use App\Contracts\StageContract;
 
 class StageService implements StageContract
 {
-
     public function getAllStages(int $courseId)
     {
         $currentUser = auth()->user();
@@ -22,7 +21,6 @@ class StageService implements StageContract
                 $query->where('account_id', $currentUser->id);
             })->get();
     }
-
 
     public function createStage(CreateStageDTO $dto): Stage
     {
