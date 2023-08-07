@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\EmailVerificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ExerciseController;
@@ -21,6 +22,15 @@ Route::post('/register', [AuthController::class, 'register' ]);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('login/{provider}', [AuthController::class ,'getProviderLink']);
 Route::get('login/{provider}/callback', [AuthController::class ,'handleProviderCallback']);
+
+Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+    ->middleware(['auth', 'signed'])
+    ->name('verification.verify');
+
+Route::post('/email/verification-notification', [EmailVerificationController::class, 'sendVerificationNotification'])
+
+    ->name('verification.send');
+
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::middleware(['admin'])->group(function () {
         Route::apiResource('/exercise', ExerciseController::class)->except(

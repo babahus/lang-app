@@ -15,6 +15,7 @@ use Illuminate\Support\{
     Facades\Hash,
 };
 use App\Contracts\AuthContract;
+use Illuminate\Auth\Events\Registered;
 
 final class AuthService implements AuthContract
 {
@@ -47,6 +48,7 @@ final class AuthService implements AuthContract
         $user->roles()->attach(1);
         $createdDictionary = $this->dictionaryService->createEmptyDictionary();
         $user->exercises()->attach($createdDictionary->id,['exercise_type' => Dictionary::class]);
+        event(new Registered($user));
 
         return $user;
     }
