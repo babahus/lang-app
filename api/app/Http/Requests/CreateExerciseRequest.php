@@ -36,25 +36,13 @@ final class CreateExerciseRequest extends BaseRequest
                 ExercisesTypes::PICTURE_EXERCISE => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
                 default                          => 'nullable'
             },
-            'transcript' => match (ExercisesTypes::inEnum($this->input('type'))) {
-                ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::DICTIONARY,
-                ExercisesTypes::PAIR_EXERCISE, ExercisesTypes::PICTURE_EXERCISE,
-                ExercisesTypes::SENTENCE  => ['nullable'],
-                ExercisesTypes::AUDIT     => ['required', 'string'],
+            'additional_data' => match (ExercisesTypes::inEnum($this->input('type'))) {
+                ExercisesTypes::AUDIT               => ['required', 'string'],
+                ExercisesTypes::SENTENCE,
+                ExercisesTypes::PICTURE_EXERCISE,   => ['required', 'nullable','json'],
+                default => 'nullable',
             },
-            'option_json' => match (ExercisesTypes::inEnum($this->input('type'))){
-                ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::DICTIONARY,
-                ExercisesTypes::PAIR_EXERCISE, ExercisesTypes::AUDIT,
-                ExercisesTypes::SENTENCE => ['nullable'],
-                ExercisesTypes::PICTURE_EXERCISE    => ['required', 'nullable', 'json'],
-            },
-            'correct_answers_json' => match (ExercisesTypes::inEnum($this->input('type'))){
-                ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::DICTIONARY,
-                ExercisesTypes::PAIR_EXERCISE, ExercisesTypes::AUDIT,
-                ExercisesTypes::PICTURE_EXERCISE => ['nullable'],
-                ExercisesTypes::SENTENCE    => ['required', 'nullable', 'json'],
-            },
-            'type'                                                          => ['required', 'string', new Enum(ExercisesTypes::class)],
+            'type'                                  => ['required', 'string', new Enum(ExercisesTypes::class)],
         ];
     }
 
@@ -66,9 +54,8 @@ final class CreateExerciseRequest extends BaseRequest
                 default               => $this->input('data'),
             },
             $this->input('type'),
- $this->input('transcript') ?? null,
-        $this->input('option_json') ?? null,
-        $this->input('correct_answers_json') ?? null
+ $this->input('additional_data') ?? null,
+
         );
     }
 }

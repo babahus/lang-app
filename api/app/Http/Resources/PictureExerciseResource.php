@@ -22,7 +22,8 @@ final class PictureExerciseResource extends JsonResource
     private function shuffleOptions($answerSetJson)
     {
         $options = json_decode($answerSetJson, true);
+        shuffle($options);
 
-        return shuffle($options);
+        return $options;
     }
 }

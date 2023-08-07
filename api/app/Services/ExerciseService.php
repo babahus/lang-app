@@ -43,37 +43,23 @@ final class ExerciseService implements ExerciseServiceContract {
      * @var PairExerciseService
      */
     private PairExerciseService $pairExerciseService;
-    /**
-     * @var PictureExerciseService
-     */
-    private PictureExerciseService $pictureService;
-    /**
-     * @var SentenceService
-     */
-    private SentenceService $sentenceService;
 
     /**
      * @param AuditService $auditService
      * @param CompilePhraseService $compilePhrase
      * @param DictionaryService $dictionaryService
      * @param PairExerciseService $pairExerciseService
-     * @param PictureExerciseService $pictureService
-     * @param SentenceService $sentenceService
      */
     public function __construct (
         AuditService $auditService,
         CompilePhraseService $compilePhrase,
         DictionaryService $dictionaryService,
         PairExerciseService $pairExerciseService,
-        PictureExerciseService $pictureService,
-        SentenceService $sentenceService
     ) {
         $this->compilePhrase = $compilePhrase;
         $this->auditService = $auditService;
         $this->dictionaryService = $dictionaryService;
         $this->pairExerciseService = $pairExerciseService;
-        $this->pictureService = $pictureService;
-        $this->sentenceService = $sentenceService;
     }
 
     /**
@@ -130,9 +116,10 @@ final class ExerciseService implements ExerciseServiceContract {
      * @param int $id
      * @return bool|int
      */
-    public function update(UpdateExerciseDTO $updateExerciseDTO, int $id): bool|int {
+    public function update(UpdateExerciseDTO $updateExerciseDTO, int $id): bool|int
+    {
         return match (ExercisesTypes::inEnum($updateExerciseDTO->type)) {
-            ExercisesTypes::DICTIONARY      => call_user_func(function() use ($id, $updateExerciseDTO): bool {
+            ExercisesTypes::DICTIONARY => call_user_func(function () use ($id, $updateExerciseDTO): bool {
                 $dictionary = Dictionary::whereId($id)->first();
 
                 if ($dictionary !== null) {
@@ -141,16 +128,57 @@ final class ExerciseService implements ExerciseServiceContract {
                     return false;
                 }
             }),
-            ExercisesTypes::COMPILE_PHRASE   => CompilePhrase::whereId($id)
-                     ->update(['phrase' => $updateExerciseDTO->data]),
-            ExercisesTypes::AUDIT => Audit::whereId($id)
-                     ->update(['transcript'  => $updateExerciseDTO->data]),
-            ExercisesTypes::PAIR_EXERCISE    => $this->pairExerciseService->updatePairExercise($id, json_decode($updateExerciseDTO->data, true)),
-            ExercisesTypes::PICTURE_EXERCISE => $this->pictureService->updatePictureExercise($id, json_decode($updateExerciseDTO->data, true)),
-            ExercisesTypes::SENTENCE         => $this->sentenceService->updateSentence($id, $updateExerciseDTO->data),
+            ExercisesTypes::COMPILE_PHRASE => CompilePhrase::whereId($id)
+                ->update(['phrase' => $updateExerciseDTO->data]),
+            ExercisesTypes::AUDIT => call_user_func(function () use ($id, $updateExerciseDTO): bool {
+                $audit = Audit::findOrFail($id);
+                $oldPath = $audit->path;
+
+                $strPath = sprintf(AuditFilesPath::AUDIT_FILE_PATH, $audit->id, $audit->id, $updateExerciseDTO->data->getClientOriginalExtension());
+                if (Storage::disk('public')->exists($oldPath)) {
+                    Storage::disk('public')->delete($oldPath);
+                }
+                Storage::disk('public')->put(
+                    $strPath,
+                    $updateExerciseDTO->data->getContent()
+                );
+
+                $audit->path = $strPath;
+                $audit->transcription = $updateExerciseDTO->additional_data;
+                $audit->save();
+
+                return true;
+            }),
+            ExercisesTypes::PAIR_EXERCISE => $this->pairExerciseService->updatePairExercise($id, json_decode($updateExerciseDTO->data, true)),
+            ExercisesTypes::PICTURE_EXERCISE => call_user_func(function () use ($id, $updateExerciseDTO): bool {
+                $exercise = PictureExercise::findOrFail($id);
+                $oldImagePath = $exercise->image_path;
+
+                $strImagePath = sprintf(PictureExerciseFilesPath::PICTURE_EXERCISE_PATH, $exercise->id, $exercise->id, $updateExerciseDTO->data->getClientOriginalExtension());
+                if (Storage::disk('public')->exists($oldImagePath)) {
+                    Storage::disk('public')->delete($oldImagePath);
+                }
+                Storage::disk('public')->put(
+                    $strImagePath,
+                    $updateExerciseDTO->data->getContent()
+                );
+
+                $exercise->image_path = $strImagePath;
+                $exercise->option_json = $updateExerciseDTO->additional_data;
+                $exercise->save();
+
+                return true;
+            }),
+
+            ExercisesTypes::SENTENCE => Sentence::whereId($id)
+                ->update([
+                    'sentence_with_gaps'   => $updateExerciseDTO->data,
+                    'correct_answers_json' => $updateExerciseDTO->additional_data
+                ]),
             default => false
         };
     }
+
 
     /**
      * @param DeleteExerciseDTO $deleteExerciseDTO
@@ -178,7 +206,7 @@ final class ExerciseService implements ExerciseServiceContract {
 
                     return $pictureObj->delete();
                 }),
-                ExercisesTypes::SENTENCE         => $this->sentenceService->deleteSentence(Sentence::whereId($id)->first()),
+                ExercisesTypes::SENTENCE         => Sentence::whereId($id)->delete(),
                 default => false
             };
         } catch (\Error $error)
@@ -207,7 +235,7 @@ final class ExerciseService implements ExerciseServiceContract {
                     $createExerciseDTO->data->getContent()
                 );
                 $auditObj->path = $strAuditPath;
-                $auditObj->transcription = $createExerciseDTO->transcript;
+                $auditObj->transcription = $createExerciseDTO->additional_data;
                 $auditObj->save();
 
                 return $auditObj;
@@ -221,14 +249,14 @@ final class ExerciseService implements ExerciseServiceContract {
                     $createExerciseDTO->data->getContent()
                 );
                 $pictureObj->image_path = $strImagePath;
-                $pictureObj->option_json = $createExerciseDTO->option_json;
+                $pictureObj->option_json = $createExerciseDTO->additional_data;
                 $pictureObj->save();
 
                 return $pictureObj;
             }),
             ExercisesTypes::SENTENCE => Sentence::create([
                 'sentence_with_gaps' => $createExerciseDTO->data,
-                'correct_answers_json' => $createExerciseDTO->correct_answers_json,
+                'correct_answers_json' => $createExerciseDTO->additional_data,
             ]),
             default => false
         };

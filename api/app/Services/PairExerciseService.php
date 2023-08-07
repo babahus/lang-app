@@ -2,9 +2,10 @@
 
 namespace App\Services;
 
+use App\Contracts\PairExerciseServiceContract;
 use App\Models\PairExercise;
 
-final class PairExerciseService
+final class PairExerciseService implements PairExerciseServiceContract
 {
     public function updatePairExercise(int $id, array $data): bool
     {

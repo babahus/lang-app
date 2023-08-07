@@ -22,5 +22,4 @@ final class CompilePhraseService
 
         return 'Incorrect answer, try again';
     }
-
 }

@@ -29,7 +29,32 @@ final class UpdateExerciseRequest extends BaseRequest
     {
         return [
             'data' => match (ExercisesTypes::inEnum($this->input('type'))) {
-                ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::AUDIT => ['required'],
+                ExercisesTypes::AUDIT            => ['required', 'file', 'mimes:mp3,wav,flac', 'max:12048'],
+                ExercisesTypes::COMPILE_PHRASE   => ['required'],
+                ExercisesTypes::PICTURE_EXERCISE => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
+                ExercisesTypes::DICTIONARY, ExercisesTypes::PAIR_EXERCISE => ['required', function ($attribute, $value, $fail) {
+                    $decodedValue = json_decode($value, true);
+
+                    if (!is_array($decodedValue)) {
+                        $fail("The $attribute field must be a valid JSON array.");
+                    } else {
+                        foreach ($decodedValue as $item) {
+                            if (!is_array($item) || !isset($item['word']) || !isset($item['translation'])) {
+                                $fail("The $attribute field must be a valid JSON array containing objects with 'word' and 'translation' keys.");
+                                break;
+                            }
+                            if (empty($item['word']) || empty($item['translation'])) {
+                                $fail("The 'word' and 'translation' values in $attribute must not be empty.");
+                                break;
+                            }
+                        }
+                    }
+                }],
+                ExercisesTypes::SENTENCE => ['required', 'string'],
+            },
+            'additional_data' => match (ExercisesTypes::inEnum($this->input('type'))) {
+                ExercisesTypes::AUDIT               => ['required', 'string'],
+                ExercisesTypes::SENTENCE         => ['required', 'nullable','json'],
                 ExercisesTypes::PICTURE_EXERCISE =>  ['required', function ($attribute, $arrOptions, $fail) {
                     $decodedOptions = json_decode($arrOptions, true);
                     if (!is_array($decodedOptions) || count($decodedOptions) < 2) {
@@ -57,25 +82,7 @@ final class UpdateExerciseRequest extends BaseRequest
                         }
                     }
                 }],
-                ExercisesTypes::DICTIONARY, ExercisesTypes::PAIR_EXERCISE => ['required', function ($attribute, $value, $fail) {
-                    $decodedValue = json_decode($value, true);
-
-                    if (!is_array($decodedValue)) {
-                        $fail("The $attribute field must be a valid JSON array.");
-                    } else {
-                        foreach ($decodedValue as $item) {
-                            if (!is_array($item) || !isset($item['word']) || !isset($item['translation'])) {
-                                $fail("The $attribute field must be a valid JSON array containing objects with 'word' and 'translation' keys.");
-                                break;
-                            }
-                            if (empty($item['word']) || empty($item['translation'])) {
-                                $fail("The 'word' and 'translation' values in $attribute must not be empty.");
-                                break;
-                            }
-                        }
-                    }
-                }],
-                ExercisesTypes::SENTENCE => ['required', 'string'],
+                default => 'nullable',
             },
             'type' => ['required', 'string', new Enum(ExercisesTypes::class)]
         ];
@@ -84,8 +91,12 @@ final class UpdateExerciseRequest extends BaseRequest
     public function getDTO(): UpdateExerciseDTO
     {
         return new UpdateExerciseDTO(
-            $this->input('data'),
-            $this->input('type')
+            match (ExercisesTypes::inEnum($this->input('type'))){
+                ExercisesTypes::AUDIT,ExercisesTypes::PICTURE_EXERCISE  => $this->file('data'),
+                default               => $this->input('data'),
+            },
+            $this->input('type'),
+            $this->input('additional_data') ?? null,
         );
     }
 
