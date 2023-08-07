@@ -75,6 +75,7 @@ final class UpdateExerciseRequest extends BaseRequest
                         }
                     }
                 }],
+                ExercisesTypes::SENTENCE => ['required', 'string'],
             },
             'type' => ['required', 'string', new Enum(ExercisesTypes::class)]
         ];

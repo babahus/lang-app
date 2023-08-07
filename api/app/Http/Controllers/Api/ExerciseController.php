@@ -17,7 +17,8 @@ use App\Http\Resources\{AuditResource,
     DictionaryResource,
     ExerciseResource,
     PairExerciseResource,
-    PictureExerciseResource};
+    PictureExerciseResource,
+    SentenceResource};
 use App\Services\{
     AuditApiService,
     ExerciseService
@@ -76,6 +77,7 @@ final class ExerciseController extends Controller {
             ExercisesTypes::AUDIT             => new ApiResponse(AuditResource::make($exercise)),
             ExercisesTypes::PAIR_EXERCISE     => new ApiResponse(PairExerciseResource::make($exercise)),
             ExercisesTypes::PICTURE_EXERCISE  => new ApiResponse(PictureExerciseResource::make($exercise)),
+            ExercisesTypes::SENTENCE          => new ApiResponse(SentenceResource::make($exercise)),
         };
     }
 
@@ -97,6 +99,7 @@ final class ExerciseController extends Controller {
             ExercisesTypes::AUDIT             => new ApiResponse(AuditResource::collection($exercises)),
             ExercisesTypes::PAIR_EXERCISE     => new ApiResponse(PairExerciseResource::collection($exercises)),
             ExercisesTypes::PICTURE_EXERCISE  => new ApiResponse(PictureExerciseResource::collection($exercises)),
+            ExercisesTypes::SENTENCE          => new ApiResponse(SentenceResource::collection($exercises)),
         };
     }
 
@@ -145,6 +148,7 @@ final class ExerciseController extends Controller {
             ExercisesTypes::AUDIT             => new ApiResponse(AuditResource::make($createdExercise)),
             ExercisesTypes::PAIR_EXERCISE     => new ApiResponse(PairExerciseResource::make($createdExercise)),
             ExercisesTypes::PICTURE_EXERCISE  => new ApiResponse(PictureExerciseResource::make($createdExercise)),
+            ExercisesTypes::SENTENCE          => new ApiResponse(SentenceResource::make($createdExercise)),
         };
     }
 
@@ -188,6 +192,7 @@ final class ExerciseController extends Controller {
                 ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::AUDIT => new ApiResponse('Successfully solved exercise'),
                 ExercisesTypes::PAIR_EXERCISE                         => new ApiResponse(PairExerciseResource::make($solved)),
                 ExercisesTypes::PICTURE_EXERCISE                      => new ApiResponse(PictureExerciseResource::make($solved)),
+                ExercisesTypes::SENTENCE                              => new ApiResponse(SentenceResource::make($solved)),
             };
         }
 

@@ -43,6 +43,7 @@ final class MoveUserExerciseRequest extends BaseRequest
                 ExercisesTypes::AUDIT => ['required', 'numeric', Rule::exists('audits', 'id')],
                 ExercisesTypes::PAIR_EXERCISE => ['required', 'numeric', Rule::exists('pair_exercises', 'id')],
                 ExercisesTypes::PICTURE_EXERCISE => ['required', 'numeric', Rule::exists('picture_exercises', 'id')],
+                ExercisesTypes::SENTENCE => ['required', 'numeric', Rule::exists('sentence', 'id')],
                 default => 'nullable'
             },
             'exercise_type' => ['required', 'string', new Enum(ExercisesTypes::class)]

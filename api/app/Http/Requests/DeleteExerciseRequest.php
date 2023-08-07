@@ -31,7 +31,8 @@ final class DeleteExerciseRequest extends FormRequest
             'type' => ['required', 'string', new Enum(ExercisesTypes::class)],
             'data' => match (ExercisesTypes::inEnum($this->input('type'))) {
                 ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::AUDIT,
-                ExercisesTypes::PICTURE_EXERCISE, ExercisesTypes::PAIR_EXERCISE => ['nullable'],
+                ExercisesTypes::PICTURE_EXERCISE, ExercisesTypes::PAIR_EXERCISE,
+                ExercisesTypes::SENTENCE => ['nullable'],
                 ExercisesTypes::DICTIONARY => ['required', function ($attribute, $value, $fail) {
                     // Try to decode the value as JSON
                     $decodedValue = json_decode($value, true);
