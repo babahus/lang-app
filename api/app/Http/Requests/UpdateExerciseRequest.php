@@ -57,23 +57,25 @@ final class UpdateExerciseRequest extends BaseRequest
                 ExercisesTypes::SENTENCE         => ['required', 'nullable','json'],
                 ExercisesTypes::PICTURE_EXERCISE =>  ['required', function ($attribute, $arrOptions, $fail) {
                     $decodedOptions = json_decode($arrOptions, true);
+
                     if (!is_array($decodedOptions) || count($decodedOptions) < 2) {
                         $fail("The $attribute field must be a valid JSON array with at least two elements.");
                     } else {
                         $hasCorrectAnswer = false;
 
                         foreach ($decodedOptions as $option) {
-                            if (!is_array($option) || !isset($option['text']) || !isset($option['is_correct'])) {
-                                $fail("Each element in the $attribute array must have 'text' and 'is_correct' keys.");
-                            }
 
-                            if ($option['is_correct'] === 'true') {
-                                if ($hasCorrectAnswer) {
-                                    $fail("Only one element in the $attribute array can have 'is_correct' set to true.");
+                            if (!is_array($option) || empty($option['text']) || empty($option['is_correct'])) {
+                                $fail("The $attribute is not being passed correctly to update the record");
+                            } else {
+                                if ($option['is_correct'] === 'true') {
+                                    if ($hasCorrectAnswer) {
+                                        $fail("Only one element in the $attribute array can have 'is_correct' set to true.");
+                                    }
+                                    $hasCorrectAnswer = true;
+                                } elseif ($option['is_correct'] !== 'false') {
+                                    $fail("The 'is_correct' value in each element of the $attribute array should be either 'true' or 'false'.");
                                 }
-                                $hasCorrectAnswer = true;
-                            } elseif ($option['is_correct'] !== 'false') {
-                                $fail("The 'is_correct' value in each element of the $attribute array should be either 'true' or 'false'.");
                             }
                         }
 
