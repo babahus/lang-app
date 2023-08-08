@@ -4,28 +4,56 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Response\ApiResponse;
+use App\Mail\EmailMail;
+use App\Models\User;
+use App\Services\EmailVerificationService;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
 
 class EmailVerificationController extends Controller
 {
-    public function verify(EmailVerificationRequest $request)
+    private EmailVerificationService $verificationService;
+
+    public function __construct(EmailVerificationService $verificationService)
     {
-        $request->fulfill();
-        return redirect('/');
+        $this->verificationService = $verificationService;
     }
 
-    public function sendVerificationNotification(Request $request): ApiResponse
+    public function verify(EmailVerificationRequest $request): ApiResponse
     {
+        $user = $request->user();
 
-        dd(auth()->user());
-        dd($user);
+        if ($user->hasVerifiedEmail()) {
+            return new ApiResponse('Email already verified');
+        }
+
+        $user->markEmailAsVerified();
+
+        return new ApiResponse('Email has been verified');
+    }
+
+    public function sendVerificationNotification(): ApiResponse
+    {
+        $user = Auth::user();
+
         if ($user->hasVerifiedEmail()) {
             return new ApiResponse('Email is already verified.');
         }
 
-        $user->sendEmailVerificationNotification();
+        $this->sendVerificationEmail($user);
 
         return new ApiResponse('Verification link sent');
+    }
+
+    private function sendVerificationEmail(User $user): void
+    {
+        $verificationUrl = $this->verificationService->createUrlVerification($user);
+
+        Mail::to($user->email)
+            ->send(new EmailMail('Verify Your Email', 'emails.verificationEmail', [
+                'user' => $user,
+                'verificationUrl' => $verificationUrl
+            ]));
     }
 }

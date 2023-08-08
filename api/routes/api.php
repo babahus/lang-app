@@ -18,18 +18,10 @@ use App\Http\Controllers\Api\StageController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::post('/register', [AuthController::class, 'register' ]);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register' ])->name('register');;
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('login/{provider}', [AuthController::class ,'getProviderLink']);
 Route::get('login/{provider}/callback', [AuthController::class ,'handleProviderCallback']);
-
-Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
-    ->middleware(['auth', 'signed'])
-    ->name('verification.verify');
-
-Route::post('/email/verification-notification', [EmailVerificationController::class, 'sendVerificationNotification'])
-
-    ->name('verification.send');
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::middleware(['admin'])->group(function () {
@@ -39,6 +31,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get('/admin/roles', [AdminController::class, 'getRoles']);
         Route::apiResource('/admin', AdminController::class);
     });
+
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'sendVerificationNotification'])
+        ->name('verification.send');
+
     Route::apiResource('/course', CourseController::class);
     Route::apiResource('/stage', StageController::class)->except('index');
     Route::get('/stages/{course_id}', [StageController::class, 'index']);
@@ -53,6 +50,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/exercise/upload/{id}', [ExerciseController::class, 'uploadAudioAndTranscript']);
     Route::get('/exercise/{type}/{id}', [ExerciseController::class, 'show']);
     Route::get('/exercise/{type}', [ExerciseController::class, 'getExercisesByType']);
+
     Route::get('/logout', [AuthController::class, 'logout']);
 });
 Route::post('/webhook', [ExerciseController::class, 'webHook']);
