@@ -53,7 +53,7 @@ class EmailVerificationController extends Controller
         Mail::to($user->email)
             ->send(new EmailMail('Verify Your Email', 'emails.verificationEmail', [
                 'user' => $user,
-                'verificationUrl' => $verificationUrl
+                'dataUrl' => $verificationUrl
             ]));
     }
 }

@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\Api\EmailVerificationController;
+use App\Http\Controllers\Api\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ExerciseController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\StageController;
+use App\Http\Controllers\Api\PasswordResetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +25,9 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('login/{provider}', [AuthController::class ,'getProviderLink']);
 Route::get('login/{provider}/callback', [AuthController::class ,'handleProviderCallback']);
 
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail']);
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.reset');
+
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::middleware(['admin'])->group(function () {
         Route::apiResource('/exercise', ExerciseController::class)->except(
@@ -30,6 +35,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         );
         Route::get('/admin/roles', [AdminController::class, 'getRoles']);
         Route::apiResource('/admin', AdminController::class);
+    });
+
+    Route::middleware(['email.confirmed'])->group(function () {
+        Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('password.change');
     });
 
     Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');

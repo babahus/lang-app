@@ -47,10 +47,11 @@
         <h1>Verify Your Email</h1>
     </div>
     <div class="content">
-        <p>Hello {{ $user->name }},</p>
-        <p>Thank you for signing up! Please click the button below to verify your email address:</p>
-        <p><a class="button" href="{{$dataUrl}}">Verify Email</a></p>
-        <p>If you're having trouble clicking the "Verify Email Address" button, copy and paste the URL below into your web browser:</p>
+        <p>Hello, {{$user->name}}</p>
+        <p>You are receiving this email because we received a password reset request for your account.</p>
+        <p><a class="button" href="{{$dataUrl}}">Reset Password</a></p>
+        <p>This password reset link will expire in 60 minutes.</p>
+        <p>If you're having trouble clicking the "Reset Password" button, copy and paste the URL below into your web browser:</p>
         <pre><a class="url" href="{{$dataUrl}}">{{$dataUrl}}</a></pre>
         <p>If you did not create an account, no further action is required.</p>
         <p>Thanks,<br>The {{ config('app.name') }} Team</p>
