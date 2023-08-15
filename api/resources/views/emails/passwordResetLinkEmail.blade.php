@@ -44,7 +44,7 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1>Verify Your Email</h1>
+        <h1>Reset Your Password </h1>
     </div>
     <div class="content">
         <p>Hello, {{$user->name}}</p>
