@@ -346,10 +346,10 @@ final class ExerciseService implements ExerciseServiceContract {
      * @param int $courseId
      * @return bool
      */
-    public function checkIfExerciseIsAttached(int $exercise_id, int $user_id, string $type, ?int $stageId, ?int $courseId): bool
+    public function checkIfExerciseIsAttached(int $exercise_id, int $account_id, string $type, ?int $stageId, ?int $courseId): bool
     {
         $query = Exercise::where('exercise_id', $exercise_id)
-            ->where('account_id', $user_id)
+            ->where('account_id', $account_id)
             ->where('exercise_type', $type);
 
         if ($stageId !== null && $courseId !== null) {
@@ -381,11 +381,12 @@ final class ExerciseService implements ExerciseServiceContract {
      * @return bool
      */
     public function attachExerciseToStageCourse(MoveUserExerciseDTO $moveUserExerciseDTO): bool {
+
         $typeClass = $this->getClassType($moveUserExerciseDTO->type);
 
         if ($this->checkIfExerciseIsAttached(
             $moveUserExerciseDTO->id,
-            auth()->user()->id,
+            $moveUserExerciseDTO->account_id,
             $typeClass,
             $moveUserExerciseDTO->stage_id,
             $moveUserExerciseDTO->course_id
@@ -393,7 +394,7 @@ final class ExerciseService implements ExerciseServiceContract {
             return false;
         }
 
-        $user = auth()->user();
+        $user = User::findOrFail($moveUserExerciseDTO->account_id);
 
         $user->exercises()->attach($moveUserExerciseDTO->id, [
             'exercise_type' => $typeClass,

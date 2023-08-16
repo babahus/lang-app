@@ -12,6 +12,10 @@ class CoursePolicy
 
     public function canManageEnrollment(User $user, Course $course, int $studentId): bool
     {
-        return $user->id === $studentId || $user->id === $course->account_id;
+        if ($user->hasRole('Admin') || $user->hasRole('Root')) {
+            return true;
+        }
+
+        return ($user->id === $studentId && $user->hasRole('User')) || ($user->id === $course->account_id && $user->hasRole('Teacher'));
     }
 }
