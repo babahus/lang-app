@@ -16,6 +16,7 @@ final class CourseActionRequest extends BaseRequest
      */
     public function authorize()
     {
+//        dd($this);
         $course = Course::findOrFail($this->input('courseId'));
         $studentId = $this->input('studentId');
 

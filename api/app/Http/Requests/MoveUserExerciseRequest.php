@@ -46,17 +46,28 @@ final class MoveUserExerciseRequest extends BaseRequest
                 ExercisesTypes::SENTENCE => ['required', 'numeric', Rule::exists('sentence', 'id')],
                 default => 'nullable'
             },
-            'exercise_type' => ['required', 'string', new Enum(ExercisesTypes::class)]
+            'exercise_type' => ['required', 'string', new Enum(ExercisesTypes::class)],
+            'student_id' => ['nullable', 'numeric', 'exists:users,id']
         ];
     }
 
     public function getDTO(): MoveUserExerciseDTO
     {
+        if ($this->user()->hasRole('Teacher')) {
+            if (empty($this->input('course_id')) && empty($this->input('stage_id'))) {
+                $account_id = $this->input('student_id');
+
+            } elseif (!empty($this->input('course_id')) && !empty($this->input('stage_id'))) {
+                $account_id = $this->user()->id;
+            }
+        }
+
         return new MoveUserExerciseDTO(
             $this->input('id'),
             $this->input('exercise_type'),
             $this->input('stage_id'),
-            $this->input('course_id')
+            $this->input('course_id'),
+            $account_id
         );
     }
 }

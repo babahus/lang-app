@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\Api\EmailVerificationController;
+use App\Http\Controllers\Api\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\StageController;
+use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\ExerciseController;
 use App\Http\Controllers\Api\ExerciseGeneratorController;
@@ -19,18 +21,13 @@ use App\Http\Controllers\Api\ExerciseGeneratorController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::post('/register', [AuthController::class, 'register' ]);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register' ])->name('register');;
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('login/{provider}', [AuthController::class ,'getProviderLink']);
 Route::get('login/{provider}/callback', [AuthController::class ,'handleProviderCallback']);
 
-Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
-    ->middleware(['auth', 'signed'])
-    ->name('verification.verify');
-
-Route::post('/email/verification-notification', [EmailVerificationController::class, 'sendVerificationNotification'])
-
-    ->name('verification.send');
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail']);
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.reset');
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::middleware(['admin'])->group(function () {
@@ -41,6 +38,15 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::apiResource('/admin', AdminController::class);
         Route::post('/exercise/generate', [ExerciseGeneratorController::class, 'generate']);
     });
+
+    Route::middleware(['email.confirmed'])->group(function () {
+        Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('password.change');
+    });
+
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'sendVerificationNotification'])
+        ->name('verification.send');
+
     Route::apiResource('/course', CourseController::class);
     Route::apiResource('/stage', StageController::class)->except('index');
     Route::get('/stages/{course_id}', [StageController::class, 'index']);
@@ -55,6 +61,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/exercise/upload/{id}', [ExerciseController::class, 'uploadAudioAndTranscript']);
     Route::get('/exercise/{type}/{id}', [ExerciseController::class, 'show']);
     Route::get('/exercise/{type}', [ExerciseController::class, 'getExercisesByType']);
+
     Route::get('/logout', [AuthController::class, 'logout']);
 });
 Route::post('/webhook', [ExerciseController::class, 'webHook']);

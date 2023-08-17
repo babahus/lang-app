@@ -118,4 +118,9 @@ final class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->roles->contains('name', $roleName);
     }
+
+    public function isEmailConfirmed()
+    {
+        return $this->email_verified_at !== null;
+    }
 }

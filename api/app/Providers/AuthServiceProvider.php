@@ -31,6 +31,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Gate::define('attach-detach-exercise', function (User $user, MoveUserExerciseDTO $moveUserExerciseDTO) {
+
             if ($user->hasRole('Admin') || $user->hasRole('Root')) {
                 return true;
             }
@@ -39,7 +40,7 @@ class AuthServiceProvider extends ServiceProvider
                 if (isset($moveUserExerciseDTO->course_id)) {
                     $course = Course::find($moveUserExerciseDTO->course_id);
 
-                    if (!$course) {
+                    if (!$course || $course->account_id !== $user->id) {
                         return false;
                     }
 
