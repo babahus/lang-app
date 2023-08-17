@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\EmailVerificationController;
 use App\Http\Controllers\Api\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
@@ -8,7 +7,6 @@ use App\Http\Controllers\Api\ExerciseController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\StageController;
-use App\Http\Controllers\Api\PasswordResetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,8 +23,8 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('login/{provider}', [AuthController::class ,'getProviderLink']);
 Route::get('login/{provider}/callback', [AuthController::class ,'handleProviderCallback']);
 
-Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail']);
-Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.reset');
+Route::post('/forgot-password', [ProfileController::class, 'sendResetLinkEmail']);
+Route::post('/reset-password', [ProfileController::class, 'resetPassword'])->name('password.reset');
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::middleware(['admin'])->group(function () {
@@ -39,10 +37,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::middleware(['email.confirmed'])->group(function () {
         Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('password.change');
+        Route::post('/change-email', [ProfileController::class, 'changeEmail'])->name('email.change');
     });
 
-    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
-    Route::post('/email/verification-notification', [EmailVerificationController::class, 'sendVerificationNotification'])
+    Route::get('/email/verify/{id}/{hash}', [ProfileController::class, 'verify'])->name('verification.verify');
+    Route::post('/email/verification-notification', [ProfileController::class, 'sendVerificationNotification'])
         ->name('verification.send');
 
     Route::apiResource('/course', CourseController::class);
