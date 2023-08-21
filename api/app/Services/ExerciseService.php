@@ -394,9 +394,9 @@ final class ExerciseService implements ExerciseServiceContract {
             return false;
         }
 
-        $user = User::findOrFail($moveUserExerciseDTO->account_id);
-
-        $user->exercises()->attach($moveUserExerciseDTO->id, [
+        Exercise::create([
+            'exercise_id' => $moveUserExerciseDTO->id,
+            'account_id' => $moveUserExerciseDTO->account_id,
             'exercise_type' => $typeClass,
             'stage_id' => $moveUserExerciseDTO->stage_id,
             'course_id' => $moveUserExerciseDTO->course_id,
@@ -405,6 +405,7 @@ final class ExerciseService implements ExerciseServiceContract {
         return true;
     }
 
+
     /**
      * @param MoveUserExerciseDTO $moveUserExerciseDTO
      * @param int $stageId
@@ -412,11 +413,12 @@ final class ExerciseService implements ExerciseServiceContract {
      * @return bool
      */
     public function detachExerciseToStageCourse(MoveUserExerciseDTO $moveUserExerciseDTO): bool {
+
         $typeClass = $this->getClassType($moveUserExerciseDTO->type);
 
         if (!$this->checkIfExerciseIsAttached(
             $moveUserExerciseDTO->id,
-            auth()->user()->id,
+            $moveUserExerciseDTO->account_id,
             $typeClass,
             $moveUserExerciseDTO->stage_id,
             $moveUserExerciseDTO->course_id
@@ -424,13 +426,13 @@ final class ExerciseService implements ExerciseServiceContract {
             return false;
         }
 
-        Exercise::whereExerciseId($moveUserExerciseDTO->id)
+        $exercise = Exercise::whereExerciseId($moveUserExerciseDTO->id)
             ->where('account_id', auth()->user()->id)
             ->where('exercise_type', $typeClass)
             ->where('stage_id', $moveUserExerciseDTO->stage_id)
             ->where('course_id', $moveUserExerciseDTO->course_id)
-            ->delete();
+            ->first();
 
-        return true;
+        return $exercise->delete();
     }
 }

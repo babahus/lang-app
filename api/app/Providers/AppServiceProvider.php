@@ -2,8 +2,14 @@
 
 namespace App\Providers;
 
-use App\Contracts\EmailServiceContract;
-use App\Services\EmailService;
+use App\Models\Course;
+use App\Models\Dictionary;
+use App\Models\Exercise;
+use App\Models\Stage;
+use App\Observers\CourseObserver;
+use App\Observers\DictionaryObserver;
+use App\Observers\ExerciseObserver;
+use App\Observers\StageObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -24,6 +30,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Exercise::observe(ExerciseObserver::class);
+        Course::observe(CourseObserver::class);
+        Stage::observe(StageObserver::class);
     }
 }
