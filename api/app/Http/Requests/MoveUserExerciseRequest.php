@@ -8,6 +8,7 @@ use App\Enums\ExercisesTypes;
 use App\Http\Response\ApiResponse;
 use App\Models\Course;
 use App\Models\Exercise;
+use App\Models\User;
 use App\Rules\StageBelongsToCourse;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Response;
@@ -34,7 +35,7 @@ final class MoveUserExerciseRequest extends BaseRequest
      */
     public function rules()
     {
-        return [
+        $rules = [
             'stage_id' => ['nullable', 'numeric', new StageBelongsToCourse($this->input('course_id'))],
             'course_id' => ['nullable', 'numeric', Rule::exists('accounts_courses', 'id')],
             'id' => match (ExercisesTypes::inEnum($this->input('exercise_type'))){
@@ -47,19 +48,36 @@ final class MoveUserExerciseRequest extends BaseRequest
                 default => 'nullable'
             },
             'exercise_type' => ['required', 'string', new Enum(ExercisesTypes::class)],
-            'student_id' => ['nullable', 'numeric', 'exists:users,id']
         ];
+
+        if (empty($this->input('course_id')) && empty($this->input('stage_id'))) {
+            $rules['account_id'] = [
+                'required',
+                'numeric',
+                'exists:users,id',
+                function ($attribute, $value, $fail) {
+                    $user = User::findOrFail($value);
+
+                    if ($user->id !== $this->user()->id){
+                        $fail('You can only add exercise to yourself');
+                    }
+
+                    if (!$user->hasRole('User')) {
+                        $fail('The selected student must have the User role.');
+                    }
+                }
+            ];
+        }
+
+        return $rules;
     }
 
     public function getDTO(): MoveUserExerciseDTO
     {
-        if ($this->user()->hasRole('Teacher')) {
-            if (empty($this->input('course_id')) && empty($this->input('stage_id'))) {
-                $account_id = $this->input('student_id');
+        $account_id = $this->input('account_id');
 
-            } elseif (!empty($this->input('course_id')) && !empty($this->input('stage_id'))) {
-                $account_id = $this->user()->id;
-            }
+        if ($this->user()->hasRole('User') || empty($account_id)) {
+            $account_id = $this->user()->id;
         }
 
         return new MoveUserExerciseDTO(
@@ -68,6 +86,6 @@ final class MoveUserExerciseRequest extends BaseRequest
             $this->input('stage_id'),
             $this->input('course_id'),
             $account_id
-        );
+         );
     }
 }

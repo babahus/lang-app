@@ -27,11 +27,14 @@ class CourseService implements CourseContract {
     }
 
     public function update(CreateCourseDTO $createCourseDTO, int $id): ?Course {
-        Course::where('id', $id)->update([
-            'title'       => $createCourseDTO->title,
+        $course = Course::findOrFail($id);
+
+        $course->fill([
+            'title' => $createCourseDTO->title,
             'description' => $createCourseDTO->description,
-            'price'       => $createCourseDTO->price
+            'price' => $createCourseDTO->price,
         ]);
+        $course->save();
 
         return $this->show($id);
     }
