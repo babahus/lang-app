@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DataTransfers\CreateExerciseDTO;
 use App\DataTransfers\GenerateExerciseFromAiDTO;
 use App\Enums\ExercisesTypes;
 use App\Enums\Generated\ExerciseGeneratedTypes;
@@ -39,7 +40,7 @@ class ExerciseGeneratorController extends Controller
                 foreach ($exercises as $exercise){
                     $request->setDTO($dto, $exercise['phrase']);
 
-                    $this->exerciseService->create($dto);
+                    $this->exerciseService->create($dto->toCreateExerciseDTO());
                 }
             }
         }

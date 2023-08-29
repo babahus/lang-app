@@ -41,7 +41,7 @@ class OpenAiService implements OpenAiContract
             'frequency_penalty' => 0,
             'presence_penalty' => 0,
         ]);
-        //var_dump($response);
+        var_dump($response);
 
         return json_decode($response)->choices[0]->message->content;
     }
