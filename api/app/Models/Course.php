@@ -23,6 +23,8 @@ class Course extends Model {
 
     protected $table = 'accounts_courses';
 
+    public $afterCommit = true;
+
     public function stages()
     {
         return $this->hasMany(Stage::class);

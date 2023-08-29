@@ -26,8 +26,20 @@ final class RegisterRequest extends BaseRequest
         return [
             'name'                  => 'required|max:255',
             'email'                 => 'required|email|unique:users',
-            'password'              => 'required|min:6',
-            'password_confirmation' => 'required|same:password'
+            'password' => [
+                'required',
+                'min:8',
+                'regex:/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$/'
+            ],
+            'password_confirmation' => 'required|same:password',
+            'role'                  => 'required|in:User,Teacher|exists:roles,name'
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'password.regex' => 'Your password must contain one capital letter and must be longer than 8 characters.'
         ];
     }
 
@@ -37,7 +49,8 @@ final class RegisterRequest extends BaseRequest
             $this->input('name'),
             $this->input('email'),
             $this->input('password'),
-            $this->input('password_confirmation')
+            $this->input('password_confirmation'),
+            $this->input('role')
         );
     }
 }

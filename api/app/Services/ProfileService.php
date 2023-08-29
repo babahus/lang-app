@@ -32,6 +32,7 @@ final class ProfileService implements ProfileServiceContract
     public function changeEmail(User $user, EmailChangeDTO $emailChangeDTO): bool
     {
         $user->email = $emailChangeDTO->email;
+        $user->email_verified_at = null;
 
         return $user->save();
     }
