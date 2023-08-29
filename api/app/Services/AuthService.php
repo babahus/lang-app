@@ -1,10 +1,8 @@
 <?php
 namespace App\Services;
 
-use App\Models\{
-    User,
-    Dictionary,
-};
+use App\Events\UserAuthorized;
+use App\Models\{Role, User, Dictionary};
 use App\DataTransfers\{
     LoginDTO,
     RegisterDTO,
@@ -35,8 +33,10 @@ final class AuthService implements AuthContract
      * @param RegisterDTO $registerDTO
      * @return User
      */
-    public function register(RegisterDTO $registerDTO): User
+    public function register(RegisterDTO $registerDTO): array
     {
+        $roleObj = Role::whereName($registerDTO->role)->first();
+
         $encryptPassword = Hash::make($registerDTO->password);
         $user = User::create([
             'name'     => $registerDTO->name,
@@ -45,19 +45,22 @@ final class AuthService implements AuthContract
         ]);
         // when user is created, we attach to him default role (User)
         // and create empty dictionary for exercises
-        $user->roles()->attach(1);
+
+        $user->roles()->attach($roleObj->id);
         $createdDictionary = $this->dictionaryService->createEmptyDictionary();
         $user->exercises()->attach($createdDictionary->id,['exercise_type' => Dictionary::class]);
-        event(new Registered($user));
 
-        return $user;
+        $token = $this->createToken($user);
+        event(new UserAuthorized($user, $registerDTO->role, $token));
+
+        return ['user' => $user, 'token' => $token];
     }
 
     /**
      * @param LoginDTO $loginDTO
      * @return \Illuminate\Contracts\Auth\Authenticatable|bool
      */
-    public function login(LoginDTO $loginDTO): \Illuminate\Contracts\Auth\Authenticatable|bool
+    public function login(LoginDTO $loginDTO): array
     {
         if (!auth()->attempt(([
             'email'    => $loginDTO->email,
@@ -66,8 +69,12 @@ final class AuthService implements AuthContract
 
             return false;
         }
+        $user = Auth::user();
+        $token = $this->createToken($user);
 
-        return Auth::user();
+        event(new UserAuthorized(Auth::user(), $loginDTO->role, $token));
+
+        return ['user' => $user, 'token' => $token];
     }
 
     /**
@@ -75,14 +82,15 @@ final class AuthService implements AuthContract
      * @param string $provider
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder|User
      */
-    public function findOrCreateUser(User|\Laravel\Socialite\Two\User $user, string $provider): \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder|User
+    public function findOrCreateUser(User|\Laravel\Socialite\Two\User $user, string $provider): array
     {
         // if the user already exists, return it
         $authUser = User::where('email', $user->email)->first();
+        $token = $this->createToken($authUser);
 
         if ($authUser) {
 
-            return $authUser;
+            return ['user' => $authUser, 'token' => $token];
         }
         // otherwise create a new user and return it
         $hashPassword = Hash::make(Str::random(16));
@@ -91,10 +99,20 @@ final class AuthService implements AuthContract
             'email'    => $user->email,
             'password' => $hashPassword
         ]);
+        // it is necessary to pass the user role in the request
         $authUser->roles()->attach(1);
         $createdDictionary = $this->dictionaryService->createEmptyDictionary();
-        $user->exercises()->attach($createdDictionary->id,['type' => Dictionary::class]);
 
-        return $authUser;
+        $authUser->exercises()->attach($createdDictionary->id,['exercise_type' => Dictionary::class]);
+        $roleName = $authUser->roles->where('id', 1)->first()->name;
+
+        event(new UserAuthorized($authUser, $roleName, $token));
+
+        return ['user' => $authUser, 'token' => $token];
+    }
+
+    private function createToken(User $user)
+    {
+        return $user->createToken('authToken')->plainTextToken;
     }
 }

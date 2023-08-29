@@ -3,11 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Course;
-use App\Models\Dictionary;
 use App\Models\Exercise;
 use App\Models\Stage;
 use App\Observers\CourseObserver;
-use App\Observers\DictionaryObserver;
 use App\Observers\ExerciseObserver;
 use App\Observers\StageObserver;
 use Illuminate\Support\ServiceProvider;

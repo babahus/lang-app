@@ -8,7 +8,7 @@ use App\DataTransfers\LoginDTO;
 
 interface AuthContract
 {
-    public function register(RegisterDTO $registerDTO) : User;
-    public function login(LoginDTO $loginDTO) : \Illuminate\Contracts\Auth\Authenticatable|bool;
+    public function register(RegisterDTO $registerDTO) : array;
+    public function login(LoginDTO $loginDTO) : array;
     public function findOrCreateUser(User $user, string $provider);
 }

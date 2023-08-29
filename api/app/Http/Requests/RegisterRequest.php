@@ -39,7 +39,7 @@ final class RegisterRequest extends BaseRequest
     public function messages()
     {
         return [
-            'password.regex' => 'Your password must contain one capital letter and must be longer than 8 characters.'
+            'password.regex' => 'Your password must contain one capital letter, 1 number and be longer than 8 characters.'
         ];
     }
 
