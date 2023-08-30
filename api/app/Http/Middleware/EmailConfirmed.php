@@ -19,8 +19,8 @@ class EmailConfirmed
     {
         $user = $request->user();
 
-        if ($user && !$user->isEmailConfirmed()) {
-            return response()->json(new ApiResponse('Forbidden', 403, false), 403);
+        if (!$user || !$user->isEmailConfirmed()) {
+            return new ApiResponse('You need to confirm your email to change it ', 403, false);
         }
 
         return $next($request);

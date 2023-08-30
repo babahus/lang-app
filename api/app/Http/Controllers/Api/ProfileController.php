@@ -42,10 +42,8 @@ class ProfileController extends Controller
 
     public function sendVerificationNotification(): ApiResponse
     {
-
         $user = Auth::user();
 
-        dd(Cache::get("users_role_" . $user->id), Cache::get("users_token_" . $user->id));
         if ($user->hasVerifiedEmail()) {
             return new ApiResponse('Email is already verified.');
         }
