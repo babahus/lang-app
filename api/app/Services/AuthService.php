@@ -66,10 +66,9 @@ final class AuthService implements AuthContract
             'email'    => $loginDTO->email,
             'password' => $loginDTO->password
         ]))) {
-//            dd(12);
+
             return false;
         }
-
 
         $user = Auth::user();
         $token = $this->createToken($user);
@@ -88,9 +87,9 @@ final class AuthService implements AuthContract
     {
         // if the user already exists, return it
         $authUser = User::where('email', $user->email)->first();
-        $token = $this->createToken($authUser);
 
         if ($authUser) {
+            $token = $this->createToken($authUser);
 
             return ['user' => $authUser, 'token' => $token];
         }
