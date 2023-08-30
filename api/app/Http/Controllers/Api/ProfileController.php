@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Services\ProfileService;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Http\Response;
@@ -41,8 +42,10 @@ class ProfileController extends Controller
 
     public function sendVerificationNotification(): ApiResponse
     {
+
         $user = Auth::user();
 
+        dd(Cache::get("users_role_" . $user->id), Cache::get("users_token_" . $user->id));
         if ($user->hasVerifiedEmail()) {
             return new ApiResponse('Email is already verified.');
         }

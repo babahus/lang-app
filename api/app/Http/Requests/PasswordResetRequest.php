@@ -36,6 +36,13 @@ class PasswordResetRequest extends FormRequest
         ];
     }
 
+    public function messages()
+    {
+        return [
+            'password.regex' => 'Your password must contain one capital letter, 1 number and be longer than 8 characters.'
+        ];
+    }
+
     public function getDTO(): PasswordResetDTO
     {
         return new PasswordResetDTO(

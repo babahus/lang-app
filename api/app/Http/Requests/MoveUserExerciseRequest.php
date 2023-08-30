@@ -52,15 +52,11 @@ final class MoveUserExerciseRequest extends BaseRequest
 
         if (empty($this->input('course_id')) && empty($this->input('stage_id'))) {
             $rules['account_id'] = [
-                'required',
+                'nullable',
                 'numeric',
                 'exists:users,id',
                 function ($attribute, $value, $fail) {
                     $user = User::findOrFail($value);
-
-                    if ($user->id !== $this->user()->id){
-                        $fail('You can only add exercise to yourself');
-                    }
 
                     if (!$user->hasRole('User')) {
                         $fail('The selected student must have the User role.');
