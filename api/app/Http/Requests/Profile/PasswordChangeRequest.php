@@ -43,6 +43,13 @@ class PasswordChangeRequest extends FormRequest
         ];
     }
 
+    public function messages()
+    {
+        return [
+            'new_password.regex' => 'Your password must contain one capital letter, 1 number and be longer than 8 characters.'
+        ];
+    }
+
     public function getDTO(): PasswordChangeDTO
     {
         return new PasswordChangeDTO(
