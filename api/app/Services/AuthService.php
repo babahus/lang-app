@@ -60,15 +60,17 @@ final class AuthService implements AuthContract
      * @param LoginDTO $loginDTO
      * @return \Illuminate\Contracts\Auth\Authenticatable|bool
      */
-    public function login(LoginDTO $loginDTO): array
+    public function login(LoginDTO $loginDTO): bool|array
     {
         if (!auth()->attempt(([
             'email'    => $loginDTO->email,
             'password' => $loginDTO->password
         ]))) {
-
+//            dd(12);
             return false;
         }
+
+
         $user = Auth::user();
         $token = $this->createToken($user);
 
