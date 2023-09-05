@@ -18,10 +18,8 @@ class PairExercise extends Model
         'correct_pair_json',
     ];
 
-    public function exercises()
+    public function exercise()
     {
-        return $this->belongsToMany(PairExercise::class,'user_exercise_type','exercise_id', 'exercise_id', 'id')
-            ->withPivotValue('type', PairExercise::class)
-            ->withPivot('solved');
+        return $this->morphOne(Exercise::class, 'exercise', 'exercise_type', 'exercise_id');
     }
 }

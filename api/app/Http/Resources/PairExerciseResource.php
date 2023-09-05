@@ -13,7 +13,6 @@ final class PairExerciseResource extends JsonResource
         return [
             'id' => $this->id,
             'options' => $this->shuffleOptions($this->correct_pair_json),
-            'solved' => $this->pivot->solved ?? null,
         ];
     }
 

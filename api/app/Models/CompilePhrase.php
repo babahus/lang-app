@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ExercisesTypes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -34,8 +35,8 @@ final class CompilePhrase extends Model
       'phrase'
     ];
 
-    public function exercises()
+    public function exercise()
     {
-        return $this->belongsToMany(CompilePhrase::class,'user_exercise_type', 'exercise_id', 'exercise_id', 'id')->withPivotValue('type', CompilePhrase::class)->withPivot('solved');
+        return $this->morphOne(Exercise::class, 'exercise', 'exercise_type', 'exercise_id');
     }
 }

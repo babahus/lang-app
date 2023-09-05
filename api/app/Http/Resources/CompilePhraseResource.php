@@ -18,7 +18,6 @@ final class CompilePhraseResource extends JsonResource
         return [
            'id'     => $this->id,
            'phrase' => $this->phrase,
-           'solved' => $this->pivot->solved ?? null
         ];
     }
 }

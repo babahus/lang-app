@@ -89,9 +89,16 @@ class CourseService implements CourseContract {
 
     public function purchased(int $courseId): bool
     {
-        $course = Course::findOrFail($courseId);
-        $course->students()->updateExistingPivot(auth()->id(), ['purchased_at' => now()]);
+        $course = Course::whereId($courseId)->firstOrFail();
+
+        $courses_students = $course->students()
+            ->where('student_id', auth()->id())
+            ->where('course_id', $courseId)
+            ->firstOrFail();
+        $courses_students->pivot->purchased_at = now();
+        $courses_students->pivot->save();
 
         return true;
     }
+
 }

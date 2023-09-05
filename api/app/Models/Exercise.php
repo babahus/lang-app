@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ExercisesResourcesTypes;
 use App\Enums\ExercisesTypes;
 use Eloquent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,10 +47,9 @@ final class Exercise extends Model
         'exercise_type',
     ];
 
-    public function users(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function users(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsToMany(User::class, 'accounts_exercises', 'exercise_id', 'account_id')
-            ->withTimestamps();
+        return $this->belongsTo(User::class, 'account_id');
     }
 
     public function stages(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -62,28 +62,33 @@ final class Exercise extends Model
         return $this->belongsTo(Dictionary::class, 'exercise_id');
     }
 
-    public function compilePhrase(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function compilePhrase()
     {
-        return $this->belongsTo(CompilePhrase::class, 'exercise_id');
+        return $this->morphTo('exercise', 'exercise_type', 'exercise_id');
     }
 
-    public function audit(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function audit()
     {
-        return $this->belongsTo(Audit::class, 'exercise_id');
+        return $this->morphTo('exercise', 'exercise_type', 'exercise_id');
     }
 
-    public function pairExercise(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function pairExercise()
     {
-        return $this->belongsTo(PairExercise::class, 'exercise_id');
+        return $this->morphTo('exercise', 'exercise_type', 'exercise_id');
     }
 
-    public function pictureExercise(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function pictureExercise()
     {
-        return $this->belongsTo(PictureExercise::class, 'exercise_id');
+        return $this->morphTo('exercise', 'exercise_type', 'exercise_id');
     }
 
-    public function sentence(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function sentence()
     {
-        return $this->belongsTo(Sentence::class, 'exercise_id');
+        return $this->morphTo('exercise', 'exercise_type', 'exercise_id');
+    }
+
+    public function progressExercises(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ProgressExercise::class, 'accounts_exercise_id', 'id');
     }
 }

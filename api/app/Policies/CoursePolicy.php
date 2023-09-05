@@ -16,6 +16,6 @@ class CoursePolicy
             return true;
         }
 
-        return ($user->id === $studentId && $user->hasRole('User')) || ($user->id === $course->account_id && $user->hasRole('Teacher'));
+        return (($user->id === $studentId && $user->hasRole('User'))) || (($user->id === $course->account_id && $user->hasRole('Teacher')));
     }
 }

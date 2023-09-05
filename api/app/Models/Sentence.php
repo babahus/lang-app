@@ -19,10 +19,8 @@ class Sentence extends Model
         'correct_answers_json'
     ];
 
-    public function exercises()
+    public function exercise()
     {
-        return $this->belongsToMany(Sentence::class,'user_exercise_type','exercise_id', 'exercise_id', 'id')
-            ->withPivotValue('type', Sentence::class)
-            ->withPivot('solved');
+        return $this->morphOne(Exercise::class, 'exercise', 'exercise_type', 'exercise_id');
     }
 }

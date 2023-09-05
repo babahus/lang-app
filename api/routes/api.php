@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\ProgressExerciseController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ExerciseController;
@@ -34,6 +35,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get('/admin/roles', [AdminController::class, 'getRoles']);
         Route::apiResource('/admin', AdminController::class);
     });
+
+    Route::get('users/completed-exercises/{userId}', [ProgressExerciseController::class, 'getUserCompletedExercises']);
+    Route::delete('exercises/users/delete-progress', [ProgressExerciseController::class, 'deleteUserProgress']);
+    Route::get('users/{user_id}/stages/{stage_id}/progress', [ProgressExerciseController::class, 'getProgressByStage']);
 
     Route::middleware(['email.confirmed'])->group(function () {
         Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('password.change');

@@ -2,24 +2,25 @@
 
 namespace App\Services;
 
+use App\Models\Exercise;
+use App\Models\ProgressExercise;
+use App\Models\User;
 use Carbon\Carbon;
 use App\Models\CompilePhrase;
 use App\DataTransfers\SolvingExerciseDTO;
 
 final class CompilePhraseService
 {
+    protected $progressExerciseService;
 
-    public function solveCompilePhrase(SolvingExerciseDTO $solvingExerciseDTO): bool|string
+    public function __construct(ProgressExerciseService $progressExerciseService)
     {
-        $compilePhrase = CompilePhrase::whereId($solvingExerciseDTO->id)->first();
+        $this->progressExerciseService = $progressExerciseService;
+    }
+    public function solveCompilePhrase(SolvingExerciseDTO $solvingExerciseDTO, Exercise $exercise): bool|string
+    {
+        $correctAnswer = $exercise->compilePhrase->phrase;
 
-        if ($compilePhrase->phrase == $solvingExerciseDTO->data)
-        {
-            $compilePhrase->exercises()->update(['solved' => true, 'user_exercise_type.updated_at' => Carbon::now()]);
-
-            return true;
-        }
-
-        return 'Incorrect answer, try again';
+        return $this->progressExerciseService->solveExercise($solvingExerciseDTO, $exercise, $correctAnswer);
     }
 }
