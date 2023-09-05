@@ -458,7 +458,7 @@ final class ExerciseService implements ExerciseServiceContract {
         }
 
         $exercise = Exercise::whereExerciseId($moveUserExerciseDTO->id)
-            ->where('account_id', auth()->user()->id)
+            ->where('account_id', $moveUserExerciseDTO->account_id)
             ->where('exercise_type', $typeClass)
             ->where('stage_id', $moveUserExerciseDTO->stage_id)
             ->where('course_id', $moveUserExerciseDTO->course_id)
