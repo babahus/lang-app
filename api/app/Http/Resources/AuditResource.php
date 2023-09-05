@@ -20,7 +20,6 @@ final class AuditResource extends JsonResource
           'id'     => $this->id,
           'path'   => Storage::disk('public')->url($this->path),
           'text'   => $this->transcription,
-          'solved' => $this->pivot->solved ?? null
         ];
     }
 }

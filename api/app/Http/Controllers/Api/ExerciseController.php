@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\DataTransfers\MoveUserExerciseDTO;
 use Illuminate\Http\Response;
 use App\Enums\ExercisesTypes;
 use App\Http\Requests\{
@@ -189,10 +188,9 @@ final class ExerciseController extends Controller {
 
             return match (ExercisesTypes::inEnum($request->getDTO()->type)){
                 ExercisesTypes::DICTIONARY                            => new ApiResponse(DictionaryResource::make($solved)),
-                ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::AUDIT => new ApiResponse('Successfully solved exercise'),
-                ExercisesTypes::PAIR_EXERCISE                         => new ApiResponse(PairExerciseResource::make($solved)),
-                ExercisesTypes::PICTURE_EXERCISE                      => new ApiResponse(PictureExerciseResource::make($solved)),
-                ExercisesTypes::SENTENCE                              => new ApiResponse(SentenceResource::make($solved)),
+                ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::AUDIT,
+                ExercisesTypes::PAIR_EXERCISE, ExercisesTypes::PICTURE_EXERCISE,
+                ExercisesTypes::SENTENCE                              => new ApiResponse('Successfully solved exercise'),
             };
         }
 

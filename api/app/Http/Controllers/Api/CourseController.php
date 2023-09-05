@@ -95,8 +95,8 @@ class CourseController extends Controller {
      */
     public function attach(CourseActionRequest $request): ApiResponse
     {
-        $purchased = $this->purchased($request->getDTO()->courseId);
         $attached = $this->courseService->attach($request->getDTO());
+        $this->purchased($request->getDTO()->courseId);
 
         if (!$attached) {
             return new ApiResponse('Invalid Provider', Response::HTTP_BAD_REQUEST, false);

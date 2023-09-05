@@ -60,5 +60,13 @@ class AuthServiceProvider extends ServiceProvider
 
             return false;
         });
+
+        Gate::define('delete-progress-exercise', function ($user) {
+            $roles = $user->roles->pluck('name');
+
+            return $roles->contains(function ($roleName) {
+                return in_array($roleName, ['Admin', 'Teacher', 'Root']);
+            });
+        });
     }
 }

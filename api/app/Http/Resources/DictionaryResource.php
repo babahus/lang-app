@@ -28,7 +28,6 @@ final class DictionaryResource extends JsonResource
           'id'         => $this->id,
           'dictionary' => $result,
           'updated_at' => $this->updated_at,
-          'solved'     => $this->pivot->solved ?? null
         ];
     }
 }

@@ -15,7 +15,6 @@ final class PictureExerciseResource extends JsonResource
             'id' => $this->id,
             'path' => Storage::disk('public')->url($this->image_path),
             'options' => $this->shuffleOptions($this->option_json),
-            'solved' => $this->pivot->solved ?? null,
         ];
     }
 

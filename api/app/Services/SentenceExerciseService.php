@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Services;
+
+use App\DataTransfers\SolvingExerciseDTO;
+use App\Models\Exercise;
+use App\Models\ProgressExercise;
+
+final class SentenceExerciseService
+{
+    protected $progressExerciseService;
+
+    public function __construct(ProgressExerciseService $progressExerciseService)
+    {
+        $this->progressExerciseService = $progressExerciseService;
+    }
+
+    public function solveSentence(SolvingExerciseDTO $solvingExerciseDTO, Exercise $exercise): bool|string
+    {
+        $correctAnswerJson = $exercise->sentence->correct_answers_json;
+
+        $userDataJson = $solvingExerciseDTO->data;
+
+        $difference = array_diff(json_decode($userDataJson), json_decode($correctAnswerJson));
+
+        if (!empty($difference)){
+
+            return 'Incorrect answer, try again';
+        }
+
+        $progressExercise = ProgressExercise::where('accounts_exercise_id', $exercise->id)
+            ->where('account_id', auth()->user()->id)
+            ->firstOrNew();
+
+        if (!$progressExercise->exists) {
+            $progressExercise->account_id = auth()->user()->id;
+            $progressExercise->accounts_exercise_id = $exercise->id;
+        }
+
+        $progressExercise->solved = true;
+        $progressExercise->solved_at = now();
+        $progressExercise->save();
+
+        return true;
+    }
+}

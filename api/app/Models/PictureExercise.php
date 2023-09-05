@@ -19,10 +19,8 @@ class PictureExercise extends Model
         'option_json'
     ];
 
-    public function exercises()
+    public function exercise()
     {
-        return $this->belongsToMany(PictureExercise::class,'user_exercise_type','exercise_id', 'exercise_id', 'id')
-            ->withPivotValue('type', PictureExercise::class)
-            ->withPivot('solved');
+        return $this->morphOne(Exercise::class, 'exercise', 'exercise_type', 'exercise_id');
     }
 }

@@ -98,9 +98,7 @@ final class User extends Authenticatable implements MustVerifyEmail
 
     public function exercises()
     {
-        return $this->belongsToMany(Exercise::class, 'accounts_exercises', 'account_id', 'exercise_id')
-            ->withPivot('type', 'solved')
-            ->withTimestamps();
+        return $this->hasMany(Exercise::class, 'account_id', 'id');
     }
 
     public function enrolledCourses()
@@ -122,5 +120,17 @@ final class User extends Authenticatable implements MustVerifyEmail
     public function isEmailConfirmed()
     {
         return $this->email_verified_at !== null;
+    }
+
+    public function progressExercises()
+    {
+        return $this->hasMany(ProgressExercise::class, 'account_id');
+    }
+
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'account_courses_students', 'student_id', 'course_id')
+            ->withPivot('added_at', 'purchased_at')
+            ->withTimestamps();
     }
 }

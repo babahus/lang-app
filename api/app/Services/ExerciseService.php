@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Constants\PictureExerciseFilesPath;
 use App\Enums\ExercisesTypes;
+use Illuminate\Support\Facades\DB;
 use App\Models\{PairExercise,
     PictureExercise,
+    ProgressExercise,
     Sentence,
     User,
     Audit,
@@ -43,23 +45,37 @@ final class ExerciseService implements ExerciseServiceContract {
      * @var PairExerciseService
      */
     private PairExerciseService $pairExerciseService;
+    /**
+     * @var PictureExerciseService
+     */
+    private PictureExerciseService $pictureExerciseService;
+    /**
+     * @var SentenceExerciseService
+     */
+    private SentenceExerciseService $sentenceExerciseService;
 
     /**
      * @param AuditService $auditService
      * @param CompilePhraseService $compilePhrase
      * @param DictionaryService $dictionaryService
      * @param PairExerciseService $pairExerciseService
+     * @param PictureExerciseService $pictureExerciseService
+     * @param SentenceExerciseService $sentenceExerciseService
      */
     public function __construct (
         AuditService $auditService,
         CompilePhraseService $compilePhrase,
         DictionaryService $dictionaryService,
         PairExerciseService $pairExerciseService,
+        PictureExerciseService $pictureExerciseService,
+        SentenceExerciseService $sentenceExerciseService,
     ) {
         $this->compilePhrase = $compilePhrase;
         $this->auditService = $auditService;
         $this->dictionaryService = $dictionaryService;
         $this->pairExerciseService = $pairExerciseService;
+        $this->pictureExerciseService = $pictureExerciseService;
+        $this->sentenceExerciseService = $sentenceExerciseService;
     }
 
     /**
@@ -299,25 +315,40 @@ final class ExerciseService implements ExerciseServiceContract {
      * @return Dictionary|CompilePhrase|Audit|PairExercise|PictureExercise|Sentence|bool
      */
     public function solving(SolvingExerciseDTO $solvingExerciseDTO): Dictionary|CompilePhrase|Audit|PairExercise|PictureExercise|Sentence|bool|string {
-        $exercise = Exercise::where('account_id', auth()->id())
+        $exercise = Exercise::where('id', $solvingExerciseDTO->exercise_id)
+            ->where('exercise_type', $this->getClassType(ExercisesTypes::inEnum($solvingExerciseDTO->type)->value))
             ->where('exercise_id', $solvingExerciseDTO->id)
-            ->where('exercise_type', '=', $this->getClassType(ExercisesTypes::inEnum($solvingExerciseDTO->type)->value))
             ->first();
 
-        if ((!$exercise
-            || $exercise->solved == 1
-            || !($exercise->account_id == auth()->id()))
-        ) {
+        $user = auth()->user();
+
+        if ($exercise->course_id && !$user->courses()->where('course_id', $exercise->course_id)->exists()) {
+            return 'You are not subscribed to this course';
+        }
+
+        if (!$exercise->course_id && !$user->exercises->where('id', $exercise->id)
+                ->where('exercise_id', $exercise->exercise_id)
+                ->whereNull('course_id')->count() > 0) {
+            return 'You are not assigned an off-course exercise';
+        }
+
+
+        $progressExercise = $exercise->progressExercises()
+            ->where('accounts_exercise_id', $exercise->id)
+            ->where('account_id', $user->id)
+            ->first();
+
+        if ($progressExercise && ($progressExercise->solved == 1 || $progressExercise->account_id != $user->id)) {
             return 'Something went wrong';
         }
 
         return match (ExercisesTypes::inEnum($solvingExerciseDTO->type)) {
             ExercisesTypes::DICTIONARY => $this->dictionaryService->fillDictionary($solvingExerciseDTO),
-            ExercisesTypes::COMPILE_PHRASE => $this->compilePhrase->solveCompilePhrase($solvingExerciseDTO),
-            ExercisesTypes::AUDIT => $this->auditService->solveAudit($solvingExerciseDTO),
-//            ExercisesTypes::PAIR_EXERCISE => $this->pairExerciseService
-//            ExercisesTypes::PICTURE_EXERCISE => $this->pictureService
-//            ExercisesTypes::SENTENCE => $this->sentenceService
+            ExercisesTypes::COMPILE_PHRASE => $this->compilePhrase->solveCompilePhrase($solvingExerciseDTO, $exercise),
+            ExercisesTypes::AUDIT => $this->auditService->solveAudit($solvingExerciseDTO, $exercise),
+            ExercisesTypes::PAIR_EXERCISE => $this->pairExerciseService->solvePair($solvingExerciseDTO, $exercise),
+            ExercisesTypes::PICTURE_EXERCISE => $this->pictureExerciseService->solvePicture($solvingExerciseDTO, $exercise),
+            ExercisesTypes::SENTENCE => $this->sentenceExerciseService->solveSentence($solvingExerciseDTO, $exercise),
             default => 'Something went wrong'
         };
     }
@@ -427,7 +458,7 @@ final class ExerciseService implements ExerciseServiceContract {
         }
 
         $exercise = Exercise::whereExerciseId($moveUserExerciseDTO->id)
-            ->where('account_id', auth()->user()->id)
+            ->where('account_id', $moveUserExerciseDTO->account_id)
             ->where('exercise_type', $typeClass)
             ->where('stage_id', $moveUserExerciseDTO->stage_id)
             ->where('course_id', $moveUserExerciseDTO->course_id)

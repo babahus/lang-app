@@ -106,13 +106,14 @@ final class AuthService implements AuthContract
 
         $authUser->exercises()->attach($createdDictionary->id,['exercise_type' => Dictionary::class]);
         $roleName = $authUser->roles->where('id', 1)->first()->name;
+        $token = $this->createToken($authUser);
 
         event(new UserAuthorized($authUser, $roleName, $token));
 
         return ['user' => $authUser, 'token' => $token];
     }
 
-    private function createToken(User $user)
+    public function createToken(User $user)
     {
         return $user->createToken('authToken')->plainTextToken;
     }

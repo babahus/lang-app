@@ -34,8 +34,8 @@ final class Dictionary extends Model
         'dictionary'
     ];
 
-    public function exercises()
+    public function exercise()
     {
-        return $this->belongsToMany(Dictionary::class,'user_exercise_type','exercise_id', 'exercise_id', 'id')->withPivotValue('type', Dictionary::class)->withPivot('solved');
+        return $this->morphOne(Exercise::class, 'exercise', 'exercise_type', 'exercise_id');
     }
 }

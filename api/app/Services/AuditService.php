@@ -4,22 +4,22 @@ namespace App\Services;
 
 use App\DataTransfers\SolvingExerciseDTO;
 use App\Models\Audit;
+use App\Models\Exercise;
+use App\Models\ProgressExercise;
 use Carbon\Carbon;
 
 final class AuditService
 {
-    public function solveAudit(SolvingExerciseDTO $solvingExerciseDTO)
+    protected $progressExerciseService;
+
+    public function __construct(ProgressExerciseService $progressExerciseService)
     {
-        $audit = Audit::whereId($solvingExerciseDTO->id)->first();
-
-        if ($audit->transcription == $solvingExerciseDTO->data)
-        {
-            $audit->exercises()->update(['solved' => true, 'user_exercise_type.updated_at' => Carbon::now()]);
-
-            return true;
-        }
-
-        return 'Invalid Description';
+        $this->progressExerciseService = $progressExerciseService;
     }
+    public function solveAudit(SolvingExerciseDTO $solvingExerciseDTO, Exercise $exercise)
+    {
+        $correctAnswer = $exercise->audit->transcription;
 
+        return $this->progressExerciseService->solveExercise($solvingExerciseDTO, $exercise, $correctAnswer);
+    }
 }
