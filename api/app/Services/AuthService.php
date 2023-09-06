@@ -43,12 +43,10 @@ final class AuthService implements AuthContract
             'email'    => $registerDTO->email,
             'password' => $encryptPassword
         ]);
-        // when user is created, we attach to him default role (User)
-        // and create empty dictionary for exercises
 
         $user->roles()->attach($roleObj->id);
-        $createdDictionary = $this->dictionaryService->createEmptyDictionary();
-        $user->exercises()->attach($createdDictionary->id,['exercise_type' => Dictionary::class]);
+
+        //creating an empty dictionary and attaching it to a user
 
         $token = $this->createToken($user);
         event(new UserAuthorized($user, $registerDTO->role, $token));
@@ -83,34 +81,39 @@ final class AuthService implements AuthContract
      * @param string $provider
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder|User
      */
-    public function findOrCreateUser(User|\Laravel\Socialite\Two\User $user, string $provider): array
+    public function findOrCreateUser(User|\Laravel\Socialite\Two\User $user, string $provider,string $role): array | bool
     {
-        // if the user already exists, return it
         $authUser = User::where('email', $user->email)->first();
+        $objRole = Role::where('name', $role)->first();
 
         if ($authUser) {
             $token = $this->createToken($authUser);
 
+            if (!$authUser->roles->contains('name', $role)) {
+
+                return false;
+            }
+
             return ['user' => $authUser, 'token' => $token];
         }
-        // otherwise create a new user and return it
+
         $hashPassword = Hash::make(Str::random(16));
-        $authUser = User::create([
-            'name'     => $user->name,
-            'email'    => $user->email,
-            'password' => $hashPassword
-        ]);
-        // it is necessary to pass the user role in the request
-        $authUser->roles()->attach(1);
-        $createdDictionary = $this->dictionaryService->createEmptyDictionary();
 
-        $authUser->exercises()->attach($createdDictionary->id,['exercise_type' => Dictionary::class]);
-        $roleName = $authUser->roles->where('id', 1)->first()->name;
-        $token = $this->createToken($authUser);
+        $newUser = new User();
+        $newUser->name = $user->name;
+        $newUser->email = $user->email;
+        $newUser->password = $hashPassword;
+        $newUser->save();
 
-        event(new UserAuthorized($authUser, $roleName, $token));
+        $newUser->roles()->attach($objRole->id);
 
-        return ['user' => $authUser, 'token' => $token];
+        //creating an empty dictionary and attaching it to a user
+
+        $token = $this->createToken($newUser);
+
+        event(new UserAuthorized($newUser, $objRole->name, $token));
+
+        return ['user' => $newUser, 'token' => $token];
     }
 
     public function createToken(User $user)
