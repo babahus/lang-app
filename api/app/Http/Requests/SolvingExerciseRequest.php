@@ -2,9 +2,15 @@
 
 namespace App\Http\Requests;
 
-use App\Contracts\DTO;
 use App\DataTransfers\SolvingExerciseDTO;
 use App\Enums\ExercisesTypes;
+use App\Rules\Solving\AuditRule;
+use App\Rules\Solving\CompilePhraseRule;
+use App\Rules\Solving\DictionaryRule;
+use App\Rules\Solving\ExerciseIdExistsRule;
+use App\Rules\Solving\PairExerciseRule;
+use App\Rules\Solving\PictureExerciseRule;
+use App\Rules\Solving\SentenceRule;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
@@ -38,49 +44,17 @@ final class SolvingExerciseRequest extends BaseRequest
                 default => 'nullable'
             },
             'data' => match (ExercisesTypes::inEnum($this->input('type'))) {
-                ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::AUDIT, ExercisesTypes::PICTURE_EXERCISE => ['required','string'],
-                ExercisesTypes::DICTIONARY => ['required', function ($attribute, $value, $fail) {
-                    // Try to decode the value as JSON
-                    $decodedValue = json_decode($value, true);
-                    // Check if the value was successfully decoded and contains the expected keys
-                    if ($decodedValue === null || !isset($decodedValue['word']) || !isset($decodedValue['translate'])) {
-                        $fail("The $attribute field must be a valid JSON object with 'word' and 'translate' keys.");
-                    }
-                }],
-                ExercisesTypes::SENTENCE => ['required', function ($attribute, $value, $fail) {
-                    $decodedValue = json_decode($value);
-
-                    if (json_last_error() !== JSON_ERROR_NONE) {
-                        $fail("The $attribute field must be a valid JSON array.");
-                    }
-                }],
-                ExercisesTypes::PAIR_EXERCISE => [
-                    'required',
-                    function ($attribute, $value, $fail) {
-                        $decodedValue = json_decode($value, true);
-
-                        if ($decodedValue === null || !is_array($decodedValue)) {
-                            $fail("The $attribute field must be a valid JSON array.");
-                        } else {
-                            foreach ($decodedValue as $item) {
-                                if (!is_array($item) || !isset($item['word']) || !isset($item['translation'])) {
-                                    $fail("The $attribute field must be a valid JSON array containing objects with 'word' and 'translation' keys.");
-                                    break;
-                                }
-                                if (empty($item['word']) || empty($item['translation'])) {
-                                    $fail("The 'word' and 'translation' values in $attribute must not be empty.");
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                ],
+                ExercisesTypes::COMPILE_PHRASE => ['required', new CompilePhraseRule()],
+                ExercisesTypes::AUDIT => ['required', new AuditRule()],
+                ExercisesTypes::PICTURE_EXERCISE => ['required', new PictureExerciseRule()],
+                ExercisesTypes::DICTIONARY => ['required', new DictionaryRule()],
+                ExercisesTypes::SENTENCE => ['required', new SentenceRule()],
+                ExercisesTypes::PAIR_EXERCISE => ['required', new PairExerciseRule()],
 
                 default => 'nullable',
-
             },
             'type' => ['required', 'string', new Enum(ExercisesTypes::class)],
-            'exercise_id' => ['required', 'numeric','exists:accounts_exercises,id']
+            'exercise_id' => ['required', 'numeric', new ExerciseIdExistsRule()]
         ];
     }
 

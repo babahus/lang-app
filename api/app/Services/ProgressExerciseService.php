@@ -68,28 +68,22 @@ class ProgressExerciseService implements ProgressExerciseServiceContract
         return $progress;
     }
 
-    public function solveExercise(SolvingExerciseDTO $solvingExerciseDTO, Exercise $exercise, string $correctAnswer): bool|string
+    public function solveExercise(Exercise $exercise): bool
     {
-        if ($correctAnswer == $solvingExerciseDTO->data)
-        {
+        $progressExercise = ProgressExercise::where('accounts_exercise_id', $exercise->id)
+            ->where('account_id', auth()->user()->id)
+            ->firstOrNew();
 
-            $progressExercise = ProgressExercise::where('accounts_exercise_id', $exercise->id)
-                ->where('account_id', auth()->user()->id)
-                ->firstOrNew();
-
-            if (!$progressExercise->exists) {
-                $progressExercise->account_id = auth()->user()->id;
-                $progressExercise->accounts_exercise_id = $exercise->id;
-            }
-
-            $progressExercise->solved = true;
-            $progressExercise->solved_at = now();
-            $progressExercise->course_attachment = ($exercise->course_id !== null);
-            $progressExercise->save();
-
-            return true;
+        if (!$progressExercise->exists) {
+            $progressExercise->account_id = auth()->user()->id;
+            $progressExercise->accounts_exercise_id = $exercise->id;
         }
 
-        return 'Incorrect answer, try again';
+        $progressExercise->solved = true;
+        $progressExercise->solved_at = now();
+        $progressExercise->course_attachment = ($exercise->course_id !== null);
+        $progressExercise->save();
+
+        return true;
     }
 }

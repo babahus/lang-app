@@ -8,6 +8,13 @@ use App\Models\ProgressExercise;
 
 final class PairExerciseService implements PairExerciseServiceContract
 {
+    protected ProgressExerciseService $progressExerciseService;
+
+    public function __construct(ProgressExerciseService $progressExerciseService)
+    {
+        $this->progressExerciseService = $progressExerciseService;
+    }
+
     public function updatePairExercise(int $id, array $data): bool
     {
         $pairExercise = PairExercise::findOrFail($id);
@@ -57,23 +64,6 @@ final class PairExerciseService implements PairExerciseServiceContract
 
         }
 
-        $progressExercise = ProgressExercise::where('accounts_exercise_id', $exercise->id)
-            ->where('account_id', auth()->user()->id)
-            ->firstOrNew();
-
-        if (!$progressExercise->exists) {
-            $progressExercise->account_id = auth()->user()->id;
-            $progressExercise->accounts_exercise_id = $exercise->id;
-        }
-
-        $progressExercise->solved = true;
-        $progressExercise->solved_at = now();
-        $progressExercise->course_attachment = ($exercise->course_id !== null);
-        $progressExercise->save();
-
-        return true;
+        return $this->progressExerciseService->solveExercise($exercise);
     }
-
-
-
 }
