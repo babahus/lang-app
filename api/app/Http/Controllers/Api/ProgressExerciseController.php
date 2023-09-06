@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class ProgressExerciseController extends Controller
 {
-    protected $progressExerciseService;
+    protected ProgressExerciseService $progressExerciseService;
 
     public function __construct(ProgressExerciseService $progressExerciseService)
     {

@@ -8,7 +8,7 @@ use App\Models\ProgressExercise;
 
 final class SentenceExerciseService
 {
-    protected $progressExerciseService;
+    protected ProgressExerciseService $progressExerciseService;
 
     public function __construct(ProgressExerciseService $progressExerciseService)
     {
@@ -28,19 +28,6 @@ final class SentenceExerciseService
             return 'Incorrect answer, try again';
         }
 
-        $progressExercise = ProgressExercise::where('accounts_exercise_id', $exercise->id)
-            ->where('account_id', auth()->user()->id)
-            ->firstOrNew();
-
-        if (!$progressExercise->exists) {
-            $progressExercise->account_id = auth()->user()->id;
-            $progressExercise->accounts_exercise_id = $exercise->id;
-        }
-
-        $progressExercise->solved = true;
-        $progressExercise->solved_at = now();
-        $progressExercise->save();
-
-        return true;
+        return $this->progressExerciseService->solveExercise($exercise);
     }
 }

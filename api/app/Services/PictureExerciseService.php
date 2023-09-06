@@ -4,7 +4,7 @@ namespace App\Services;
 
 final class PictureExerciseService
 {
-    protected $progressExerciseService;
+    protected ProgressExerciseService $progressExerciseService;
 
     public function __construct(ProgressExerciseService $progressExerciseService)
     {
@@ -24,6 +24,12 @@ final class PictureExerciseService
             }
         }
 
-        return $this->progressExerciseService->solveExercise($solvingExerciseDTO, $exercise, $correctAnswer);
+        if ($correctAnswer !== $solvingExerciseDTO->data)
+        {
+
+            return 'Incorrect answer, try again';
+        }
+
+        return $this->progressExerciseService->solveExercise($exercise);
     }
 }

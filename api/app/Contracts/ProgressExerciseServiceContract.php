@@ -13,5 +13,5 @@ interface ProgressExerciseServiceContract
     public function getUserCompletedExercises(int $user_id): \Illuminate\Database\Eloquent\Collection;
     public function deleteUserProgress(DeleteProgressDTO $deleteProgressRequest): bool;
     public function getProgressByStage($userId, $stageId): array|string;
-    public function solveExercise(SolvingExerciseDTO $solvingExerciseDTO, Exercise $exercise, string $correctAnswer): bool|string;
+    public function solveExercise(Exercise $exercise): bool;
 }

@@ -10,16 +10,23 @@ use Carbon\Carbon;
 
 final class AuditService
 {
-    protected $progressExerciseService;
+    protected ProgressExerciseService $progressExerciseService;
 
     public function __construct(ProgressExerciseService $progressExerciseService)
     {
         $this->progressExerciseService = $progressExerciseService;
     }
-    public function solveAudit(SolvingExerciseDTO $solvingExerciseDTO, Exercise $exercise)
+
+    public function solveAudit(SolvingExerciseDTO $solvingExerciseDTO, Exercise $exercise): bool|string
     {
         $correctAnswer = $exercise->audit->transcription;
 
-        return $this->progressExerciseService->solveExercise($solvingExerciseDTO, $exercise, $correctAnswer);
+        if ($correctAnswer !== $solvingExerciseDTO->data)
+        {
+
+            return 'Incorrect answer, try again';
+        }
+
+        return $this->progressExerciseService->solveExercise($exercise);
     }
 }
