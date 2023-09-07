@@ -81,36 +81,41 @@ final class AuthService implements AuthContract
      * @param string $provider
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder|User
      */
-    public function findOrCreateUser(User|\Laravel\Socialite\Two\User $user, string $provider,string $role): array | bool
+    public function findOrCreateUser(User|\Laravel\Socialite\Two\User $user, string $provider, string $role): array | bool
     {
         $authUser = User::where('email', $user->email)->first();
         $objRole = Role::where('name', $role)->first();
 
         if ($authUser) {
-            $token = $this->createToken($authUser);
-
-            if (!$authUser->roles->contains('name', $role)) {
-
+            if (!$authUser->hasRole($role)) {
                 return false;
             }
+
+            $authUser->email_verified_at = now();
+            $authUser->save();
+
+            $token = $this->createToken($authUser);
+            event(new UserAuthorized($authUser, $objRole->name, $token));
 
             return ['user' => $authUser, 'token' => $token];
         }
 
+        return $this->createNewUser($user, $objRole);
+    }
+
+    private function createNewUser($user, $objRole)
+    {
         $hashPassword = Hash::make(Str::random(16));
 
-        $newUser = new User();
-        $newUser->name = $user->name;
-        $newUser->email = $user->email;
-        $newUser->password = $hashPassword;
-        $newUser->save();
+        $newUser = User::create([
+            'name' => $user->name,
+            'email' => $user->email,
+            'password' => $hashPassword,
+        ]);
 
         $newUser->roles()->attach($objRole->id);
 
-        //creating an empty dictionary and attaching it to a user
-
         $token = $this->createToken($newUser);
-
         event(new UserAuthorized($newUser, $objRole->name, $token));
 
         return ['user' => $newUser, 'token' => $token];
