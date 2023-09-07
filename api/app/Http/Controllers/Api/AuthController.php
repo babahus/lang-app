@@ -59,31 +59,29 @@ final class AuthController extends Controller
      * @param string $provider
      * @return ApiResponse
      */
-    public function getProviderLink(string $provider)
+    public function getProviderLink(string $provider, LoginSocialiteRequest $request)
     {
         if (!ProvidersTypes::tryFrom($provider)){
 
             return new ApiResponse('Invalid Provider', Response::HTTP_BAD_REQUEST, false);
         }
 
-        return new ApiResponse(Socialite::with($provider)->stateless()->redirect()->getTargetUrl());
+        return new ApiResponse(Socialite::with($provider)->with(['role' => $request->input('role')])->stateless()->redirect()->getTargetUrl());
     }
 
     /**
      * @param string $provider
      * @return ApiResponse
      */
-    public function handleProviderCallback(LoginSocialiteRequest $loginSocialiteRequest, string $provider): ApiResponse
+    public function handleProviderCallback(string $provider, LoginSocialiteRequest $request): ApiResponse
     {
-
         if (!ProvidersTypes::tryFrom($provider)){
-
             return new ApiResponse('Invalid Provider', Response::HTTP_BAD_REQUEST, false);
         }
 
         $user = Socialite::driver($provider)->stateless()->user();
 
-        $authUser = $this->authService->findOrCreateUser($user, $provider, $loginSocialiteRequest->input('role'));
+        $authUser = $this->authService->findOrCreateUser($user, $provider, $request->input('role'));
 
         if (!$authUser){
 

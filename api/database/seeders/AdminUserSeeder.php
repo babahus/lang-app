@@ -28,5 +28,6 @@ class AdminUserSeeder extends Seeder
             'password' => Hash::make('Qwertyuiop1')
         ]);
         $admin->roles()->attach(3);
+        $admin->roles()->attach(2);
     }
 }

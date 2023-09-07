@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Laravel\Socialite\Facades\Socialite;
 
 class LoginSocialiteRequest extends FormRequest
 {

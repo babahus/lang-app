@@ -2,16 +2,10 @@
 
 namespace App\Http\Requests;
 
-use App\Contracts\DTO;
 use App\DataTransfers\MoveUserExerciseDTO;
 use App\Enums\ExercisesTypes;
-use App\Http\Response\ApiResponse;
-use App\Models\Course;
-use App\Models\Exercise;
 use App\Models\User;
 use App\Rules\StageBelongsToCourse;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
