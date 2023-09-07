@@ -18,7 +18,6 @@ class AddExerciseIdToTableAccountsExercises extends Migration
         });
     }
 
-
     /**
      * Reverse the migrations.
      *

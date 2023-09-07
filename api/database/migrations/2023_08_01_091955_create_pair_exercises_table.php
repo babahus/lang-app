@@ -14,7 +14,7 @@ class CreatePairExercisesTable extends Migration
     public function up()
     {
         Schema::create('pair_exercises', function (Blueprint $table) {
-            $table->increments('id')->unsigned();
+            $table->id()->unsigned();
             $table->json('correct_pair_json');
             $table->timestamps();
         });

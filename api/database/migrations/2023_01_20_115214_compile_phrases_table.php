@@ -14,7 +14,7 @@ class CompilePhrasesTable extends Migration
     public function up()
     {
         Schema::create('compile_phrases', function (Blueprint $table) {
-            $table->increments('id')->unsigned();
+            $table->id()->unsigned();
             $table->string('phrase');
             $table->timestamps();
         });
