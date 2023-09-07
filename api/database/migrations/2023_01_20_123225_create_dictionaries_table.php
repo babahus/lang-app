@@ -14,7 +14,7 @@ class CreateDictionariesTable extends Migration
     public function up()
     {
         Schema::create('dictionaries', function (Blueprint $table) {
-            $table->increments('id')->unsigned();
+            $table->id()->unsigned();
             $table->json('dictionary');
             $table->timestamps();
         });

@@ -14,7 +14,7 @@ class CreatePictureExercisesTable extends Migration
     public function up()
     {
         Schema::create('picture_exercises', function (Blueprint $table) {
-            $table->increments('id')->unsigned();
+            $table->id()->unsigned();
             $table->string('image_path')->nullable();
             $table->json('option_json')->nullable();
             $table->timestamps();

@@ -14,7 +14,7 @@ class ProgressExerciseResource extends JsonResource
 {
     public function toArray($request)
     {
-        $response = [
+        return [
             'id' => $this->id,
             'accounts_exercise_id' => $this->accounts_exercise_id,
             'user' => $this->user->only(['id', 'name']),
@@ -28,7 +28,5 @@ class ProgressExerciseResource extends JsonResource
             },
             'solved' => $this->solved,
         ];
-
-        return $response;
     }
 }
