@@ -29,7 +29,7 @@ final class UpdateExerciseRequest extends BaseRequest
     {
         return [
             'data' => match (ExercisesTypes::inEnum($this->input('type'))) {
-                ExercisesTypes::AUDIT            => ['required', 'file', 'mimes:mp3,wav,flac', 'max:12048'],
+                ExercisesTypes::AUDIT            => ['required', 'file', 'mimes:mp3,wav,flac,ogg', 'max:12048'],
                 ExercisesTypes::COMPILE_PHRASE   => ['required'],
                 ExercisesTypes::PICTURE_EXERCISE => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
                 ExercisesTypes::DICTIONARY, ExercisesTypes::PAIR_EXERCISE => ['required', function ($attribute, $value, $fail) {

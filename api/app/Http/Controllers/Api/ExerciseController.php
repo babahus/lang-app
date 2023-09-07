@@ -158,7 +158,7 @@ final class ExerciseController extends Controller {
     public function attachExerciseToStageCourses(MoveUserExerciseRequest $request): ApiResponse {
 
         if ($this->exerciseService->attachExerciseToStageCourse($request->getDTO())) {
-            return new ApiResponse('Successful attached exercise to stage and course');
+            return new ApiResponse('Successful attached exercise');
         }
 
         return new ApiResponse('Something went wrong', ResponseAlias::HTTP_BAD_REQUEST, false);

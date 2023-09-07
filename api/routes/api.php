@@ -24,7 +24,8 @@ use App\Http\Controllers\Api\ExerciseGeneratorController;
 Route::post('/register', [AuthController::class, 'register' ])->name('register');;
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('login/{provider}', [AuthController::class ,'getProviderLink']);
-Route::get('login/{provider}/callback', [AuthController::class ,'handleProviderCallback']);
+Route::post('login/{provider}/callback', [AuthController::class ,'handleProviderCallback']);
+//Route::post('login/{provider}', [AuthController::class ,'authenticateViaCode']);
 
 Route::post('/forgot-password', [ProfileController::class, 'sendResetLinkEmail']);
 Route::post('/reset-password', [ProfileController::class, 'resetPassword'])->name('password.reset');

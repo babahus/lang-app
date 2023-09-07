@@ -312,7 +312,7 @@ final class ExerciseService implements ExerciseServiceContract {
 
     /**
      * @param SolvingExerciseDTO $solvingExerciseDTO
-     * @return Dictionary|CompilePhrase|Audit|PairExercise|PictureExercise|Sentence|bool
+     * @return Dictionary|CompilePhrase|Audit|PairExercise|PictureExercise|Sentence|bool|string
      */
     public function solving(SolvingExerciseDTO $solvingExerciseDTO): Dictionary|CompilePhrase|Audit|PairExercise|PictureExercise|Sentence|bool|string {
         $exercise = Exercise::where('id', $solvingExerciseDTO->exercise_id)
