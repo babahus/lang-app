@@ -15,24 +15,13 @@ class CoursePolicy
     public function canManageEnrollment(User $user, Course $course, int $studentId): bool
     {
         $userRoles = optional(Cache::get('users_role_' . $user->id));
-        $objRole = Role::whereId($userRoles['role_id'])->first();
+        $objRole = Role::whereId($userRoles['role_id'])->firstOrFail();
 
-        if ($objRole && $objRole->name === 'Teacher') {
-            if ($user->id === $course->account_id) {
-                return true;
-            }
-        }
-
-        if ($objRole && $objRole->name === 'User') {
-            if ($user->id === $studentId) {
-                return true;
-            }
-        }
-
-        if ($objRole && $objRole->name === 'Admin' || $objRole->name === 'Root') {
-            return true;
-        }
-
-        return false;
+        return match ($objRole->name) {
+            'Teacher' => $user->id === $course->account_id,
+            'User' => $user->id === $studentId,
+            'Admin', 'Root' => true,
+            default => false,
+        };
     }
 }
