@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Rules\Solving;
+namespace App\Rules\Profile;
 
-use App\Enums\ExercisesResourcesTypes;
-use App\Models\Exercise;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
 
-class ExerciseIdExistsRule implements Rule
+class PasswordChangeRule implements Rule
 {
     /**
      * Create a new rule instance.
@@ -27,15 +26,7 @@ class ExerciseIdExistsRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $exercise = Exercise::find($value);
-
-        if (!$exercise) {
-            return false;
-        }
-
-        $type = ExercisesResourcesTypes::inEnum(strtoupper(request('type')))->value;
-
-        if ($exercise->exercise_type !== $type || $exercise->exercise_id !== intval(request('id'))) {
+        if (!Hash::check($value, auth()->user()->password)) {
             return false;
         }
 
@@ -49,6 +40,6 @@ class ExerciseIdExistsRule implements Rule
      */
     public function message()
     {
-        return 'The specified exercise_id does not exist or does not match the exercise type and id.';
+        return 'Current password is incorrect.';
     }
 }

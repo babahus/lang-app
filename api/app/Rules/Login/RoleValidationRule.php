@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Rules\Solving;
+namespace App\Rules\Login;
 
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Contracts\Validation\Rule;
 
-class CompilePhraseRule implements Rule
+class RoleValidationRule implements Rule
 {
     /**
      * Create a new rule instance.
@@ -25,13 +27,17 @@ class CompilePhraseRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $data = json_decode($value);
+        $roleId = Role::where('name', $value)->value('id');
+        $user = User::where('email', request()->input('email'))->first();
 
-        if (is_array($data)){
+        if (!$user) {
             return false;
         }
 
-        return is_string($value);
+        return User::whereHas('roles', function ($query) use ($roleId, $user) {
+            $query->where('role_id', $roleId)
+                ->where('user_id', $user->id);
+        })->exists();
     }
 
     /**
@@ -41,6 +47,6 @@ class CompilePhraseRule implements Rule
      */
     public function message()
     {
-        return 'The :attribute field must be a required string.';
+        return 'Enter your current account role';
     }
 }

@@ -16,5 +16,5 @@ interface CourseContract
     public function attach(CourseActionDTO $courseActionDTO): bool;
     public function addStudentToCourse(User $student, Course $course);
     public function detach(CourseActionDTO $courseActionDTO): bool;
-    public function purchased(int $courseId): bool;
+    public function purchased(CourseActionDTO $courseActionDTO): bool;
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Rules\Solving;
+namespace App\Rules\Exercise\Solving;
 
 use Illuminate\Contracts\Validation\Rule;
 

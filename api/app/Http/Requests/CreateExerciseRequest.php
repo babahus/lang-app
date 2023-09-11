@@ -2,11 +2,10 @@
 
 namespace App\Http\Requests;
 
-use App\Contracts\DTO;
 use App\DataTransfers\CreateExerciseDTO;
 use App\Enums\ExercisesTypes;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+use App\Rules\Exercise\AdditionalDataValidationRule;
+use App\Rules\Exercise\DataValidationRule;
 use Illuminate\Validation\Rules\Enum;
 
 final class CreateExerciseRequest extends BaseRequest
@@ -29,20 +28,9 @@ final class CreateExerciseRequest extends BaseRequest
     public function rules()
     {
         return [
-            'data'       => match (ExercisesTypes::inEnum($this->input('type'))){
-                ExercisesTypes::COMPILE_PHRASE, ExercisesTypes::SENTENCE => ['required', 'string'],
-                ExercisesTypes::DICTIONARY, ExercisesTypes::PAIR_EXERCISE => ['required', 'nullable', 'json'],
-                ExercisesTypes::AUDIT            => ['required', 'file', 'mimes:mp3,wav,flac,ogg', 'max:12048'],
-                ExercisesTypes::PICTURE_EXERCISE => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
-                default                          => 'nullable'
-            },
-            'additional_data' => match (ExercisesTypes::inEnum($this->input('type'))) {
-                ExercisesTypes::AUDIT               => ['required', 'string'],
-                ExercisesTypes::SENTENCE,
-                ExercisesTypes::PICTURE_EXERCISE,   => ['required', 'nullable','json'],
-                default => 'nullable',
-            },
-            'type'                                  => ['required', 'string', new Enum(ExercisesTypes::class)],
+            'data'            => ['required', new DataValidationRule()],
+            'additional_data' => ['nullable', new AdditionalDataValidationRule()],
+            'type'            => ['required', 'string', new Enum(ExercisesTypes::class)],
         ];
     }
 
@@ -55,7 +43,6 @@ final class CreateExerciseRequest extends BaseRequest
             },
             $this->input('type'),
  $this->input('additional_data') ?? null,
-
         );
     }
 }

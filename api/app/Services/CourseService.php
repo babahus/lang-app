@@ -87,16 +87,19 @@ class CourseService implements CourseContract {
         return true;
     }
 
-    public function purchased(int $courseId): bool
+    public function purchased(CourseActionDTO $courseActionDTO): bool
     {
-        $course = Course::whereId($courseId)->firstOrFail();
+        $user = User::find($courseActionDTO->studentId);
+        $course = $user->courses->find($courseActionDTO->courseId);
 
-        $courses_students = $course->students()
-            ->where('student_id', auth()->id())
-            ->where('course_id', $courseId)
-            ->firstOrFail();
-        $courses_students->pivot->purchased_at = now();
-        $courses_students->pivot->save();
+        if (!$course) {
+            return false;
+        }
+
+        if (!$course->pivot->purchased_at) {
+            $course->pivot->purchased_at = now();
+            $course->pivot->save();
+        }
 
         return true;
     }

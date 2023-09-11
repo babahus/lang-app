@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Rules\Solving;
+namespace App\Rules\Exercise;
 
+use App\Models\User;
 use Illuminate\Contracts\Validation\Rule;
 
-class SentenceRule implements Rule
+class MoveUserExerciseAccountIdRule implements Rule
 {
     /**
      * Create a new rule instance.
@@ -25,9 +26,13 @@ class SentenceRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $decodedValue = json_decode($value);
+        $user = User::findOrFail($value);
 
-        return json_last_error() === JSON_ERROR_NONE && is_array($decodedValue);
+        if (!$user->hasRole('User')) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -37,6 +42,6 @@ class SentenceRule implements Rule
      */
     public function message()
     {
-        return 'The :attribute field must be a valid JSON array.';
+        return 'The selected student must have the User role.';
     }
 }

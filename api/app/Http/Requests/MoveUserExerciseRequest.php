@@ -5,6 +5,8 @@ namespace App\Http\Requests;
 use App\DataTransfers\MoveUserExerciseDTO;
 use App\Enums\ExercisesTypes;
 use App\Models\User;
+use App\Rules\Exercise\MoveUserExerciseAccountIdRule;
+use App\Rules\Exercise\MoveUserExerciseIdRule;
 use App\Rules\StageBelongsToCourse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -32,31 +34,12 @@ final class MoveUserExerciseRequest extends BaseRequest
         $rules = [
             'stage_id' => ['nullable', 'numeric', new StageBelongsToCourse($this->input('course_id'))],
             'course_id' => ['nullable', 'numeric', Rule::exists('accounts_courses', 'id')],
-            'id' => match (ExercisesTypes::inEnum($this->input('exercise_type'))){
-                ExercisesTypes::COMPILE_PHRASE => ['required', 'numeric', Rule::exists('compile_phrases', 'id')],
-                ExercisesTypes::DICTIONARY => ['required', 'numeric', Rule::exists('dictionaries', 'id')],
-                ExercisesTypes::AUDIT => ['required', 'numeric', Rule::exists('audits', 'id')],
-                ExercisesTypes::PAIR_EXERCISE => ['required', 'numeric', Rule::exists('pair_exercises', 'id')],
-                ExercisesTypes::PICTURE_EXERCISE => ['required', 'numeric', Rule::exists('picture_exercises', 'id')],
-                ExercisesTypes::SENTENCE => ['required', 'numeric', Rule::exists('sentence', 'id')],
-                default => 'nullable'
-            },
+            'id' => ['required', new MoveUserExerciseIdRule()],
             'exercise_type' => ['required', 'string', new Enum(ExercisesTypes::class)],
         ];
 
         if (empty($this->input('course_id')) && empty($this->input('stage_id'))) {
-            $rules['account_id'] = [
-                'nullable',
-                'numeric',
-                'exists:users,id',
-                function ($attribute, $value, $fail) {
-                    $user = User::findOrFail($value);
-
-                    if (!$user->hasRole('User')) {
-                        $fail('The selected student must have the User role.');
-                    }
-                }
-            ];
+            $rules['account_id'] = ['nullable', 'numeric', 'exists:users,id', new MoveUserExerciseAccountIdRule()];
         }
 
         return $rules;

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Profile;
 
 use App\DataTransfers\Profile\PasswordChangeDTO;
+use App\Rules\Profile\PasswordChangeRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Hash;
 
@@ -26,14 +27,7 @@ class PasswordChangeRequest extends FormRequest
     public function rules()
     {
         return [
-            'current_password' => [
-                'required',
-                function ($attribute, $value, $fail) {
-                    if (!Hash::check($value, $this->user()->password)) {
-                        $fail('Current password is incorrect');
-                    }
-                },
-            ],
+            'current_password' => ['required', new PasswordChangeRule()],
             'new_password' => [
                 'required',
                 'min:8',

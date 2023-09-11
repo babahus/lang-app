@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Rules\Solving;
+namespace App\Rules\Exercise\Solving;
 
 use Illuminate\Contracts\Validation\Rule;
 
-class AuditRule implements Rule
+class CompilePhraseRule implements Rule
 {
     /**
      * Create a new rule instance.

@@ -4,13 +4,13 @@ namespace App\Http\Requests;
 
 use App\DataTransfers\SolvingExerciseDTO;
 use App\Enums\ExercisesTypes;
-use App\Rules\Solving\AuditRule;
-use App\Rules\Solving\CompilePhraseRule;
-use App\Rules\Solving\DictionaryRule;
-use App\Rules\Solving\ExerciseIdExistsRule;
-use App\Rules\Solving\PairExerciseRule;
-use App\Rules\Solving\PictureExerciseRule;
-use App\Rules\Solving\SentenceRule;
+use App\Rules\Exercise\Solving\AuditRule;
+use App\Rules\Exercise\Solving\CompilePhraseRule;
+use App\Rules\Exercise\Solving\DictionaryRule;
+use App\Rules\Exercise\Solving\ExerciseIdExistsRule;
+use App\Rules\Exercise\Solving\PairExerciseRule;
+use App\Rules\Exercise\Solving\PictureExerciseRule;
+use App\Rules\Exercise\Solving\SentenceRule;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 

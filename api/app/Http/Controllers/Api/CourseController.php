@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DataTransfers\Courses\CourseActionDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Courses\CourseActionRequest;
 use App\Http\Requests\Courses\CourseCreateRequest;
@@ -12,7 +13,6 @@ use App\Http\Response\ApiResponse;
 use App\Models\Course;
 use App\Services\CourseService;
 use Illuminate\Http\Response;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class CourseController extends Controller {
@@ -96,13 +96,14 @@ class CourseController extends Controller {
     public function attach(CourseActionRequest $request): ApiResponse
     {
         $attached = $this->courseService->attach($request->getDTO());
-        $this->purchased($request->getDTO()->courseId);
+
+        $purchased = $this->purchased($request->getDTO());
 
         if (!$attached) {
             return new ApiResponse('Invalid Provider', Response::HTTP_BAD_REQUEST, false);
         }
 
-        return new ApiResponse('Course attached successfully', Response::HTTP_OK);
+        return new ApiResponse('Course attached successfully', ResponseAlias::HTTP_OK);
     }
 
     /**
@@ -120,9 +121,9 @@ class CourseController extends Controller {
         return new ApiResponse('Course detached successfully', Response::HTTP_OK);
     }
 
-    public function purchased( int $courseId): ApiResponse
+    public function purchased(CourseActionDTO $courseActionDTO): ApiResponse
     {
-        $purchased = $this->courseService->purchased($courseId);
+        $purchased = $this->courseService->purchased($courseActionDTO);
 
         if (!$purchased) {
             return new ApiResponse('Course not purchased or invalid', Response::HTTP_BAD_REQUEST, false);

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Rules\Solving;
+namespace App\Rules\Exercise\Solving;
 
 use Illuminate\Contracts\Validation\Rule;
 
-class PictureExerciseRule implements Rule
+class SentenceRule implements Rule
 {
     /**
      * Create a new rule instance.
@@ -25,13 +25,9 @@ class PictureExerciseRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $data = json_decode($value);
+        $decodedValue = json_decode($value);
 
-        if (is_array($data)){
-            return false;
-        }
-
-        return is_string($value);
+        return json_last_error() === JSON_ERROR_NONE && is_array($decodedValue);
     }
 
     /**
@@ -41,6 +37,6 @@ class PictureExerciseRule implements Rule
      */
     public function message()
     {
-        return 'The :attribute field must be a required string.';
+        return 'The :attribute field must be a valid JSON array.';
     }
 }

@@ -6,6 +6,7 @@ use App\Contracts\DTO;
 use App\DataTransfers\LoginDTO;
 use App\Models\Role;
 use App\Models\User;
+use App\Rules\Login\RoleValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 final class LoginRequest extends BaseRequest
@@ -39,24 +40,7 @@ final class LoginRequest extends BaseRequest
                 'string',
                 'in:User,Teacher,Admin,Root',
                 'exists:roles,name',
-                function ($attribute, $value, $fail) {
-
-                    $roleId = Role::where('name', $value)->value('id');
-                    $user = User::where('email', $this->input('email'))->first();
-
-                    if (!$user) {
-                        return $fail('User with the provided email does not exist.');
-                    }
-
-                    $roleUser = User::whereHas('roles', function ($query) use ($roleId, $user) {
-                        $query->where('role_id', $roleId)
-                            ->where('user_id', $user->id);
-                    })->exists();
-
-                    if(!$roleUser){
-                        $fail('Enter your current account role');
-                    };
-                }
+                new RoleValidationRule(),
             ],
         ];
     }
