@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class ApiAdminMiddleware
 {
@@ -17,10 +18,9 @@ class ApiAdminMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $usersRolesIds = Auth::user()->roles()->pluck('id')->toArray();
+        $userRoleId = Cache::get('users_role_' . Auth::id())['role_id'];
 
-        if (!(in_array(3,$usersRolesIds) || in_array(4,$usersRolesIds))) {
-
+        if ($userRoleId !== 3 && $userRoleId !== 4) {
             return response()->json(['error' => 'Not enough rights'], 401);
         }
 

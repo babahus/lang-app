@@ -8,7 +8,6 @@ use App\Http\Controllers\Api\ExerciseController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\StageController;
-use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\ExerciseGeneratorController;
 
 /*
