@@ -9,6 +9,7 @@ use App\Models\User;
 
 interface ProfileServiceContract
 {
+    public function getProfileInfo(): array;
     public function sendResetLinkEmail(User $user): string;
     public function createUrlVerification(User $user): string;
     public function resetPassword(PasswordResetDTO $passwordResetDTO): string;

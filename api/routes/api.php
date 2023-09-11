@@ -46,6 +46,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::middleware(['email.confirmed'])->group(function () {
         Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('password.change');
         Route::post('/change-email', [ProfileController::class, 'changeEmail'])->name('email.change');
+        Route::get('/profile-info', [ProfileController::class, 'getProfileInfo'])->name('profile.info');
     });
 
     Route::get('/email/verify/{id}/{hash}', [ProfileController::class, 'verify'])->name('verification.verify');

@@ -6,13 +6,30 @@ use App\Contracts\ProfileServiceContract;
 use App\DataTransfers\EmailChangeDTO;
 use App\DataTransfers\PasswordResetDTO;
 use App\DataTransfers\Profile\PasswordChangeDTO;
+use App\Models\Role;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\URL;
 
 final class ProfileService implements ProfileServiceContract
 {
+    public function getProfileInfo(): array
+    {
+        $user = auth()->user();
+        $userRoleCach = optional(Cache::get('users_role_' . $user->id));
+
+        $userRole = $user->roles->where('id', $userRoleCach['role_id'])->first();
+
+        return [
+            'name' => $user->name,
+            'email' => $user->email,
+            'email_verified_at' => $user->email_verified_at,
+            'role' => $userRole->name,
+        ];
+    }
+
     public function createUrlVerification(User $user): string
     {
         return URL::temporarySignedRoute(

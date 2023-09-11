@@ -7,6 +7,7 @@ use App\Http\Requests\EmailChangeRequest;
 use App\Http\Requests\PasswordForgotRequest;
 use App\Http\Requests\PasswordResetRequest;
 use App\Http\Requests\Profile\PasswordChangeRequest;
+use App\Http\Resources\UserResponseResource;
 use App\Http\Response\ApiResponse;
 use App\Mail\EmailMail;
 use App\Models\User;
@@ -25,6 +26,18 @@ class ProfileController extends Controller
     public function __construct(ProfileService $profileService)
     {
         $this->profileService = $profileService;
+    }
+
+    public function getProfileInfo()
+    {
+        $profileInfo = $this->profileService->getProfileInfo();
+
+        if (!$profileInfo){
+
+            return new ApiResponse('Something went wrong', Response::HTTP_BAD_REQUEST, false);
+        }
+
+        return new ApiResponse($profileInfo);
     }
 
     public function verify(EmailVerificationRequest $request): ApiResponse
