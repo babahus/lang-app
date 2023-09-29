@@ -43,7 +43,7 @@ final class ProfileService implements ProfileServiceContract
     {
         $token = Password::createToken($user);
 
-        return url('/reset-password' . '?token=' . $token) . '?email=' . urlencode($user->email);
+        return 'http://localhost:4200/reset-password' . '?token=' . $token . '&email=' . urlencode($user->email);
     }
 
     public function changeEmail(User $user, EmailChangeDTO $emailChangeDTO): bool

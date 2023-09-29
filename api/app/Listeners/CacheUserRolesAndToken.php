@@ -27,6 +27,7 @@ class CacheUserRolesAndToken
      */
     public function handle(UserAuthorized $event)
     {
+
         $user = $event->user;
         $roleName = $event->roleName;
 

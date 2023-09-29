@@ -25,7 +25,7 @@ class LoginSocialiteRequest extends FormRequest
     public function rules()
     {
         return [
-            'role' => 'required|exists:roles,name'
+            'role' => 'required|in:User,Teacher|exists:roles,name'
         ];
     }
 }

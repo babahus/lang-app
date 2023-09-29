@@ -20,7 +20,8 @@ use App\Http\Controllers\Api\ExerciseGeneratorController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::post('/register', [AuthController::class, 'register' ])->name('register');;
+
+Route::post('/register', [AuthController::class, 'register' ])->name('register');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('login/{provider}', [AuthController::class ,'getProviderLink']);
 Route::post('login/{provider}/callback', [AuthController::class ,'handleProviderCallback']);

@@ -88,13 +88,16 @@ final class AuthService implements AuthContract
 
         if ($authUser) {
             if (!$authUser->hasRole($role)) {
-                return false;
+                $authUser->roles()->attach($objRole->id);
             }
+
+            auth()->login($authUser);
 
             $authUser->email_verified_at = now();
             $authUser->save();
 
             $token = $this->createToken($authUser);
+
             event(new UserAuthorized($authUser, $objRole->name, $token));
 
             return ['user' => $authUser, 'token' => $token];
@@ -102,6 +105,7 @@ final class AuthService implements AuthContract
 
         return $this->createNewUser($user, $objRole);
     }
+
 
     private function createNewUser($user, $objRole)
     {
