@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Mail\EmailMail;
+use App\Services\ProfileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\{LoginRequest, LoginSocialiteRequest, RegisterRequest};
 use Illuminate\Http\Response;
 use App\Enums\ProvidersTypes;
@@ -20,12 +23,15 @@ final class AuthController extends Controller
      * @var AuthService
      */
     private AuthService $authService;
+    private ProfileService $profileService;
 
     /**
      * @param AuthService $authService
+     * @param ProfileService $profileService
      */
-    public function __construct(AuthService $authService){
+    public function __construct(AuthService $authService, ProfileService $profileService){
         $this->authService = $authService;
+        $this->profileService = $profileService;
     }
 
     /**
@@ -51,6 +57,13 @@ final class AuthController extends Controller
     public function register(RegisterRequest $request): ApiResponse
     {
         $user = $this->authService->register($request->getDTO());
+        $verificationUrl = $this->profileService->createUrlVerification($user['user']);
+
+        Mail::to($user['user']->email)
+            ->send(new EmailMail('Verify Your Email', 'emails.verificationEmail', [
+                'user' => $user['user'],
+                'dataUrl' => $verificationUrl
+            ]));
 
         return new ApiResponse(new UserResponseResource($user));
     }
