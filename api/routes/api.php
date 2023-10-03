@@ -25,6 +25,7 @@ Route::post('/register', [AuthController::class, 'register' ])->name('register')
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('login/{provider}', [AuthController::class ,'getProviderLink']);
 Route::post('login/{provider}/callback', [AuthController::class ,'handleProviderCallback']);
+
 //Route::post('login/{provider}', [AuthController::class ,'authenticateViaCode']);
 
 Route::post('/forgot-password', [ProfileController::class, 'sendResetLinkEmail']);
@@ -50,9 +51,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get('/profile-info', [ProfileController::class, 'getProfileInfo'])->name('profile.info');
     });
 
-    Route::get('/email/verify/{id}/{hash}', [ProfileController::class, 'verify'])->name('verification.verify');
     Route::post('/email/verification-notification', [ProfileController::class, 'sendVerificationNotification'])
         ->name('verification.send');
+    Route::get('/email/verify/{id}/{hash}', [ProfileController::class, 'verify'])->name('verification.verify');
 
     Route::apiResource('/course', CourseController::class);
     Route::apiResource('/stage', StageController::class)->except('index');

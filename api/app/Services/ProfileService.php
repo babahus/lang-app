@@ -32,11 +32,14 @@ final class ProfileService implements ProfileServiceContract
 
     public function createUrlVerification(User $user): string
     {
-        return URL::temporarySignedRoute(
+        $url = URL::temporarySignedRoute(
             'verification.verify',
             now()->addHours(24),
-            ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
+            ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())],
+            false
         );
+
+        return 'http://localhost:4200/' . $url;
     }
 
     public function sendResetLinkEmail(User $user): string
