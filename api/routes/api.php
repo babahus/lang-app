@@ -56,6 +56,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/email/verify/{id}/{hash}', [ProfileController::class, 'verify'])->name('verification.verify');
 
     Route::apiResource('/course', CourseController::class);
+    Route::get('/courses/user/{user}', [CourseController::class, 'getAttachedCoursesToUser']);
     Route::apiResource('/stage', StageController::class)->except('index');
     Route::get('/stages/{course_id}', [StageController::class, 'index']);
 

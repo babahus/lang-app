@@ -11,6 +11,7 @@ use App\Http\Requests\Courses\CourseUpdateRequest;
 use App\Http\Resources\CourseResource;
 use App\Http\Response\ApiResponse;
 use App\Models\Course;
+use App\Models\User;
 use App\Services\CourseService;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
@@ -30,6 +31,17 @@ class CourseController extends Controller {
      */
     public function index(?int $count = 8): ApiResponse {
         $courses = Course::paginate($count);
+
+        return new ApiResponse(new CourseResource($courses));
+    }
+
+    /**
+     * @param int|null $count
+     * @param User $user
+     * @return ApiResponse
+     */
+    public function getAttachedCoursesToUser(User $user, ?int $count = 100): ApiResponse {
+        $courses = $user->courses()->paginate($count);
 
         return new ApiResponse(new CourseResource($courses));
     }

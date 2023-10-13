@@ -2,7 +2,9 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Role;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Cache;
 
 final class UserResponseResource extends JsonResource
 {
@@ -19,6 +21,7 @@ final class UserResponseResource extends JsonResource
           'name'  => $this->resource['user']->name,
           'email' => $this->resource['user']->email,
           'token' => $this->resource['token'],
+          'role'  => Role::whereId(Cache::get('users_role_' . $this->resource['user']->id))->value('name') ?? 'User'
         ];
     }
 }
