@@ -28,10 +28,10 @@ class CourseController extends Controller {
      * @param int|null $count
      * @return ApiResponse
      */
-    public function index(?int $count = 10): ApiResponse {
+    public function index(?int $count = 8): ApiResponse {
         $courses = Course::paginate($count);
 
-        return new ApiResponse(CourseResource::collection($courses));
+        return new ApiResponse(new CourseResource($courses));
     }
 
     /**

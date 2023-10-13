@@ -79,7 +79,7 @@ final class AuthController extends Controller
             return new ApiResponse('Invalid Provider', Response::HTTP_BAD_REQUEST, false);
         }
 
-        return new ApiResponse(Socialite::with($provider)->with(['role' => $request->input('role')])->stateless()->redirect()->getTargetUrl());
+        return new ApiResponse(Socialite::with($provider)->with(['state' => json_encode([ 'role' => $request->input('role')])])->stateless()->redirect()->getTargetUrl());
     }
 
     /**
