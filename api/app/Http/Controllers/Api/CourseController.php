@@ -8,6 +8,7 @@ use App\Http\Requests\Courses\CourseActionRequest;
 use App\Http\Requests\Courses\CourseCreateRequest;
 use App\Http\Requests\Courses\CourseDeleteRequest;
 use App\Http\Requests\Courses\CourseUpdateRequest;
+use App\Http\Resources\CourseCollectionResource;
 use App\Http\Resources\CourseResource;
 use App\Http\Response\ApiResponse;
 use App\Models\Course;
@@ -32,7 +33,7 @@ class CourseController extends Controller {
     public function index(?int $count = 8): ApiResponse {
         $courses = Course::paginate($count);
 
-        return new ApiResponse(new CourseResource($courses));
+        return new ApiResponse(new CourseCollectionResource($courses));
     }
 
     /**
@@ -43,7 +44,7 @@ class CourseController extends Controller {
     public function getAttachedCoursesToUser(User $user, ?int $count = 100): ApiResponse {
         $courses = $user->courses()->paginate($count);
 
-        return new ApiResponse(new CourseResource($courses));
+        return new ApiResponse(new CourseCollectionResource($courses));
     }
 
     /**
@@ -133,6 +134,10 @@ class CourseController extends Controller {
         return new ApiResponse('Course detached successfully', Response::HTTP_OK);
     }
 
+    /**
+     * @param CourseActionDTO $courseActionDTO
+     * @return ApiResponse
+     */
     public function purchased(CourseActionDTO $courseActionDTO): ApiResponse
     {
         $purchased = $this->courseService->purchased($courseActionDTO);
