@@ -104,4 +104,13 @@ class CourseService implements CourseContract {
         return true;
     }
 
+    public function checkIfUserAttachCourse(Course $course): bool
+    {
+        return $course->students->contains(auth()->id());
+    }
+
+    public function checkIfUserIsCourseCreator(Course $course) : bool
+    {
+        return $course->account_id == auth()->id();
+    }
 }

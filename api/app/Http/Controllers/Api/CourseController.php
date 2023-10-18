@@ -72,6 +72,24 @@ class CourseController extends Controller {
     }
 
     /**
+     * @param Course $course
+     * @return ApiResponse
+     */
+    public function checkIfUserAttachedCourse(Course $course): ApiResponse
+    {
+        return new ApiResponse($this->courseService->checkIfUserAttachCourse($course));
+    }
+
+    /**
+     * @param Course $course
+     * @return ApiResponse
+     */
+    public function checkIfUserIsCourseCreator(Course $course): ApiResponse
+    {
+        return new ApiResponse($this->courseService->checkIfUserIsCourseCreator($course));
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param CourseUpdateRequest $request

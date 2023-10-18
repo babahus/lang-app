@@ -62,6 +62,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::post('/course/attach', [CourseController::class, 'attach']);
     Route::post('/course/detach', [CourseController::class, 'detach']);
+    Route::get('/course/{course}/is-attached', [CourseController::class, 'checkIfUserAttachedCourse']);
+    Route::get('/course/{course}/is-creator', [CourseController::class, 'checkIfUserIsCourseCreator']);
 
     Route::post('/exercise/solve', [ExerciseController::class, 'solving']);
     Route::get('/exercise', [ExerciseController::class, 'index']);
