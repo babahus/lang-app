@@ -18,9 +18,7 @@ final class ProfileService implements ProfileServiceContract
     public function getProfileInfo(): array
     {
         $user = auth()->user();
-        $userRoleCach = optional(Cache::get('users_role_' . $user->id));
-
-        $userRole = $user->roles->where('id', $userRoleCach['role_id'])->first();
+        $userRole = $this->getUserRoleFromCache($user);
 
         return [
             'name' => $user->name,
@@ -39,14 +37,14 @@ final class ProfileService implements ProfileServiceContract
             false
         );
 
-        return 'http://localhost:4200/' . $url;
+        return env('FRONT_END_URL') . $url;
     }
 
     public function sendResetLinkEmail(User $user): string
     {
         $token = Password::createToken($user);
 
-        return 'http://localhost:4200/reset-password' . '?token=' . $token . '&email=' . urlencode($user->email);
+        return env('FRONT_END_URL') . 'reset-password' . '?token=' . $token . '&email=' . urlencode($user->email);
     }
 
     public function changeEmail(User $user, EmailChangeDTO $emailChangeDTO): bool
@@ -83,5 +81,12 @@ final class ProfileService implements ProfileServiceContract
         );
 
         return $status;
+    }
+
+    public function getUserRoleFromCache(User|\Illuminate\Contracts\Auth\Authenticatable $user)
+    {
+        $userRoleCache = optional(Cache::get('users_role_' . $user->id));
+
+        return $user->roles->where('id', $userRoleCache['role_id'])->first();
     }
 }

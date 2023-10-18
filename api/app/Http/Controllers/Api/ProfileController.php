@@ -12,7 +12,9 @@ use App\Mail\EmailMail;
 use App\Models\User;
 use App\Services\ProfileService;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Http\Response;
@@ -119,5 +121,13 @@ class ProfileController extends Controller
         } else {
             return new ApiResponse('Password reset failed', Response::HTTP_BAD_REQUEST, false);
         }
+    }
+
+    public function getCachedInfo(Request $request): ApiResponse
+    {
+        $user = auth()->user();
+        $userRole = $this->profileService->getUserRoleFromCache($user);
+
+        return new ApiResponse($userRole->name);
     }
 }

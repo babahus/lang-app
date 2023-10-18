@@ -5,7 +5,8 @@ namespace App\Http\Requests\Courses;
 use App\Contracts\DTO;
 use App\DataTransfers\Courses\CreateCourseDTO;
 use App\Http\Requests\BaseRequest;
-use Illuminate\Foundation\Http\FormRequest;
+use Auth;
+use Illuminate\Support\Facades\Cache;
 
 class CourseCreateRequest extends BaseRequest
 {
@@ -16,7 +17,14 @@ class CourseCreateRequest extends BaseRequest
      */
     public function authorize()
     {
-        return true;
+        $user = Auth::user();
+        $userRoleId = Cache::get("users_role_" . $user->id);
+
+        if ($userRoleId && ($userRoleId['role_id'] == 2 || $userRoleId['role_id'] == 3)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

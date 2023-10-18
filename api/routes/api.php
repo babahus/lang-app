@@ -50,7 +50,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('/change-email', [ProfileController::class, 'changeEmail'])->name('email.change');
         Route::get('/profile-info', [ProfileController::class, 'getProfileInfo'])->name('profile.info');
     });
-
+    Route::get('/get-cache-info', [ProfileController::class, 'getCachedInfo']);
     Route::post('/email/verification-notification', [ProfileController::class, 'sendVerificationNotification'])
         ->name('verification.send');
     Route::get('/email/verify/{id}/{hash}', [ProfileController::class, 'verify'])->name('verification.verify');
@@ -70,7 +70,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/exercise/upload/{id}', [ExerciseController::class, 'uploadAudioAndTranscript']);
     Route::get('/exercise/{type}/{id}', [ExerciseController::class, 'show']);
     Route::get('/exercise/{type}', [ExerciseController::class, 'getExercisesByType']);
-
     Route::get('/logout', [AuthController::class, 'logout']);
 });
 Route::post('/webhook', [ExerciseController::class, 'webHook']);
