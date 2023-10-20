@@ -49,7 +49,7 @@ final class MoveUserExerciseRequest extends BaseRequest
     {
         $account_id = $this->input('account_id');
 
-        if ($this->user()->hasRole('User') || empty($account_id)) {
+        if (empty($account_id)) {
             $account_id = $this->user()->id;
         }
 
