@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  * App\Models\Exercise
  *
  * @property int $id
- * @property int $user_id
+ * @property int $account_id
  * @property int $exercise_id
  * @property string $solved
  * @property string $type
@@ -29,7 +29,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Exercise whereSolved($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Exercise whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Exercise whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Exercise whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Exercise whereAccountId($value)
  * @property-read \App\Models\Stage|null $stages
  * @mixin Eloquent
  */

@@ -41,7 +41,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('/exercise/generate', [ExerciseGeneratorController::class, 'generate']);
     });
 
+    Route::get('/user/course/{course}/progress', [ProgressExerciseController::class, 'getCourseProgressForCurrentUser']);
     Route::get('users/completed-exercises/{userId}', [ProgressExerciseController::class, 'getUserCompletedExercises']);
+    Route::get('/user/{user}/count-exercises', [ProgressExerciseController::class, 'getCountProgressOfAllExercisesForUser']);
     Route::delete('exercises/users/delete-progress', [ProgressExerciseController::class, 'deleteUserProgress']);
     Route::get('users/{user_id}/stages/{stage_id}/progress', [ProgressExerciseController::class, 'getProgressByStage']);
 

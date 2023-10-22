@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ProgressExercise\DeleteProgressRequest;
 use App\Http\Resources\ProgressExerciseResource;
 use App\Http\Response\ApiResponse;
+use App\Models\Course;
+use App\Models\User;
 use App\Services\ProgressExerciseService;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
@@ -19,7 +21,7 @@ class ProgressExerciseController extends Controller
         $this->progressExerciseService = $progressExerciseService;
     }
 
-    public function getUserCompletedExercises(int $user_id)
+    public function getUserCompletedExercises(int $user_id): ApiResponse
     {
         $progressExercise = $this->progressExerciseService->getUserCompletedExercises($user_id);
 
@@ -31,7 +33,7 @@ class ProgressExerciseController extends Controller
         return new ApiResponse(ProgressExerciseResource::collection($progressExercise));
     }
 
-    public function deleteUserProgress(DeleteProgressRequest $deleteProgressRequest)
+    public function deleteUserProgress(DeleteProgressRequest $deleteProgressRequest): ApiResponse
     {
         $deleteProgress =  $this->progressExerciseService->deleteUserProgress($deleteProgressRequest->getDTO());
 
@@ -43,7 +45,7 @@ class ProgressExerciseController extends Controller
         return new ApiResponse('Result of the exercise was successfully deleted');
     }
 
-    public function getProgressByStage($userId, $stageId)
+    public function getProgressByStage($userId, $stageId): ApiResponse
     {
         $progressByStage = $this->progressExerciseService->getProgressByStage($userId, $stageId);
 
@@ -53,5 +55,24 @@ class ProgressExerciseController extends Controller
         }
 
         return new ApiResponse($progressByStage);
+    }
+
+    public function getCourseProgressForCurrentUser(Course $course): ApiResponse
+    {
+        $progressCourse = $this->progressExerciseService->getCourseProgressForCurrentUser($course);
+
+        if (is_string($progressCourse)){
+
+            return new ApiResponse($progressCourse, ResponseAlias::HTTP_BAD_REQUEST, false);
+        }
+
+        return new ApiResponse($progressCourse);
+    }
+
+    public function getCountProgressOfAllExercisesForUser(User $user): ApiResponse
+    {
+        $exerciseProgressCountArr = $this->progressExerciseService->getCountProgressOfAllExercisesForUser($user);
+
+        return new ApiResponse($exerciseProgressCountArr);
     }
 }

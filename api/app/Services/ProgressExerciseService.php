@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Contracts\ProgressExerciseServiceContract;
 use App\DataTransfers\ProgressExercise\DeleteProgressDTO;
 use App\DataTransfers\SolvingExerciseDTO;
+use App\Models\Course;
 use App\Models\Exercise;
 use App\Models\ProgressExercise;
 use App\Models\Stage;
@@ -85,5 +86,75 @@ class ProgressExerciseService implements ProgressExerciseServiceContract
         $progressExercise->save();
 
         return true;
+    }
+
+    public function getCourseProgressForCurrentUser(Course $course): array|string
+    {
+        $user = auth()->user();
+
+        if (!$user || !$course) {
+            return 'Could not find information on the transferred data';
+        }
+
+        $stages = $course->stages;
+        $progress = [];
+
+        foreach ($stages as $stage) {
+            $exercises = $stage->exercises;
+            $stageProgress = 0;
+            $totalExercises = $exercises->count();
+
+            foreach ($exercises as $exercise) {
+                $userProgress = $exercise->progressExercises->where('account_id', $user->id)->first();
+                if ($userProgress && $userProgress->solved) {
+                    $stageProgress++;
+                }
+            }
+
+            $progress[] = [
+                'stage' => $stage->id,
+                'stage_title' => $stage->title,
+                'stage_progress' => $stageProgress,
+                'total_exercises' => $totalExercises,
+            ];
+        }
+
+        return $progress;
+    }
+
+    public function getCountProgressOfAllExercisesForUser(User $user): array
+    {
+        $countExercisesWithoutCourse = Exercise::where('account_id', $user->id)
+            ->whereNull('course_id')
+            ->whereNull('stage_id')
+            ->count();
+
+        $countExercisesWithCourse = 0;
+        $courses = $user->courses;
+
+        foreach ($courses as $course) {
+            foreach ($course->stages as $stage) {
+                $countExercisesWithCourse += $stage->exercises->count();
+            }
+        }
+
+        $countSolvedExercisesWithoutCourse = ProgressExercise::where('account_id', $user->id)
+            ->whereHas('exercise', function ($query) {
+                $query->where('course_attachment', 0);
+            })
+            ->count();
+
+        $countSolvedExercisesWithCourse = ProgressExercise::where('account_id', $user->id)
+            ->whereHas('exercise', function ($query) {
+                $query->where('course_attachment', 1);
+            })
+            ->count();
+
+        return [
+            'countExercisesWithoutCourse' => $countExercisesWithoutCourse,
+            'countExercisesWithCourse' => $countExercisesWithCourse,
+            'countSolvedExercisesWithoutCourse' => $countSolvedExercisesWithoutCourse,
+            'countSolvedExercisesWithCourse' => $countSolvedExercisesWithCourse
+        ];
     }
 }
