@@ -21,12 +21,12 @@ final class ExerciseResource extends JsonResource
             'id' => $this->id,
             'type' => strtolower(ExercisesResourcesTypes::from($this->exercise_type)->name),
             'data' => match ($this->exercise_type) {
-                ExercisesResourcesTypes::DICTIONARY->value => new DictionaryResource($this->dictionary),
-                ExercisesResourcesTypes::COMPILE_PHRASE->value => new CompilePhraseResource($this->compilePhrase),
-                ExercisesResourcesTypes::AUDIT->value => new AuditResource($this->audit),
-                ExercisesResourcesTypes::PAIR_EXERCISE->value => new PairExerciseResource($this->pairExercise),
-                ExercisesResourcesTypes::PICTURE_EXERCISE->value => new PictureExerciseResource($this->pictureExercise),
-                ExercisesResourcesTypes::SENTENCE->value => new SentenceResource($this->sentence),
+                ExercisesResourcesTypes::DICTIONARY->value => new DictionaryResource($this->exercise),
+                ExercisesResourcesTypes::COMPILE_PHRASE->value => new CompilePhraseResource($this->compilePhrase ?? $this->exercise),
+                ExercisesResourcesTypes::AUDIT->value => new AuditResource($this->audit ?? $this->exercise),
+                ExercisesResourcesTypes::PAIR_EXERCISE->value => new PairExerciseResource($this->pairExercise ?? $this->exercise),
+                ExercisesResourcesTypes::PICTURE_EXERCISE->value => new PictureExerciseResource($this->pictureExercise ?? $this->exercise),
+                ExercisesResourcesTypes::SENTENCE->value => new SentenceResource($this->sentence ?? $this->exercise),
                 default => null,
             },
         ];
