@@ -15,6 +15,11 @@ use App\Http\Resources\{AuditResource,
     CompilePhraseResource,
     DictionaryResource,
     ExerciseResource,
+    ExerciseTypePaginationResources\AuditPaginationResource,
+    ExerciseTypePaginationResources\CompilePhrasePaginationResource,
+    ExerciseTypePaginationResources\PairExercisePaginationResource,
+    ExerciseTypePaginationResources\PictureExercisePaginationResource,
+    ExerciseTypePaginationResources\SentencePaginationResource,
     PairExerciseResource,
     PictureExerciseResource,
     SentenceResource};
@@ -62,11 +67,11 @@ final class ExerciseController extends Controller {
 
         $resourceCollection =  match (ExercisesTypes::inEnum($type)){
             ExercisesTypes::DICTIONARY        => DictionaryResource::collection($attachedExercise),
-            ExercisesTypes::COMPILE_PHRASE    => new CompilePhraseResource($attachedExercise),
-            ExercisesTypes::AUDIT             => new AuditResource($attachedExercise),
-            ExercisesTypes::PAIR_EXERCISE     => new PairExerciseResource($attachedExercise),
-            ExercisesTypes::PICTURE_EXERCISE  => new PictureExerciseResource($attachedExercise),
-            ExercisesTypes::SENTENCE          => new SentenceResource($attachedExercise),
+            ExercisesTypes::COMPILE_PHRASE    => new CompilePhrasePaginationResource($attachedExercise),
+            ExercisesTypes::AUDIT             => new AuditPaginationResource($attachedExercise),
+            ExercisesTypes::PAIR_EXERCISE     => new PairExercisePaginationResource($attachedExercise),
+            ExercisesTypes::PICTURE_EXERCISE  => new PictureExercisePaginationResource($attachedExercise),
+            ExercisesTypes::SENTENCE          => new SentencePaginationResource($attachedExercise),
         };
 
         return new ApiResponse($resourceCollection);
@@ -109,11 +114,11 @@ final class ExerciseController extends Controller {
 
         $resourceCollection =  match (ExercisesTypes::inEnum($type)){
             ExercisesTypes::DICTIONARY        => DictionaryResource::collection($exercises),
-            ExercisesTypes::COMPILE_PHRASE    => new CompilePhraseResource($exercises),
-            ExercisesTypes::AUDIT             => new AuditResource($exercises),
-            ExercisesTypes::PAIR_EXERCISE     => new PairExerciseResource($exercises),
-            ExercisesTypes::PICTURE_EXERCISE  => new PictureExerciseResource($exercises),
-            ExercisesTypes::SENTENCE          => new SentenceResource($exercises),
+            ExercisesTypes::COMPILE_PHRASE    => new CompilePhrasePaginationResource($exercises),
+            ExercisesTypes::AUDIT             => new AuditPaginationResource($exercises),
+            ExercisesTypes::PAIR_EXERCISE     => new PairExercisePaginationResource($exercises),
+            ExercisesTypes::PICTURE_EXERCISE  => new PictureExercisePaginationResource($exercises),
+            ExercisesTypes::SENTENCE          => new SentencePaginationResource($exercises),
         };
 
         return new ApiResponse($resourceCollection);
