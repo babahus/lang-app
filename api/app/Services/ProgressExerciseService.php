@@ -130,9 +130,8 @@ class ProgressExerciseService implements ProgressExerciseServiceContract
             ->count();
 
         $countExercisesWithCourse = 0;
-        $courses = $user->courses;
 
-        foreach ($courses as $course) {
+        foreach ($user->courses as $course) {
             foreach ($course->stages as $stage) {
                 $countExercisesWithCourse += $stage->exercises->count();
             }

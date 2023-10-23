@@ -128,6 +128,6 @@ class ProfileController extends Controller
         $user = auth()->user();
         $userRole = $this->profileService->getUserRoleFromCache($user);
 
-        return new ApiResponse($userRole->name);
+        return new ApiResponse(['userRole' => $userRole->name, 'userId' => $user->id]);
     }
 }
