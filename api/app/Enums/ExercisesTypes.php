@@ -23,4 +23,16 @@ enum ExercisesTypes : string
             default => false,
         };
     }
+
+    public static function allValues(): array
+    {
+        return [
+            self::COMPILE_PHRASE,
+            self::DICTIONARY,
+            self::AUDIT,
+            self::PAIR_EXERCISE,
+            self::PICTURE_EXERCISE,
+            self::SENTENCE,
+        ];
+    }
 }

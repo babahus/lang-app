@@ -20,7 +20,7 @@ class ApiAdminMiddleware
     {
         $userRoleId = Cache::get('users_role_' . Auth::id())['role_id'];
 
-        if ($userRoleId !== 3 && $userRoleId !== 4) {
+        if ($userRoleId !== 3 && $userRoleId !== 4 && $userRoleId !== 2) {
             return response()->json(['error' => 'Not enough rights'], 401);
         }
 

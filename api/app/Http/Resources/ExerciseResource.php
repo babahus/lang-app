@@ -17,7 +17,7 @@ final class ExerciseResource extends JsonResource
      */
     public function toArray($request)
     {
-        $response = [
+        return  [
             'id' => $this->id,
             'type' => strtolower(ExercisesResourcesTypes::from($this->exercise_type)->name),
             'data' => match ($this->exercise_type) {
@@ -30,7 +30,5 @@ final class ExerciseResource extends JsonResource
                 default => null,
             },
         ];
-
-        return $response;
     }
 }

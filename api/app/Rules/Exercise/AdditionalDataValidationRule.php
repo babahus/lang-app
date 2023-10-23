@@ -48,6 +48,10 @@ class AdditionalDataValidationRule implements Rule
 
     public function sentence_validation($value)
     {
+        if (!is_array(json_decode($value))){
+            return false;
+        }
+
         $decodedValue = json_decode($value, true);
 
         if ($decodedValue === null || json_last_error() !== JSON_ERROR_NONE) {
@@ -72,7 +76,7 @@ class AdditionalDataValidationRule implements Rule
                 return false;
             }
 
-            if (empty($option['text']) || empty($option['is_correct'])) {
+            if (empty($option['text']) || !isset($option['is_correct'])) {
                 return false;
             }
 
@@ -90,7 +94,11 @@ class AdditionalDataValidationRule implements Rule
             }
         }
 
-        return $hasCorrectAnswer;
+        if (!$hasCorrectAnswer) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

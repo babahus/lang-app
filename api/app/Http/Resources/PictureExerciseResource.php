@@ -12,9 +12,23 @@ final class PictureExerciseResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
-            'path' => Storage::disk('public')->url($this->image_path),
-            'options' => $this->shuffleOptions($this->option_json),
+            'data' => $this->getCollection()->transform(function ($picture) {
+                return [
+                    'id' => $picture->id,
+                    'path' => Storage::disk('public')->url($picture->image_path),
+                    'options' => $this->shuffleOptions($picture->option_json),
+                ];
+            }),
+            'pagination' => [
+                'current_page' => $this->currentPage(),
+                'last_page'    => $this->lastPage(),
+                'per_page'     => $this->perPage(),
+                'next_page_url'=> $this->nextPageUrl(),
+                'prev_page_url'=> $this->previousPageUrl(),
+                'total'        => $this->total(),
+                'from'         => $this->firstItem(),
+                'to'           => $this->lastItem(),
+            ],
         ];
     }
 

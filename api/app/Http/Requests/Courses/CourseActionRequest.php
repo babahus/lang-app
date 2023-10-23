@@ -16,6 +16,10 @@ final class CourseActionRequest extends BaseRequest
      */
     public function authorize()
     {
+        if ($this->input('courseId') === null || $this->input('studentId') === null) {
+            return false;
+        }
+
         $course = Course::findOrFail($this->input('courseId'));
         $studentId = $this->input('studentId');
 

@@ -3,7 +3,14 @@
 namespace App\Services;
 
 use App\Constants\PictureExerciseFilesPath;
+use App\Enums\ExercisesResourcesTypes;
 use App\Enums\ExercisesTypes;
+use App\Http\Resources\AuditResource;
+use App\Http\Resources\CompilePhraseResource;
+use App\Http\Resources\DictionaryResource;
+use App\Http\Resources\PairExerciseResource;
+use App\Http\Resources\PictureExerciseResource;
+use App\Http\Resources\SentenceResource;
 use Illuminate\Support\Facades\DB;
 use App\Models\{PairExercise,
     PictureExercise,
@@ -90,19 +97,36 @@ final class ExerciseService implements ExerciseServiceContract {
             ->get();
     }
 
+    public function getAttachedExerciseType(string $type, int $id, int $count): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
+        $modelType = ExercisesResourcesTypes::inEnum(strtoupper($type));
+
+        $exerciseRelationshipName = $modelType::getExerciseRelationshipName($modelType);
+
+        $exercises = Exercise::where('account_id', $id)
+            ->whereNull('course_id')
+            ->whereNull('stage_id')
+            ->where('exercise_type', $modelType)
+            ->with($exerciseRelationshipName)
+            ->paginate($count);
+
+        $pluckedExercises = $exercises->pluck('exercise');
+
+        return $exercises->setCollection($pluckedExercises);
+    }
     /**
      * @param string $type
      * @param int $userId
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|bool
      */
-    public function getExercisesByType(string $type, int $userId): \Illuminate\Contracts\Pagination\LengthAwarePaginator|bool {
+    public function getExercisesByType(string $type, int $userId, int $count): \Illuminate\Contracts\Pagination\LengthAwarePaginator|bool {
         return match (ExercisesTypes::inEnum($type)) {
-            ExercisesTypes::DICTIONARY       => Dictionary::paginate(10),
-            ExercisesTypes::COMPILE_PHRASE   => CompilePhrase::paginate(10),
-            ExercisesTypes::AUDIT            => Audit::paginate(10),
-            ExercisesTypes::PAIR_EXERCISE    => PairExercise::paginate(10),
-            ExercisesTypes::PICTURE_EXERCISE => PictureExercise::paginate(10),
-            ExercisesTypes::SENTENCE         => Sentence::paginate(10),
+            ExercisesTypes::DICTIONARY       => Dictionary::paginate($count),
+            ExercisesTypes::COMPILE_PHRASE   => CompilePhrase::paginate($count),
+            ExercisesTypes::AUDIT            => Audit::paginate($count),
+            ExercisesTypes::PAIR_EXERCISE    => PairExercise::paginate($count),
+            ExercisesTypes::PICTURE_EXERCISE => PictureExercise::paginate($count),
+            ExercisesTypes::SENTENCE         => Sentence::paginate($count),
             default => false
         };
     }

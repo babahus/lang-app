@@ -42,7 +42,7 @@ class DataValidationRule implements Rule
 
     public function audit_validation($value)
     {
-        return is_file($value) && in_array($value->getClientOriginalExtension(), ['mp3', 'wav', 'flac', 'ogg']) && ($value->getSize() / 1024) <= 12048;
+        return is_file($value) && in_array($value->getClientOriginalExtension(), ['mp3', 'wav', 'flac', 'ogg']) && ($value->getSize() / (1024 * 1024)) <= 100;
     }
 
     public function compile_phrase_validation($value)
@@ -56,11 +56,15 @@ class DataValidationRule implements Rule
 
     public function picture_exercise_validation($value)
     {
-        return is_file($value) && in_array($value->getClientOriginalExtension(), ['jpg','jpeg','png']) && ($value->getSize() / 1024) <= 2048;
+        return is_file($value) && in_array($value->getClientOriginalExtension(), ['jpg','jpeg','png']) && ($value->getSize() / (1024 * 1024)) <= 100;
     }
 
     public function pair_exercise_validation($value)
     {
+        if (!is_array(json_decode($value))){
+            return false;
+        }
+
         $decodedValue = json_decode($value, true);
 
         if ($decodedValue === null || !is_array($decodedValue)) {

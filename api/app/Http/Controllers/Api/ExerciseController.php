@@ -54,7 +54,22 @@ final class ExerciseController extends Controller {
     public function index(): ApiResponse {
         $userExercises = $this->exerciseService->getAllExercises(auth()->id());
 
-        return new ApiResponse(ExerciseResource::collection($userExercises));
+        return new ApiResponse(ExerciseResource::collection($userExercises), Response::HTTP_OK);
+    }
+
+    public function getAttachedExerciseType(string $type, ?int $count = 5) : ApiResponse {
+        $attachedExercise = $this->exerciseService->getAttachedExerciseType($type, auth()->id(), $count);
+
+        $resourceCollection =  match (ExercisesTypes::inEnum($type)){
+            ExercisesTypes::DICTIONARY        => DictionaryResource::collection($attachedExercise),
+            ExercisesTypes::COMPILE_PHRASE    => new CompilePhraseResource($attachedExercise),
+            ExercisesTypes::AUDIT             => new AuditResource($attachedExercise),
+            ExercisesTypes::PAIR_EXERCISE     => new PairExerciseResource($attachedExercise),
+            ExercisesTypes::PICTURE_EXERCISE  => new PictureExerciseResource($attachedExercise),
+            ExercisesTypes::SENTENCE          => new SentenceResource($attachedExercise),
+        };
+
+        return new ApiResponse($resourceCollection);
     }
 
     /**
@@ -84,22 +99,24 @@ final class ExerciseController extends Controller {
      * @param string $type
      * @return ApiResponse
      */
-    public function getExercisesByType(string $type): ApiResponse {
-        $exercises = $this->exerciseService->getExercisesByType($type, auth()->id());
+    public function getExercisesByType(string $type, ?int $count = 5): ApiResponse {
+        $exercises = $this->exerciseService->getExercisesByType($type, auth()->id(), $count);
 
         if (!$exercises){
 
             return new ApiResponse('Can not find Exercises Type', Response::HTTP_BAD_REQUEST, false);
         }
 
-        return match (ExercisesTypes::inEnum($type)){
-            ExercisesTypes::DICTIONARY        => new ApiResponse(DictionaryResource::collection($exercises)),
-            ExercisesTypes::COMPILE_PHRASE    => new ApiResponse(CompilePhraseResource::collection($exercises)),
-            ExercisesTypes::AUDIT             => new ApiResponse(AuditResource::collection($exercises)),
-            ExercisesTypes::PAIR_EXERCISE     => new ApiResponse(PairExerciseResource::collection($exercises)),
-            ExercisesTypes::PICTURE_EXERCISE  => new ApiResponse(PictureExerciseResource::collection($exercises)),
-            ExercisesTypes::SENTENCE          => new ApiResponse(SentenceResource::collection($exercises)),
+        $resourceCollection =  match (ExercisesTypes::inEnum($type)){
+            ExercisesTypes::DICTIONARY        => DictionaryResource::collection($exercises),
+            ExercisesTypes::COMPILE_PHRASE    => new CompilePhraseResource($exercises),
+            ExercisesTypes::AUDIT             => new AuditResource($exercises),
+            ExercisesTypes::PAIR_EXERCISE     => new PairExerciseResource($exercises),
+            ExercisesTypes::PICTURE_EXERCISE  => new PictureExerciseResource($exercises),
+            ExercisesTypes::SENTENCE          => new SentenceResource($exercises),
         };
+
+        return new ApiResponse($resourceCollection);
     }
 
     /**

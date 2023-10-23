@@ -17,9 +17,23 @@ final class AuditResource extends JsonResource
     public function toArray($request)
     {
         return [
-          'id'     => $this->id,
-          'path'   => Storage::disk('public')->url($this->path),
-          'text'   => $this->transcription,
+            'data' => $this->getCollection()->transform(function ($audit) {
+                return [
+                    'id' => $audit->id,
+                    'path' => Storage::disk('public')->url($audit->path),
+                    'text'   => $audit->transcription,
+                ];
+            }),
+            'pagination' => [
+                'current_page' => $this->currentPage(),
+                'last_page'    => $this->lastPage(),
+                'per_page'     => $this->perPage(),
+                'next_page_url'=> $this->nextPageUrl(),
+                'prev_page_url'=> $this->previousPageUrl(),
+                'total'        => $this->total(),
+                'from'         => $this->firstItem(),
+                'to'           => $this->lastItem(),
+            ],
         ];
     }
 }

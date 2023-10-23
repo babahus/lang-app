@@ -12,7 +12,8 @@ use App\Models\User;
 interface ExerciseServiceContract
 {
     public function getAllExercises(int $userId);
-    public function getExercisesByType(string $type, int $userId);
+    public function getExercisesByType(string $type, int $userId, int $count);
+    public function getAttachedExerciseType(string $type, int $id, int $count);
     public function getExerciseByIdAndType(string $type, int $id ,int $userId);
 //    public function attach(MoveUserExerciseDTO $moveUserExerciseDTO, User $user);
     public function update(UpdateExerciseDTO $updateExerciseDTO, int $id);

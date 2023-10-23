@@ -23,4 +23,21 @@ enum ExercisesResourcesTypes : string
             default => false,
         };
     }
+
+    public static function getExerciseRelationshipName($type)
+    {
+        if ($type === self::COMPILE_PHRASE) {
+            return 'compilePhrase';
+        } elseif ($type === self::DICTIONARY) {
+            return 'dictionary';
+        } elseif ($type === self::AUDIT) {
+            return 'audit';
+        } elseif ($type === self::PAIR_EXERCISE) {
+            return 'pairExercise';
+        } elseif ($type === self::PICTURE_EXERCISE) {
+            return 'pictureExercise';
+        } elseif ($type === self::SENTENCE) {
+            return 'sentence';
+        };
+    }
 }

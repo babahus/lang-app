@@ -11,8 +11,22 @@ final class PairExerciseResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
-            'options' => $this->shuffleOptions($this->correct_pair_json),
+            'data' => $this->getCollection()->transform(function ($pair) {
+                return [
+                    'id' => $pair->id,
+                    'options' => $this->shuffleOptions($pair->correct_pair_json),
+                ];
+            }),
+            'pagination' => [
+                'current_page' => $this->currentPage(),
+                'last_page'    => $this->lastPage(),
+                'per_page'     => $this->perPage(),
+                'next_page_url'=> $this->nextPageUrl(),
+                'prev_page_url'=> $this->previousPageUrl(),
+                'total'        => $this->total(),
+                'from'         => $this->firstItem(),
+                'to'           => $this->lastItem(),
+            ],
         ];
     }
 
