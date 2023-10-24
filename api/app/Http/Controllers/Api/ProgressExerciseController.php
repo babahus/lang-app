@@ -7,6 +7,7 @@ use App\Http\Requests\ProgressExercise\DeleteProgressRequest;
 use App\Http\Resources\ProgressExerciseResource;
 use App\Http\Response\ApiResponse;
 use App\Models\Course;
+use App\Models\Stage;
 use App\Models\User;
 use App\Services\ProgressExerciseService;
 use Illuminate\Support\Facades\Response;
@@ -75,4 +76,17 @@ class ProgressExerciseController extends Controller
 
         return new ApiResponse($exerciseProgressCountArr);
     }
+
+    public function canCurrentUserProceedToNextStage(Stage $stage): ApiResponse
+    {
+        $user = auth()->user();
+        $canProceed = $this->progressExerciseService->canUserProceedToNextStage($user, $stage);
+
+        if (!$canProceed){
+          return new ApiResponse($canProceed, ResponseAlias::HTTP_BAD_REQUEST, false);
+        };
+
+        return new ApiResponse($canProceed);
+    }
+
 }

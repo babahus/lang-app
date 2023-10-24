@@ -156,4 +156,25 @@ class ProgressExerciseService implements ProgressExerciseServiceContract
             'countSolvedExercisesWithCourse' => $countSolvedExercisesWithCourse
         ];
     }
+
+    public function canUserProceedToNextStage(\Illuminate\Contracts\Auth\Authenticatable|User $user, Stage $stage) : bool
+    {
+        $previousStages = Stage::where('course_id', $stage->course_id)
+            ->where('created_at', '<', $stage->created_at)
+            ->get();
+
+        foreach ($previousStages as $stage) {
+            $exercises = $stage->exercises;
+
+            foreach ($exercises as $exercise) {
+                $progress = $exercise->progressExercises()->where('account_id', $user->id)->first();
+
+                if (!$progress || !$progress->solved) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 }

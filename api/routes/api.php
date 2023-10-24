@@ -42,6 +42,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     Route::get('/user/course/{course}/progress', [ProgressExerciseController::class, 'getCourseProgressForCurrentUser']);
+    Route::get('/user/stage/{stage}/can-proceed', [ProgressExerciseController::class, 'canCurrentUserProceedToNextStage']);
     Route::get('users/completed-exercises/{userId}', [ProgressExerciseController::class, 'getUserCompletedExercises']);
     Route::get('/user/{user}/count-exercises', [ProgressExerciseController::class, 'getCountProgressOfAllExercisesForUser']);
     Route::delete('exercises/users/delete-progress', [ProgressExerciseController::class, 'deleteUserProgress']);
