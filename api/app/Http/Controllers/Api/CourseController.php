@@ -10,6 +10,7 @@ use App\Http\Requests\Courses\CourseDeleteRequest;
 use App\Http\Requests\Courses\CourseUpdateRequest;
 use App\Http\Resources\CourseCollectionResource;
 use App\Http\Resources\CourseResource;
+use App\Http\Resources\Progress\CourseProgressResourse;
 use App\Http\Response\ApiResponse;
 use App\Models\Course;
 use App\Models\User;
@@ -45,6 +46,12 @@ class CourseController extends Controller {
         $courses = $user->courses()->paginate($count);
 
         return new ApiResponse(new CourseCollectionResource($courses));
+    }
+
+    public function getTeacherCourses(User $teacher, ?int $count = 5): ApiResponse {
+        $courses = $this->courseService->getTeacherCourses($teacher, $count);
+
+        return new ApiResponse(new CourseProgressResourse($courses));
     }
 
     /**

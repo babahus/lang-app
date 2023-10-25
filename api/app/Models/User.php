@@ -133,4 +133,9 @@ final class User extends Authenticatable implements MustVerifyEmail
             ->withPivot('added_at', 'purchased_at')
             ->withTimestamps();
     }
+
+    public function teacherCourses()
+    {
+        return $this->hasMany(Course::class, 'account_id');
+    }
 }

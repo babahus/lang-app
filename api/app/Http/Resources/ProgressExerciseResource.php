@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Enums\ExercisesResourcesTypes;
+use App\Http\Resources\Progress\UserProgressResource;
 use App\Models\Audit;
 use App\Models\CompilePhrase;
 use App\Models\PairExercise;
@@ -27,6 +28,7 @@ class ProgressExerciseResource extends JsonResource
             },
             'course_id' => $this->exercise->course_id ?? null,
             'solved' => $this->solved,
+            'user' => new UserProgressResource($this->user),
         ];
     }
 }

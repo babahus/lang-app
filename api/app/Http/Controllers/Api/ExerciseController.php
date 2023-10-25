@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\User;
 use Illuminate\Http\Response;
 use App\Enums\ExercisesTypes;
 use App\Http\Requests\{

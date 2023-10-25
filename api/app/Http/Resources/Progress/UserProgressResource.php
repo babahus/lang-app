@@ -1,23 +1,22 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Progress;
 
-use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-final class UserResource extends JsonResource
+class UserProgressResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
-     * @param  User  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request)
     {
         return [
             'id' => $this->id,
-            'name'  => $this->name,
+            'name' => $this->name,
             'email' => $this->email,
         ];
     }

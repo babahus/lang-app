@@ -114,6 +114,7 @@ final class ExerciseService implements ExerciseServiceContract {
 
         return $exercises->setCollection($pluckedExercises);
     }
+
     /**
      * @param string $type
      * @param int $userId

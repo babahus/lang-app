@@ -59,6 +59,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::apiResource('/course', CourseController::class);
     Route::get('/courses/user/{user}', [CourseController::class, 'getAttachedCoursesToUser']);
+    Route::get('/courses/teacher/{teacher}', [CourseController::class, 'getTeacherCourses']);
     Route::apiResource('/stage', StageController::class)->except('index');
     Route::get('/stages/{course_id}', [StageController::class, 'index']);
 

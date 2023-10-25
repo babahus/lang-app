@@ -8,6 +8,7 @@ use App\DataTransfers\Courses\CreateCourseDTO;
 use App\Models\Course;
 use App\Models\User;
 use App\Exceptions\Handler;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
 
 class CourseService implements CourseContract {
@@ -22,9 +23,39 @@ class CourseService implements CourseContract {
     }
 
     public function show(int $id): Course {
-
         return Course::findOrFail($id);
     }
+
+    public function getTeacherCourses(User $teacher, int $count): LengthAwarePaginator {
+        return $teacher->teacherCourses()->paginate($count);
+    }
+
+//    public function getProgressTeacherCourses(User $teacher)
+//    {
+//        return $teacher->teacherCourses()->paginate(5);
+////        $courses = $teacher->teacherCourses()->with('stages.exercises.progressExercises')->get();
+////
+////        $progressData = [];
+////
+////        foreach ($courses as $course) {
+////            foreach ($course->stages as $stage) {
+////                foreach ($stage->exercises as $exercise) {
+////                    $completedUsers = $exercise->progressExercises->pluck('user');
+////                    $completedExercisesCount = $completedUsers->count();
+////
+////                    $progressData[] = [
+////                        'course' => $course,
+////                        'stage' => $stage,
+////                        'exercise' => $exercise,
+////                        'completedExercises' => $completedExercisesCount,
+////                        'completedUsers' => $completedUsers,
+////                    ];
+////                }
+////            }
+////        }
+//
+//
+//    }
 
     public function update(CreateCourseDTO $createCourseDTO, int $id): ?Course {
         $course = Course::findOrFail($id);
