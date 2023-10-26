@@ -17,11 +17,12 @@ final class UserResponseResource extends JsonResource
     public function toArray($request)
     {
         return [
-          'id'    => $this->resource['user']->id,
-          'name'  => $this->resource['user']->name,
-          'email' => $this->resource['user']->email,
-          'token' => $this->resource['token'],
-          'role'  => Role::whereId(Cache::get('users_role_' . $this->resource['user']->id))->value('name') ?? 'User'
+          'id'         => $this->resource['user']->id,
+          'name'       => $this->resource['user']->name,
+          'email'      => $this->resource['user']->email,
+          'token'      => $this->resource['token'],
+          'expired_at' => $this->resource['expired_at'],
+          'role'       => Role::whereId(Cache::get('users_role_' . $this->resource['user']->id))->value('name') ?? 'User'
         ];
     }
 }
