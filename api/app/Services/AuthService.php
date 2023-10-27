@@ -15,18 +15,6 @@ use Illuminate\Auth\Events\Registered;
 final class AuthService implements AuthContract
 {
     /**
-     * @var DictionaryService
-     */
-    private DictionaryService $dictionaryService;
-
-    /**
-     * @param DictionaryService $dictionaryService
-     */
-    public function __construct(DictionaryService $dictionaryService){
-        $this->dictionaryService = $dictionaryService;
-    }
-
-    /**
      * @param RegisterDTO $registerDTO
      * @return User
      */
@@ -42,8 +30,6 @@ final class AuthService implements AuthContract
         ]);
 
         $user->roles()->attach($roleObj->id);
-
-        //creating an empty dictionary and attaching it to a user
 
         $tokenArr = $this->createToken($user);
         event(new UserAuthorized($user, $registerDTO->role, $tokenArr['token']));
