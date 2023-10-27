@@ -19,6 +19,7 @@ class PictureExercisePaginationResource extends JsonResource
             'data' => $this->getCollection()->transform(function ($picture) {
                 return [
                     'id' => $picture->id,
+                    'exercises_id' => $picture->exercise->id,
                     'path' => Storage::disk('public')->url($picture->image_path),
                     'options' => $this->shuffleOptions($picture->option_json),
                 ];

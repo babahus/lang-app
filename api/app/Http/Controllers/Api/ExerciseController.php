@@ -63,7 +63,7 @@ final class ExerciseController extends Controller {
         return new ApiResponse(ExerciseResource::collection($userExercises), Response::HTTP_OK);
     }
 
-    public function getAttachedExerciseType(string $type, ?int $count = 5) : ApiResponse {
+    public function getAttachedExerciseType(string $type, ?int $count = 100) : ApiResponse {
         $attachedExercise = $this->exerciseService->getAttachedExerciseType($type, auth()->id(), $count);
 
         $resourceCollection =  match (ExercisesTypes::inEnum($type)){

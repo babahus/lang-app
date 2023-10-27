@@ -27,7 +27,17 @@ class SentenceRule implements Rule
     {
         $decodedValue = json_decode($value);
 
-        return json_last_error() === JSON_ERROR_NONE && is_array($decodedValue);
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($decodedValue)) {
+            return false;
+        }
+
+        foreach ($decodedValue as $item) {
+            if (!is_string($item) || mb_strlen($item, 'utf-8') > 255) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -37,6 +47,6 @@ class SentenceRule implements Rule
      */
     public function message()
     {
-        return 'The :attribute field must be a valid JSON array.';
+        return 'The :attribute field must be a mandatory string and each value must not exceed 255 characters.';
     }
 }

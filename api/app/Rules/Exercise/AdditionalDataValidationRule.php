@@ -4,6 +4,7 @@ namespace App\Rules\Exercise;
 
 use App\Enums\ExercisesTypes;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 class AdditionalDataValidationRule implements Rule
 {
@@ -39,27 +40,30 @@ class AdditionalDataValidationRule implements Rule
 
     public function audit_validation($value)
     {
-        if (is_array(json_decode($value))){
-            return false;
-        }
+        $validator = Validator::make(['value' => $value], [
+            'value' => 'string|max:255',
+        ]);
 
-        return is_string($value);
+        return !$validator->fails();
     }
 
     public function sentence_validation($value)
     {
-        if (!is_array(json_decode($value))){
-            return false;
-        }
-
         $decodedValue = json_decode($value, true);
 
-        if ($decodedValue === null || json_last_error() !== JSON_ERROR_NONE) {
+        if (!is_array($decodedValue)) {
             return false;
         }
 
-        return !in_array('', $decodedValue, true);
+        foreach ($decodedValue as $sentence) {
+            if (!is_string($sentence) || mb_strlen($sentence, 'utf-8') > 255) {
+                return false;
+            }
+        }
+
+        return true;
     }
+
 
     public function picture_exercise_validation($value)
     {
@@ -71,7 +75,11 @@ class AdditionalDataValidationRule implements Rule
 
         $hasCorrectAnswer = false;
 
-        foreach ($decodedOptions as $option) {
+        $validationRules = [];
+
+        foreach ($decodedOptions as $index => $option) {
+            $validationRules["options.$index.text"] = 'string|max:255';
+
             if (!is_array($option) || !isset($option['text']) || !isset($option['is_correct'])) {
                 return false;
             }
@@ -98,7 +106,9 @@ class AdditionalDataValidationRule implements Rule
             return false;
         }
 
-        return true;
+        $validator = Validator::make(['options' => $decodedOptions], $validationRules);
+
+        return !$validator->fails();
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Rules\Exercise;
 
 use App\Enums\ExercisesTypes;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 class DataValidationRule implements Rule
 {
@@ -47,11 +48,11 @@ class DataValidationRule implements Rule
 
     public function compile_phrase_validation($value)
     {
-        if (is_array(json_decode($value))){
-            return false;
-        }
+        $validator = Validator::make(['value' => $value], [
+            'value' => 'string|max:255',
+        ]);
 
-        return is_string($value);
+        return !$validator->fails();
     }
 
     public function picture_exercise_validation($value)
@@ -61,7 +62,7 @@ class DataValidationRule implements Rule
 
     public function pair_exercise_validation($value)
     {
-        if (!is_array(json_decode($value))){
+        if (!is_array(json_decode($value))) {
             return false;
         }
 
@@ -72,7 +73,6 @@ class DataValidationRule implements Rule
         }
 
         foreach ($decodedValue as $item) {
-
             if (!is_array($item) || !isset($item['word']) || !isset($item['translation'])) {
                 return false;
             }
@@ -81,16 +81,22 @@ class DataValidationRule implements Rule
             }
         }
 
-        return true;
+        $validator = Validator::make($decodedValue, [
+            '*.word' => 'string|min:1|max:255',
+            '*.translation' => 'string|min:1|max:255',
+        ]);
+
+        return !$validator->fails();
     }
+
 
     public function sentence_validation($value)
     {
-        if (is_array(json_decode($value))){
-            return false;
-        }
+        $validator = Validator::make(['value' => $value], [
+            'value' => 'string|max:255',
+        ]);
 
-        return is_string($value);
+        return !$validator->fails();
     }
 
     /**

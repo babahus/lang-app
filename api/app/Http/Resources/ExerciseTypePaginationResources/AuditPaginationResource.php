@@ -19,6 +19,7 @@ class AuditPaginationResource extends JsonResource
             'data' => $this->getCollection()->transform(function ($audit) {
                 return [
                     'id' => $audit->id,
+                    'exercises_id' => $audit->exercise->id,
                     'path' => Storage::disk('public')->url($audit->path),
                     'text'   => $audit->transcription,
                 ];

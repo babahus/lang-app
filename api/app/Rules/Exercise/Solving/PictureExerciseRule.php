@@ -3,6 +3,7 @@
 namespace App\Rules\Exercise\Solving;
 
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 class PictureExerciseRule implements Rule
 {
@@ -25,13 +26,11 @@ class PictureExerciseRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $data = json_decode($value);
+        $validator = Validator::make(['value' => $value], [
+            'value' => 'string|max:255',
+        ]);
 
-        if (is_array($data)){
-            return false;
-        }
-
-        return is_string($value);
+        return !$validator->fails();
     }
 
     /**
@@ -41,6 +40,6 @@ class PictureExerciseRule implements Rule
      */
     public function message()
     {
-        return 'The :attribute field must be a required string.';
+        return 'The :attribute field must be a mandatory string and must not exceed 255 characters.';
     }
 }

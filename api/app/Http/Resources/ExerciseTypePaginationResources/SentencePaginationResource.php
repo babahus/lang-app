@@ -14,10 +14,13 @@ class SentencePaginationResource extends JsonResource
      */
     public function toArray($request)
     {
+
         return [
             'data' => $this->getCollection()->transform(function ($sentence) {
+
                 return [
                     'id' => $sentence->id,
+                    'exercises_id' => $sentence->exercise->id,
                     'sentence_with_gaps' => $sentence->sentence_with_gaps,
                     'correct_answers_json' => json_decode($sentence->correct_answers_json, true),
                     'created_at' => $sentence->created_at,
