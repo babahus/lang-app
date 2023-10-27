@@ -351,10 +351,8 @@ final class ExerciseService implements ExerciseServiceContract {
             return 'You are not subscribed to this course';
         }
 
-        if (!$exercise->course_id && !$user->exercises->where('id', $exercise->id)
-                ->where('exercise_id', $exercise->exercise_id)
-                ->whereNull('course_id')->count() > 0) {
-            return 'You are not assigned an off-course exercise';
+        if (!$exercise->course_id && $exercise->account_id != $user->id) {
+            return 'You do not have access to this exercise';
         }
 
 
