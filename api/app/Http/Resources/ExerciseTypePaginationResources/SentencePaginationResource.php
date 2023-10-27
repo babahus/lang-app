@@ -17,10 +17,9 @@ class SentencePaginationResource extends JsonResource
 
         return [
             'data' => $this->getCollection()->transform(function ($sentence) {
-
                 return [
                     'id' => $sentence->id,
-                    'exercises_id' => $sentence->exercise->id,
+                    'exercises_id' => $sentence->exercise ? $sentence->exercise->id : null,
                     'sentence_with_gaps' => $sentence->sentence_with_gaps,
                     'correct_answers_json' => json_decode($sentence->correct_answers_json, true),
                     'created_at' => $sentence->created_at,

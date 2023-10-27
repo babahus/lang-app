@@ -18,7 +18,7 @@ class CompilePhrasePaginationResource extends JsonResource
             'data' => $this->getCollection()->transform(function ($compilePhrase) {
                 return [
                     'id' => $compilePhrase->id,
-                    'exercises_id' => $compilePhrase->exercise->id,
+                    'exercises_id' => $compilePhrase->exercise ? $compilePhrase->exercise->id : null,
                     'phrase' => $compilePhrase->phrase,
                 ];
             }),

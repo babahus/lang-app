@@ -19,7 +19,7 @@ class PairExercisePaginationResource extends JsonResource
             'data' => $this->getCollection()->transform(function ($pair) {
                 return [
                     'id' => $pair->id,
-                    'exercises_id' => $pair->exercise->id,
+                    'exercises_id' => $pair->exercise ? $pair->exercise->id : null,
                     'options' => $this->shuffleOptions($pair->correct_pair_json),
                 ];
             }),
