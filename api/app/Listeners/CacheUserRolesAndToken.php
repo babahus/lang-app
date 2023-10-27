@@ -30,7 +30,7 @@ class CacheUserRolesAndToken
 
         $user = $event->user;
         $roleName = $event->roleName;
-
+        \Log::debug($roleName);
         $dataUserRole = [
             'role_id' => $user->roles->where('name', $roleName)->first()->id,
             'user_id' => $user->id

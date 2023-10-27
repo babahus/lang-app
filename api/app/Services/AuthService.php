@@ -2,33 +2,18 @@
 namespace App\Services;
 
 use App\Events\UserAuthorized;
+use Date;
 use App\Models\{Role, User, Dictionary};
 use App\DataTransfers\{
     LoginDTO,
     RegisterDTO,
 };
-use Illuminate\Support\{
-    Str,
-    Facades\Auth,
-    Facades\Hash,
-};
+use Illuminate\Support\{Facades\Config, Str, Facades\Auth, Facades\Hash};
 use App\Contracts\AuthContract;
 use Illuminate\Auth\Events\Registered;
 
 final class AuthService implements AuthContract
 {
-    /**
-     * @var DictionaryService
-     */
-    private DictionaryService $dictionaryService;
-
-    /**
-     * @param DictionaryService $dictionaryService
-     */
-    public function __construct(DictionaryService $dictionaryService){
-        $this->dictionaryService = $dictionaryService;
-    }
-
     /**
      * @param RegisterDTO $registerDTO
      * @return User
@@ -46,12 +31,10 @@ final class AuthService implements AuthContract
 
         $user->roles()->attach($roleObj->id);
 
-        //creating an empty dictionary and attaching it to a user
+        $tokenArr = $this->createToken($user);
+        event(new UserAuthorized($user, $registerDTO->role, $tokenArr['token']));
 
-        $token = $this->createToken($user);
-        event(new UserAuthorized($user, $registerDTO->role, $token));
-
-        return ['user' => $user, 'token' => $token];
+        return ['user' => $user, 'token' => $tokenArr['token'], 'expired_at' => $tokenArr['expired_at']];
     }
 
     /**
@@ -69,11 +52,11 @@ final class AuthService implements AuthContract
         }
 
         $user = Auth::user();
-        $token = $this->createToken($user);
+        $tokenArr = $this->createToken($user);
 
-        event(new UserAuthorized(Auth::user(), $loginDTO->role, $token));
+        event(new UserAuthorized(Auth::user(), $loginDTO->role, $tokenArr['token']));
 
-        return ['user' => $user, 'token' => $token];
+        return ['user' => $user, 'token' => $tokenArr['token'], 'expired_at' => $tokenArr['expired_at']];
     }
 
     /**
@@ -96,11 +79,11 @@ final class AuthService implements AuthContract
             $authUser->email_verified_at = now();
             $authUser->save();
 
-            $token = $this->createToken($authUser);
+            $tokenArr = $this->createToken($authUser);
 
-            event(new UserAuthorized($authUser, $objRole->name, $token));
+            event(new UserAuthorized($authUser, $objRole->name, $tokenArr['token']));
 
-            return ['user' => $authUser, 'token' => $token];
+            return ['user' => $authUser, 'token' => $tokenArr['token'], 'expired_at' => $tokenArr['expired_at']];
         }
 
         return $this->createNewUser($user, $objRole);
@@ -119,14 +102,21 @@ final class AuthService implements AuthContract
 
         $newUser->roles()->attach($objRole->id);
 
-        $token = $this->createToken($newUser);
-        event(new UserAuthorized($newUser, $objRole->name, $token));
+        $tokenArr = $this->createToken($newUser);
+        event(new UserAuthorized($newUser, $objRole->name, $tokenArr['token']));
 
-        return ['user' => $newUser, 'token' => $token];
+        return ['user' => $newUser, 'token' => $tokenArr['token'], 'expired_at' => $tokenArr['expired_at']];
     }
 
-    public function createToken(User $user)
+    public function createToken(User $user): array
     {
-        return $user->createToken('authToken')->plainTextToken;
+        $tokenResult = $user->createToken('authToken');
+        $expirationMinutes = Config::get('sanctum.expiration');
+        $expiredAt = Date::now()->addMinutes($expirationMinutes);
+
+        return [
+            'token'      => $tokenResult->plainTextToken,
+            'expired_at' => $expiredAt->toDateTimeString(),
+        ];
     }
 }
