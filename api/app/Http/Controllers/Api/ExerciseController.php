@@ -63,7 +63,7 @@ final class ExerciseController extends Controller {
         return new ApiResponse(ExerciseResource::collection($userExercises), Response::HTTP_OK);
     }
 
-    public function getAttachedExerciseType(string $type, ?int $count = 100) : ApiResponse {
+    public function getAttachedExerciseType(string $type, ?int $count = 10) : ApiResponse {
         $attachedExercise = $this->exerciseService->getAttachedExerciseType($type, auth()->id(), $count);
 
         $resourceCollection =  match (ExercisesTypes::inEnum($type)){
@@ -180,8 +180,10 @@ final class ExerciseController extends Controller {
      */
     public function attachExerciseToStageCourses(MoveUserExerciseRequest $request): ApiResponse {
 
-        if ($this->exerciseService->attachExerciseToStageCourse($request->getDTO())) {
-            return new ApiResponse('Successful attached exercise');
+        $attachedExerciseId = $this->exerciseService->attachExerciseToStageCourse($request->getDTO());
+
+        if ($attachedExerciseId) {
+            return new ApiResponse($attachedExerciseId);
         }
 
         return new ApiResponse('Something went wrong', ResponseAlias::HTTP_BAD_REQUEST, false);
