@@ -430,11 +430,9 @@ final class ExerciseService implements ExerciseServiceContract {
 
     /**
      * @param MoveUserExerciseDTO $moveUserExerciseDTO
-     * @param int $stageId
-     * @param int $courseId
-     * @return bool
+     * @return int|bool
      */
-    public function attachExerciseToStageCourse(MoveUserExerciseDTO $moveUserExerciseDTO): bool {
+    public function attachExerciseToStageCourse(MoveUserExerciseDTO $moveUserExerciseDTO): int|bool {
 
         $typeClass = $this->getClassType($moveUserExerciseDTO->type);
 
@@ -448,7 +446,7 @@ final class ExerciseService implements ExerciseServiceContract {
             return false;
         }
 
-        Exercise::create([
+        $exercise = Exercise::create([
             'exercise_id' => $moveUserExerciseDTO->id,
             'account_id' => $moveUserExerciseDTO->account_id,
             'exercise_type' => $typeClass,
@@ -456,7 +454,7 @@ final class ExerciseService implements ExerciseServiceContract {
             'course_id' => $moveUserExerciseDTO->course_id,
         ]);
 
-        return true;
+        return $exercise->id;
     }
 
 

@@ -96,8 +96,21 @@ class DataValidationRule implements Rule
             'value' => 'string|max:255',
         ]);
 
-        return !$validator->fails();
+        if ($validator->fails()) {
+            return false;
+        }
+
+        $words = json_decode(request()->input('additional_data', []));
+
+        foreach ($words as $word) {
+            if (!str_contains($value, $word)) {
+                return false;
+            }
+        }
+
+        return true;
     }
+
 
     /**
      * Get the validation error message.
