@@ -2,10 +2,22 @@
 
 namespace Database\Seeders;
 
+use App\Enums\ExercisesTypes;
 use App\Models\CompilePhrase;
+use App\Models\Course;
+use App\Models\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use App\Models\Exercise;
+use App\Models\User;
+use App\Models\Stage;
+use App\Models\Dictionary;
+use App\Models\Audit;
+use App\Models\PairExercise;
+use App\Models\PictureExercise;
+use App\Models\Sentence;
+use Faker\Factory as Faker;
 
 class ExerciseSeeder extends Seeder
 {
@@ -16,23 +28,24 @@ class ExerciseSeeder extends Seeder
      */
     public function run()
     {
-        Schema::disableForeignKeyConstraints();
-        DB::table('compile_phrases')->truncate();
-        DB::table('user_exercise_type')->truncate();
-        Schema::enableForeignKeyConstraints();
+        \App\Models\Sentence::factory(10)->create();
+        \App\Models\CompilePhrase::factory(10)->create();
+        \App\Models\PictureExercise::factory(10)->create();
+        \App\Models\PairExercise::factory(10)->create();
+        \App\Models\Audit::factory(10)->create();
 
-       $phrases = [
-           ['phrase' => 'Test phrase number 1'],
-           ['phrase' => 'Test phrase number 2'],
-           ['phrase' => 'Does Samuel L. Jackson like anime?'],
-           ['phrase' => 'How did you pass the exam?'],
-       ];
+        $teacher = User::factory()->create();
+        auth()->login($teacher);
+        $teacher->roles()->attach(Role::where('name', 'Teacher')->first());
 
+        $courses = Course::factory()->count(3)->create(['account_id' => $teacher->id]);
 
-       foreach ($phrases as $phrase)
-       {
-           CompilePhrase::create($phrase);
-       }
+        foreach ($courses as $course) {
 
+            $stages = Stage::factory()->count(3)->create(['course_id' => $course->id]);
+
+            $course->stages()->saveMany($stages);
+        }
     }
+
 }

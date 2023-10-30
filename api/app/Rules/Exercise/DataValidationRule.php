@@ -49,12 +49,11 @@ class DataValidationRule implements Rule
     public function compile_phrase_validation($value)
     {
         $validator = Validator::make(['value' => $value], [
-            'value' => 'string|max:255',
+            'value' => ['string', 'max:255', 'regex:/\b\w+\b.*\b\w+\b/'],
         ]);
 
         return !$validator->fails();
     }
-
     public function picture_exercise_validation($value)
     {
         return is_file($value) && in_array($value->getClientOriginalExtension(), ['jpg','jpeg','png']) && ($value->getSize() / (1024 * 1024)) <= 100;

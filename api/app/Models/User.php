@@ -66,6 +66,7 @@ final class User extends Authenticatable implements MustVerifyEmail
      */
     protected $table = 'users';
 
+
     protected $fillable = [
         'name',
         'email',
