@@ -27,7 +27,7 @@ class ExerciseObserver
         ChangeLog::create([
             'model_name' => Exercise::class,
             'record_id' => $exercise->id,
-            'user_id' => auth()->user()->id,
+            'user_id' => auth()->user()->id ?? 1,
             'old_values' => json_encode($oldValues),
             'new_values' => json_encode($newValues),
             'operation' => $operation,

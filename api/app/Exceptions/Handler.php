@@ -71,9 +71,9 @@ class Handler extends ExceptionHandler
      */
     protected function handleNotFoundException(NotFoundHttpException $e, $request)
     {
-        if ($request->expectsJson()) {
-            return ApiResponse::error('The resource was not found', 404);
-        }
+//        if ($request->expectsJson()) {
+//            return ApiResponse::error('The resource was not found', 404);
+//        }
 
         return parent::render($request, $e);
     }
