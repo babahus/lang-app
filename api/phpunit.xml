@@ -9,10 +9,13 @@
 <!--            <directory suffix="Test.php">./tests/Unit</directory>-->
 <!--        </testsuite>-->
         <testsuite name="Feature">
-            <directory suffix="TestRegisterUserWithRole.php">./tests/Feature</directory>
+            <directory suffix="TestRegisterUserWithRole.php">./tests/Feature/Auth</directory>
         </testsuite>
         <testsuite name="Feature">
-            <directory suffix="TestLoginUserWithRole.php">./tests/Feature</directory>
+            <directory suffix="TestLoginUserWithRole.php">./tests/Feature/Auth</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory suffix="TestSendResetLinkEmail.php">./tests/Feature/Auth</directory>
         </testsuite>
     </testsuites>
     <coverage processUncoveredFiles="true">
