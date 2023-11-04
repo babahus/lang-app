@@ -9,7 +9,7 @@ services:
       MYSQL_DATABASE: 'lang_app'
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     volumes:
-      - ${VOLUME_PATH}:/var/lib/mysql
+      - /var/lib/mysql:/var/lib/mysql
       - ./docker/mysql/init.sql:/data/application/init.sql
     ports:
       - ${DB_HOST_PORT}:3306
@@ -53,5 +53,3 @@ services:
 networks:
   lang_app_network:
     driver: bridge
-volumes:
-  ${VOLUME_PATH}:

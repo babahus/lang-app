@@ -30,7 +30,7 @@ class CourseObserver
         ChangeLog::create([
             'model_name' => Course::class,
             'record_id' => $course->id,
-            'user_id' => auth()->user()->id,
+            'user_id' => auth()->user()->id ?? 0, // it's means that test user created this course
             'old_values' => json_encode($oldValues),
             'new_values' => json_encode($newValues),
             'operation' => $operation,
